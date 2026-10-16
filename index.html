@@ -599,13 +599,60 @@
     footer { background: #3d0610; color: #d49aa3; text-align: center; padding: 20px 16px; font-size: .85rem; }
 
     /* Clickable champions + photo popup */
-    dialog { border: 0; border-radius: 12px; padding: 0; max-width: min(900px, calc(100vw - 32px)); width: 100%; background: var(--surface); box-shadow: 0 20px 60px rgba(0,0,0,.4); }
-    dialog::backdrop { background: rgba(20, 5, 8, .75); }
-    dialog .pop-head { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 12px 16px; background: var(--brand); color: #fff; }
-    dialog .pop-head h3 { font-size: 1.1rem; }
-    dialog .close { background: none; border: 0; color: #fff; font-size: 1.8rem; line-height: 1; cursor: pointer; }
-    dialog img { display: block; width: 100%; max-height: 75vh; object-fit: contain; background: #111; }
-    dialog .missing { padding: 48px 16px; text-align: center; color: var(--muted); }
+    /* Full-screen photo viewer */
+    .viewer {
+      width: 100%; height: 100%; max-width: none; max-height: none; margin: 0; padding: 0; border: 0;
+      background: rgba(10, 4, 6, .99); color: #fff;
+      display: none; flex-direction: column;
+    }
+    .viewer[open] { display: flex; animation: v-in .2s ease; }
+    .viewer::backdrop { background: transparent; }
+    @keyframes v-in { from { opacity: 0; } to { opacity: 1; } }
+    .v-top {
+      display: flex; align-items: center; gap: 12px;
+      padding: max(12px, env(safe-area-inset-top)) 16px 12px;
+      background: linear-gradient(to bottom, rgba(0,0,0,.6), transparent);
+    }
+    .v-cap { flex: 1; display: flex; align-items: center; gap: 12px; min-width: 0; }
+    .v-logo { flex-shrink: 0; width: 44px; height: 44px; border-radius: 50%; background: #fff; border: 2px solid var(--gold); overflow: hidden; }
+    .v-logo[hidden] { display: none; }
+    .v-logo img { width: 100%; height: 100%; object-fit: contain; padding: 2px; display: block; }
+    .v-text { min-width: 0; }
+    .v-sub { display: block; color: var(--gold); font-size: .75rem; font-weight: 600; letter-spacing: .1em; text-transform: uppercase; }
+    .v-title { font-size: 1.15rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .v-count { flex-shrink: 0; padding: 4px 10px; border-radius: 99px; background: rgba(255,255,255,.12); font-size: .8rem; font-weight: 600; }
+    .v-btn {
+      display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+      width: 44px; height: 44px; border-radius: 50%; border: 0; cursor: pointer;
+      background: rgba(255,255,255,.12); color: #fff; transition: background .15s ease, transform .15s ease;
+    }
+    .v-btn[hidden], .v-strip[hidden] { display: none; }
+    .v-btn:hover { background: rgba(255,255,255,.24); }
+    .v-btn:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
+    .v-btn svg { width: 22px; height: 22px; }
+    .v-stage { position: relative; flex: 1; min-height: 0; display: flex; align-items: center; justify-content: center; padding: 0 72px; touch-action: pan-y pinch-zoom; }
+    .v-stage img { max-width: 100%; max-height: 100%; object-fit: contain; border-radius: 8px; box-shadow: 0 20px 60px rgba(0,0,0,.6); user-select: none; -webkit-user-drag: none; transition: opacity .2s ease, transform .25s ease; }
+    .v-stage img.v-fade { opacity: 0; transform: scale(.97); }
+    .v-nav { position: absolute; top: 50%; transform: translateY(-50%); z-index: 2; width: 52px; height: 52px; }
+    .v-nav:hover { transform: translateY(-50%) scale(1.08); }
+    .v-prev { left: 12px; }
+    .v-next { right: 12px; }
+    .v-missing { color: rgba(255,255,255,.7); text-align: center; padding: 24px; }
+    .v-missing[hidden] { display: none; }
+    /* Thumbnails along the bottom */
+    .v-strip { display: flex; justify-content: center; gap: 10px; padding: 14px 16px max(16px, env(safe-area-inset-bottom)); overflow-x: auto; }
+    .v-thumb { flex-shrink: 0; width: 56px; height: 56px; padding: 0; border-radius: 50%; overflow: hidden; cursor: pointer; border: 2px solid transparent; background: #222; opacity: .55; transition: opacity .15s ease, border-color .15s ease, transform .15s ease; }
+    .v-thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .v-thumb:hover { opacity: .85; }
+    .v-thumb.active { opacity: 1; border-color: var(--gold); transform: scale(1.08); }
+    @media (max-width: 720px) {
+      .v-stage { padding: 0 8px; }
+      .v-nav { width: 40px; height: 40px; background: rgba(0,0,0,.45); }
+      .v-prev { left: 6px; }
+      .v-next { right: 6px; }
+      .v-thumb { width: 46px; height: 46px; }
+      .v-strip { justify-content: flex-start; }
+    }
 
     @media (max-width: 720px) {
       nav ul { display: none; }
@@ -631,6 +678,7 @@
       .player-fields { grid-template-columns: 1fr 70px; }
       .p-id { grid-column: 1 / -1; padding-block: 6px; }
       .winners { --ph: 128px; grid-template-columns: 1fr 1fr; gap: 32px 12px; }
+      .winners .champ-link:last-child:nth-child(odd) { grid-column: 1 / -1; }
       .w-year { font-size: 1.2rem; bottom: 10px; }
       .w-team { font-size: .95rem; }
       .w-logo { width: 42px; height: 42px; top: calc(var(--ph) - 42px); left: calc(50% + var(--ph) / 2 - 40px); }
@@ -1020,13 +1068,32 @@
     &copy; <span id="yr"></span> Young Players SC &middot; YP Veterans Futsal
   </footer>
 
-  <dialog id="photo-pop">
-    <div class="pop-head">
-      <h3 id="pop-title"></h3>
-      <button class="close" aria-label="Close">&times;</button>
+  <!-- Full-screen photo viewer: swipe, arrows or keyboard to move between photos -->
+  <dialog id="photo-pop" class="viewer" aria-label="Photo viewer">
+    <div class="v-top">
+      <div class="v-cap">
+        <span class="v-logo" id="v-logo" hidden><img alt=""></span>
+        <div class="v-text">
+          <span class="v-sub" id="v-sub"></span>
+          <h3 class="v-title" id="pop-title"></h3>
+        </div>
+      </div>
+      <span class="v-count" id="v-count" dir="ltr"></span>
+      <button class="v-btn v-close" aria-label="Close">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>
+      </button>
     </div>
-    <img id="pop-img" alt="">
-    <p class="missing" id="pop-missing" hidden></p>
+    <div class="v-stage" id="v-stage">
+      <button class="v-btn v-nav v-prev" aria-label="Previous photo">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
+      </button>
+      <img id="pop-img" alt="">
+      <p class="v-missing" id="pop-missing" hidden></p>
+      <button class="v-btn v-nav v-next" aria-label="Next photo">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>
+      </button>
+    </div>
+    <div class="v-strip" id="v-strip"></div>
   </dialog>
 
   <script>
@@ -1215,34 +1282,101 @@
 
     document.getElementById("lang-btn").addEventListener("click", () => setLang(lang === "dv" ? "en" : "dv"));
 
+    // ---------- Photo viewer ----------
     const pop = document.getElementById("photo-pop");
     const popImg = document.getElementById("pop-img");
     const popMissing = document.getElementById("pop-missing");
+    const vStrip = document.getElementById("v-strip");
+    let vItems = [];   // the buttons in the group that was opened (champions posters, or past winners)
+    let vIndex = 0;
 
-    document.querySelectorAll(".champ-link, .poster").forEach(btn => {
-      btn.addEventListener("click", () => {
-        const title = btn.classList.contains("poster")
-          ? (lang === "dv"
-              ? btn.querySelector(".poster-tag").textContent.replace(/^\S+\s/, "") + ": " + btn.querySelector(".poster-name").textContent
-              : btn.dataset.title)
-          : t("popChampions", btn.dataset.year) + ": " + btn.querySelector(".w-team").textContent;
-        document.getElementById("pop-title").textContent = title;
-        popImg.hidden = false;
-        popMissing.hidden = true;
-        popImg.alt = title;
-        popImg.onerror = () => {
-          popImg.hidden = true;
-          popMissing.hidden = false;
-          popMissing.textContent = t("photoSoon") + " (" + btn.dataset.photo + ")";
+    // What the viewer shows for one card
+    function viewerInfo(btn) {
+      if (btn.classList.contains("poster")) {
+        return {
+          sub: btn.querySelector(".poster-tag").textContent.replace(/^\S+\s/, ""),
+          title: btn.querySelector(".poster-name").textContent,
+          logo: null
         };
-        popImg.src = btn.dataset.photo;
-        pop.showModal();
-      });
-    });
+      }
+      const logo = btn.querySelector(".w-logo img");
+      return {
+        sub: t("popChampions", btn.dataset.year),
+        title: btn.querySelector(".w-team").textContent,
+        logo: logo ? logo.getAttribute("src") : null
+      };
+    }
 
-    pop.querySelector(".close").addEventListener("click", () => pop.close());
-    // Close when clicking outside the photo
-    pop.addEventListener("click", e => { if (e.target === pop) pop.close(); });
+    function showPhoto(i) {
+      vIndex = (i + vItems.length) % vItems.length;
+      const btn = vItems[vIndex];
+      const info = viewerInfo(btn);
+      document.getElementById("v-sub").textContent = info.sub;
+      document.getElementById("pop-title").textContent = info.title;
+      const logo = document.getElementById("v-logo");
+      logo.hidden = !info.logo;
+      if (info.logo) logo.querySelector("img").src = info.logo;
+      document.getElementById("v-count").textContent = (vIndex + 1) + " / " + vItems.length;
+      pop.querySelectorAll(".v-nav").forEach(b => b.hidden = vItems.length < 2);
+      vStrip.querySelectorAll(".v-thumb").forEach((th, n) => th.classList.toggle("active", n === vIndex));
+      const active = vStrip.querySelector(".v-thumb.active");
+      if (active) active.scrollIntoView({ inline: "center", block: "nearest" });
+
+      popMissing.hidden = true;
+      popImg.hidden = false;
+      popImg.classList.add("v-fade");
+      popImg.alt = info.sub + ": " + info.title;
+      popImg.onload = () => popImg.classList.remove("v-fade");
+      popImg.onerror = () => {
+        popImg.hidden = true;
+        popMissing.hidden = false;
+        popMissing.textContent = t("photoSoon");
+      };
+      popImg.src = btn.dataset.photo;
+    }
+
+    function openViewer(btn) {
+      const group = btn.classList.contains("poster") ? ".poster" : ".champ-link";
+      vItems = [...document.querySelectorAll(group)];
+      vStrip.innerHTML = "";
+      vItems.forEach((b, n) => {
+        const th = document.createElement("button");
+        th.className = "v-thumb";
+        th.setAttribute("aria-label", viewerInfo(b).title);
+        th.innerHTML = '<img alt="" src="' + b.dataset.photo + '">';
+        th.addEventListener("click", () => showPhoto(n));
+        vStrip.appendChild(th);
+      });
+      vStrip.hidden = vItems.length < 2;
+      pop.showModal();
+      document.body.style.overflow = "hidden";
+      showPhoto(vItems.indexOf(btn));
+    }
+
+    document.querySelectorAll(".champ-link, .poster").forEach(btn =>
+      btn.addEventListener("click", () => openViewer(btn)));
+
+    pop.querySelector(".v-close").addEventListener("click", () => pop.close());
+    pop.querySelector(".v-prev").addEventListener("click", () => showPhoto(vIndex - 1));
+    pop.querySelector(".v-next").addEventListener("click", () => showPhoto(vIndex + 1));
+    pop.addEventListener("close", () => document.body.style.overflow = "");
+    // Tap the dark area around the photo to close
+    document.getElementById("v-stage").addEventListener("click", e => { if (e.target.id === "v-stage") pop.close(); });
+    // Arrow keys move between photos (Esc closes)
+    pop.addEventListener("keydown", e => {
+      if (e.key === "ArrowLeft") showPhoto(vIndex - 1);
+      if (e.key === "ArrowRight") showPhoto(vIndex + 1);
+    });
+    // Swipe left / right on phones
+    let touchX = null;
+    const stage = document.getElementById("v-stage");
+    stage.addEventListener("touchstart", e => { touchX = e.touches.length === 1 ? e.touches[0].clientX : null; }, { passive: true });
+    stage.addEventListener("touchend", e => {
+      if (touchX === null) return;
+      const dx = e.changedTouches[0].clientX - touchX;
+      if (Math.abs(dx) > 50) showPhoto(vIndex + (dx < 0 ? 1 : -1));
+      touchX = null;
+    });
 
     // Team registration settings come from config.js
     const CONFIG = window.YP_CONFIG || {};
