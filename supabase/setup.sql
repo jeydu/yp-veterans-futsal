@@ -32,6 +32,28 @@ as $$
 $$;
 
 
+-- 1b. Settings: organisers open or close registration ------------------------
+-- One row only. The website reads it; only organisers can change it.
+
+create table if not exists public.settings (
+  id                 int primary key default 1 check (id = 1),
+  registration_open  boolean not null default true,
+  closed_message     text check (char_length(closed_message) <= 500),
+  updated_at         timestamptz not null default now()
+);
+
+insert into public.settings (id) values (1) on conflict do nothing;
+
+-- True while registration is open (used by the security rules below)
+create or replace function public.registration_open()
+returns boolean
+language sql stable security definer
+set search_path = public
+as $$
+  select coalesce((select registration_open from public.settings where id = 1), false);
+$$;
+
+
 -- 2. Teams ------------------------------------------------------------------
 
 create table if not exists public.teams (
@@ -66,22 +88,35 @@ create index if not exists players_team_id_idx on public.players (team_id);
 alter table public.organisers enable row level security;
 alter table public.teams      enable row level security;
 alter table public.players    enable row level security;
+alter table public.settings   enable row level security;
 
 grant insert                 on public.teams, public.players to anon, authenticated;
 grant select, update, delete on public.teams                 to authenticated;
 grant select, delete         on public.players               to authenticated;
 grant select                 on public.organisers            to authenticated;
+grant select                 on public.settings              to anon, authenticated;
+grant update                 on public.settings              to authenticated;
 
--- The public can register, but can't read anything back
+-- The public can register while registration is open, but can't read anything back
 drop policy if exists "public can register teams" on public.teams;
 create policy "public can register teams" on public.teams
   for insert to anon, authenticated
-  with check (status = 'pending');
+  with check (status = 'pending' and (public.registration_open() or public.is_organiser()));
 
 drop policy if exists "public can add players" on public.players;
 create policy "public can add players" on public.players
   for insert to anon, authenticated
-  with check (true);
+  with check (public.registration_open() or public.is_organiser());
+
+-- Anyone can see whether registration is open; only organisers can change it
+drop policy if exists "anyone reads settings" on public.settings;
+create policy "anyone reads settings" on public.settings
+  for select to anon, authenticated using (true);
+
+drop policy if exists "organisers update settings" on public.settings;
+create policy "organisers update settings" on public.settings
+  for update to authenticated
+  using (public.is_organiser()) with check (public.is_organiser());
 
 -- Organisers can read, update and delete
 drop policy if exists "organisers read teams" on public.teams;
@@ -123,7 +158,7 @@ on conflict (id) do update
 drop policy if exists "public can upload id cards" on storage.objects;
 create policy "public can upload id cards" on storage.objects
   for insert to anon, authenticated
-  with check (bucket_id = 'id-cards');
+  with check (bucket_id = 'id-cards' and (public.registration_open() or public.is_organiser()));
 
 drop policy if exists "organisers read id cards" on storage.objects;
 create policy "organisers read id cards" on storage.objects

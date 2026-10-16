@@ -72,6 +72,27 @@
     .primary-btn:disabled { opacity: .7; cursor: wait; }
     .form-error { margin-top: 12px; color: var(--brand-text); font-size: .88rem; }
 
+    /* Registration open / closed control */
+    .reg-control { display: flex; align-items: center; gap: 18px; flex-wrap: wrap; padding: 18px 20px; margin-bottom: 16px; border-inline-start: 5px solid var(--green); }
+    .reg-control.closed { border-inline-start-color: var(--brand); }
+    .rc-text { flex: 1; min-width: 200px; }
+    .rc-text h2 { font-size: 1.1rem; }
+    .rc-text p { color: var(--muted); font-size: .88rem; }
+    .rc-state { font-weight: 600; }
+    .reg-control .rc-state { color: var(--green); }
+    .reg-control.closed .rc-state { color: var(--brand-text); }
+    .switch { position: relative; flex-shrink: 0; width: 64px; height: 34px; border: 0; padding: 0; border-radius: 99px; background: var(--border); transition: background .25s ease; }
+    .switch[aria-checked="true"] { background: var(--green); }
+    .switch::after { content: ""; position: absolute; top: 4px; left: 4px; width: 26px; height: 26px; border-radius: 50%; background: #fff; box-shadow: 0 2px 6px rgba(0,0,0,.3); transition: transform .25s cubic-bezier(.4, 1.4, .6, 1); }
+    .switch[aria-checked="true"]::after { transform: translateX(30px); }
+    .switch:focus-visible { outline: 2px solid var(--brand); outline-offset: 3px; }
+    .switch:disabled { opacity: .6; cursor: wait; }
+    .rc-msg { flex-basis: 100%; display: none; gap: 8px; align-items: flex-start; }
+    .reg-control.closed .rc-msg { display: flex; }
+    .rc-msg textarea { flex: 1; font: inherit; font-size: .9rem; color: var(--text); background: var(--bg); border: 1.5px solid var(--border); border-radius: 10px; padding: 9px 12px; resize: vertical; min-height: 44px; }
+    .rc-msg textarea:focus { outline: none; border-color: var(--brand); }
+    .rc-saved { color: var(--green); font-size: .85rem; align-self: center; }
+
     /* Stats */
     .stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 20px; }
     .stat { padding: 16px 18px; }
@@ -179,6 +200,7 @@
     const db = createClient(CONFIG.supabaseUrl, CONFIG.supabaseKey);
 
     let teams = [];
+    let settings = { registration_open: true, closed_message: "" };
     let filter = "all";
     let query = "";
 
@@ -239,6 +261,8 @@
         return;
       }
       teams = data.map(t => ({ ...t, players: (t.players || []).sort((a, b) => a.position - b.position) }));
+      const s = await db.from("settings").select("registration_open, closed_message").eq("id", 1).single();
+      if (s.data) settings = s.data;
       render();
     }
 
@@ -256,7 +280,22 @@
         (filter === "all" || t.status === filter) &&
         (!q || [t.team_name, t.manager, t.island, t.phone].some(v => (v || "").toLowerCase().includes(q))));
 
+      const open = settings.registration_open;
       app.innerHTML = `
+        <div class="card reg-control ${open ? "" : "closed"}">
+          <div class="rc-text">
+            <h2>Team registration</h2>
+            <p>Registration is <span class="rc-state">${open ? "OPEN" : "CLOSED"}</span>. ${open
+              ? "Teams can register on the website."
+              : "The website shows a “Registration is closed” message instead of the form."}</p>
+          </div>
+          <button class="switch" id="reg-switch" role="switch" aria-checked="${open}" aria-label="Registration open"></button>
+          <div class="rc-msg">
+            <textarea id="closed-msg" maxlength="500" placeholder="Optional message for teams, e.g. “Registration opens on 1 December”">${esc(settings.closed_message || "")}</textarea>
+            <button class="tool-btn" id="save-msg">Save message</button>
+            <span class="rc-saved" id="msg-saved" hidden>✓ Saved</span>
+          </div>
+        </div>
         <div class="stats">
           <div class="card stat"><b>${counts.all}</b><span>Teams registered</span></div>
           <div class="card stat pending"><b>${counts.pending}</b><span>Waiting for review</span></div>
@@ -280,6 +319,8 @@
       const search = document.getElementById("search");
       search.oninput = () => { query = search.value; render(); const s = document.getElementById("search"); s.focus(); s.setSelectionRange(s.value.length, s.value.length); };
       document.getElementById("refresh").onclick = load;
+      document.getElementById("reg-switch").onclick = toggleRegistration;
+      document.getElementById("save-msg").onclick = saveClosedMessage;
       document.getElementById("export").onclick = exportCsv;
 
       app.querySelectorAll(".team").forEach(card => {
@@ -347,6 +388,28 @@
         imgs[i].src = d.signedUrl;
         imgs[i].onclick = () => { photoDlg.querySelector("img").src = d.signedUrl; photoDlg.showModal(); };
       });
+    }
+
+    async function toggleRegistration() {
+      const next = !settings.registration_open;
+      if (!next && !confirm("Close registration? Teams won't be able to register until you open it again.")) return;
+      const sw = document.getElementById("reg-switch");
+      sw.disabled = true;
+      const { error } = await db.from("settings").update({ registration_open: next, updated_at: new Date().toISOString() }).eq("id", 1);
+      sw.disabled = false;
+      if (error) return alert("Couldn't change registration: " + error.message);
+      settings.registration_open = next;
+      render();
+    }
+
+    async function saveClosedMessage() {
+      const text = document.getElementById("closed-msg").value.trim();
+      const { error } = await db.from("settings").update({ closed_message: text || null, updated_at: new Date().toISOString() }).eq("id", 1);
+      if (error) return alert("Couldn't save: " + error.message);
+      settings.closed_message = text;
+      const saved = document.getElementById("msg-saved");
+      saved.hidden = false;
+      setTimeout(() => saved.hidden = true, 2000);
     }
 
     async function setStatus(team, status) {
