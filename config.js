@@ -8,8 +8,8 @@
 //
 // Leave both empty to keep registrations going to WhatsApp only.
 window.YP_CONFIG = {
-  supabaseUrl: "",
-  supabaseKey: "",
+  supabaseUrl: "https://ooofcwqeosatktwlahnq.supabase.co",
+  supabaseKey: "sb_publishable_GF-gpMQn6U2i2V5S-TJwDA_8Cuz8Vcd",
 
   // Organiser's WhatsApp number, country code first, no "+" or spaces
   whatsapp: "9609751808"
