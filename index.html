@@ -1172,6 +1172,7 @@
       contactWa: "ވަޓްސްއަޕް",
       contactCall: "ކޯލް",
       submitServer: "ރަޖިސްޓްރޭޝަން ފޮނުއްވާ",
+      regIntroServer: "ޓީމާއި ކުޅުންތެރިންގެ މަޢުލޫމާތު ފުރުއްވާފައި ފޮނުއްވާ. ހުރިހާ މަޢުލޫމާތެއް ސީދާ ރާވާ ފަރާތަށް ދާނެ.",
       submitNoteServer: "ޓީމުގެ މަޢުލޫމާތާއި އައިޑީ ކާޑުގެ ފޮޓޯ ރައްކާތެރިކޮށް ރާވާ ފަރާތަށް ފޮނުވޭނެ.",
       step2Server: "<b>ފޮނުއްވާ</b><span>ހުރިހާ މަޢުލޫމާތެއް ސީދާ ރާވާ ފަރާތަށް</span>",
       regError: "މާފުކުރައްވާ، ރަޖިސްޓްރޭޝަން ނުފޮނުވުނު. އިންޓަރނެޓް ބައްލަވާފައި އަލުން މަސައްކަތް ކުރައްވާ، ނުވަތަ ވަޓްސްއަޕްގައި ފޮނުއްވާ.",
@@ -1308,6 +1309,9 @@
       const note = document.getElementById("submit-note");
       note.dataset.i18n = "submitNoteServer";
       note.textContent = "Your team details and ID card photos are sent securely to the organisers.";
+      const intro = document.querySelector('[data-i18n="regIntro"]');
+      intro.dataset.i18n = "regIntroServer";
+      intro.textContent = "Fill in your team and players, then submit. Everything goes straight to the organisers.";
       document.querySelector('.reg-steps [data-i18n="step2"]').dataset.i18n = "step2Server";
       document.querySelector('.reg-steps [data-i18n="step2Server"]').innerHTML = "<b>Submit</b><span>Everything goes straight to the organisers</span>";
     }
