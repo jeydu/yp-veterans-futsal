@@ -12,5 +12,5 @@ window.YP_CONFIG = {
   supabaseKey: "sb_publishable_GF-gpMQn6U2i2V5S-TJwDA_8Cuz8Vcd",
 
   // Organiser's WhatsApp number, country code first, no "+" or spaces
-  whatsapp: "9609751808"
+  whatsapp: "9609763551"
 };
