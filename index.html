@@ -370,24 +370,6 @@
       .w-photo, .w-photo img, .w-logo, .champ-link.current::before { transition: none; }
     }
 
-    /* Tournament regulations */
-    .rules-doc {
-      display: flex; align-items: center; gap: 20px; max-width: 820px; margin: 0 auto;
-      background: var(--surface); border: 1px solid var(--border); border-inline-start: 5px solid var(--brand);
-      border-radius: 16px; padding: 24px 28px; box-shadow: 0 12px 28px rgba(138, 11, 31, .08);
-    }
-    .doc-icon { display: flex; align-items: center; justify-content: center; flex-shrink: 0; width: 60px; height: 60px; border-radius: 14px; background: var(--tint); font-size: 1.8rem; }
-    .doc-text { flex: 1; }
-    .doc-text h3 { font-size: 1.25rem; margin-bottom: 2px; }
-    .doc-text p { color: var(--muted); font-size: .92rem; }
-    .doc-actions { display: flex; gap: 10px; flex-shrink: 0; }
-    .doc-btn {
-      padding: 11px 20px; border-radius: 10px; font-weight: 600; font-size: .92rem; text-decoration: none;
-      border: 1.5px solid var(--brand); color: var(--brand-text); transition: background .15s ease, transform .15s ease;
-    }
-    .doc-btn:hover { background: var(--tint); transform: translateY(-2px); }
-    .doc-btn.primary { background: var(--brand); color: #fff; box-shadow: 0 6px 16px rgba(200, 16, 46, .3); }
-    .doc-btn.primary:hover { background: var(--brand-dark); }
     .field.check a { color: var(--brand-text); font-weight: 600; }
 
     /* Team registration */
@@ -847,29 +829,6 @@
     </div>
   </section>
 
-  <!-- TOURNAMENT REGULATIONS — the PDF lives at regulations.pdf in this folder -->
-  <section id="rules">
-    <div class="wrap">
-      <div class="sec-head">
-        <span data-i18n="rulesEyebrow" class="eyebrow">Read before you register</span>
-        <h2 data-i18n="rulesTitle">Tournament Regulations</h2>
-        <p data-i18n="rulesLead" class="lead">Every team and player agrees to these rules when they register.</p>
-      </div>
-
-      <div class="rules-doc">
-        <span class="doc-icon" aria-hidden="true">📄</span>
-        <div class="doc-text">
-          <h3 data-i18n="docTitle">Official Tournament Regulations</h3>
-          <p data-i18n="docText">PDF document · Please read before registering your team</p>
-        </div>
-        <div class="doc-actions">
-          <a data-i18n="docView" class="doc-btn" href="regulations.pdf" target="_blank" rel="noopener">View</a>
-          <a data-i18n="docDownload" class="doc-btn primary" href="regulations.pdf" download="YP-Veterans-Futsal-Regulations.pdf">Download</a>
-        </div>
-      </div>
-    </div>
-  </section>
-
   <!-- TEAM REGISTRATION — sends the details to the organiser on WhatsApp (number set in the script at the bottom) -->
   <section id="register">
     <div class="wrap">
@@ -966,7 +925,7 @@
                 <textarea id="r-notes" name="notes" rows="3" placeholder="Jersey colour, questions, anything else" data-i18n-ph="phNotes"></textarea>
               </div>
               <div class="field full check">
-                <label><input type="checkbox" name="agree" required> <span data-i18n="agree">All our players meet the age rule and we agree to the <a href="#rules">tournament regulations</a>.</span></label>
+                <label><input type="checkbox" name="agree" required> <span data-i18n="agree">All our players meet the age rule and we agree to the tournament rules.</span></label>
                 <span data-i18n="errAgree" class="err">Please confirm to continue</span>
               </div>
             </div>
@@ -1132,13 +1091,6 @@
       pastLead: "މުބާރާތުގެ ތާރީޚުގައި ހުރިހާ ޗެމްޕިއަނުން. ފޮޓޯ ބެއްލެވުމަށް ޓީމަކަށް ފިއްތަވާ.",
       badgeCurrent: "މިހާރުގެ ޗެމްޕިއަން",
       viewPhoto: "ފޮޓޯ ބައްލަވާ",
-      rulesEyebrow: "ރަޖިސްޓްރީ ކުރުމުގެ ކުރިން ކިޔުއްވާ",
-      rulesTitle: "މުބާރާތުގެ ޤަވާޢިދު",
-      rulesLead: "ރަޖިސްޓްރީ ކުރާއިރު ކޮންމެ ޓީމަކާއި ކުޅުންތެރިއަކު މި ޤަވާޢިދަށް އެއްބަސްވެއެވެ.",
-      docTitle: "މުބާރާތުގެ ރަސްމީ ޤަވާޢިދު",
-      docText: "PDF ލިޔުން · ޓީމު ރަޖިސްޓްރީ ކުރުމުގެ ކުރިން ކިޔުއްވާ",
-      docView: "ބައްލަވާ",
-      docDownload: "ޑައުންލޯޑް",
       regEyebrow: "ދެން އޮތް މުބާރާތް",
       regTitle: "ޓީމު ރަޖިސްޓްރީ ކުރައްވާ",
       regIntro: "ޓީމާއި ކުޅުންތެރިންގެ މަޢުލޫމާތު ފުރުއްވާފައި، ވަޓްސްއަޕް މެދުވެރިކޮށް ރާވާ ފަރާތަށް ފޮނުއްވާ.",
@@ -1158,7 +1110,7 @@
       playersHint: "މަދުވެގެން 14 ކުޅުންތެރިން · ހުރިހާ ކުޅުންތެރިންގެ އުމުރު 35 ނުވަތަ މަތި",
       addPlayer: "ކުޅުންތެރިއަކު އިތުރުކުރައްވާ",
       lblNotes: "ނޯޓު <small>(ލާޒިމެއް ނޫން)</small>",
-      agree: "އަހަރެމެންގެ ހުރިހާ ކުޅުންތެރިންނަށް އުމުރުގެ ޝަރުތު ހަމަވާ ކަމަށާއި <a href=\"#rules\">މުބާރާތުގެ ޤަވާޢިދަށް</a> އެއްބަސްވާ ކަމަށް ކަށަވަރުކުރަމެވެ.",
+      agree: "އަހަރެމެންގެ ހުރިހާ ކުޅުންތެރިންނަށް އުމުރުގެ ޝަރުތު ހަމަވާ ކަމަށާއި މުބާރާތުގެ ޤަވާޢިދަށް އެއްބަސްވާ ކަމަށް ކަށަވަރުކުރަމެވެ.",
       errAgree: "ކުރިއަށް ދިޔުމަށް ކަށަވަރުކުރައްވާ",
       submit: "ވަޓްސްއަޕްގައި ރަޖިސްޓްރޭޝަން ފޮނުއްވާ",
       submitNote: "ތިޔަ މަޢުލޫމާތު ފުރިފައި ވަޓްސްއަޕް ހުޅުވޭނެ.",
