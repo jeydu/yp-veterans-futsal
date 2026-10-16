@@ -150,6 +150,13 @@
     .act.delete { margin-inline-start: auto; border-color: var(--brand); color: var(--brand-text); }
     .act.delete:hover { background: var(--brand); color: #fff; }
 
+    .toast {
+      position: fixed; left: 50%; bottom: 24px; z-index: 50; transform: translate(-50%, 20px); opacity: 0;
+      background: var(--green); color: #fff; font-weight: 600; padding: 12px 20px; border-radius: 12px;
+      box-shadow: 0 10px 30px rgba(0,0,0,.3); transition: transform .3s ease, opacity .3s ease;
+    }
+    .toast.show { transform: translate(-50%, 0); opacity: 1; }
+
     dialog { border: 0; border-radius: 12px; padding: 0; max-width: min(900px, calc(100vw - 32px)); background: #111; }
     dialog::backdrop { background: rgba(0,0,0,.8); }
     dialog img { display: block; max-width: 100%; max-height: 85vh; }
@@ -202,6 +209,9 @@
     let teams = [];
     let settings = { registration_open: true, closed_message: "" };
     let filter = "all";
+    const openIds = new Set();   // teams the organiser has expanded; kept open across refreshes
+    let lastSignature = "";
+    let signedIn = false;
     let query = "";
 
     // ---------- Login ----------
@@ -233,7 +243,7 @@
       };
     }
 
-    logoutBtn.onclick = async () => { await db.auth.signOut(); showLogin(); };
+    logoutBtn.onclick = async () => { signedIn = false; await db.auth.signOut(); showLogin(); };
 
     // ---------- Load data ----------
     async function start() {
@@ -247,23 +257,53 @@
           <p>${esc(session.user.email)} isn't on the organiser list. Add it to the <code>organisers</code> table in Supabase.</p></div>`;
         return;
       }
+      signedIn = true;
       await load();
     }
 
-    async function load() {
-      app.innerHTML = `<p class="notice">Loading registrations…</p>`;
+    // silent = background check: only redraw when something changed, and never while typing
+    async function load(silent = false) {
+      if (silent) {
+        const el = document.activeElement;
+        if (el && (el.tagName === "TEXTAREA" || el.tagName === "INPUT")) return;
+      } else {
+        app.innerHTML = `<p class="notice">Loading registrations…</p>`;
+      }
       const { data, error } = await db
         .from("teams")
         .select("*, players(id, position, name, age, id_photo_path)")
         .order("created_at", { ascending: false });
       if (error) {
-        app.innerHTML = `<div class="card notice"><h2>Couldn't load</h2><p>${esc(error.message)}</p></div>`;
+        if (!silent) app.innerHTML = `<div class="card notice"><h2>Couldn't load</h2><p>${esc(error.message)}</p></div>`;
         return;
       }
-      teams = data.map(t => ({ ...t, players: (t.players || []).sort((a, b) => a.position - b.position) }));
       const s = await db.from("settings").select("registration_open, closed_message").eq("id", 1).single();
+
+      const signature = JSON.stringify([data.map(t => [t.id, t.status, (t.players || []).length]), s.data]);
+      if (silent && signature === lastSignature) return;
+      const knownIds = new Set(teams.map(t => t.id));
+      const newTeams = silent ? data.filter(t => !knownIds.has(t.id)) : [];
+      lastSignature = signature;
+
+      teams = data.map(t => ({ ...t, players: (t.players || []).sort((a, b) => a.position - b.position) }));
       if (s.data) settings = s.data;
       render();
+      if (newTeams.length) toast(newTeams.length === 1
+        ? "🔔 New registration: " + newTeams[0].team_name
+        : "🔔 " + newTeams.length + " new registrations");
+    }
+
+    // Check for new registrations every 30 seconds, and when coming back to this tab
+    setInterval(() => { if (signedIn && !document.hidden) load(true); }, 30000);
+    document.addEventListener("visibilitychange", () => { if (signedIn && !document.hidden) load(true); });
+
+    function toast(text) {
+      const el = document.createElement("div");
+      el.className = "toast";
+      el.textContent = text;
+      document.body.appendChild(el);
+      setTimeout(() => el.classList.add("show"), 10);
+      setTimeout(() => { el.classList.remove("show"); setTimeout(() => el.remove(), 300); }, 5000);
     }
 
     // ---------- Render ----------
@@ -318,7 +358,7 @@
       app.querySelectorAll(".tab").forEach(b => b.onclick = () => { filter = b.dataset.filter; render(); });
       const search = document.getElementById("search");
       search.oninput = () => { query = search.value; render(); const s = document.getElementById("search"); s.focus(); s.setSelectionRange(s.value.length, s.value.length); };
-      document.getElementById("refresh").onclick = load;
+      document.getElementById("refresh").onclick = () => load();
       document.getElementById("reg-switch").onclick = toggleRegistration;
       document.getElementById("save-msg").onclick = saveClosedMessage;
       document.getElementById("export").onclick = exportCsv;
@@ -326,6 +366,7 @@
       app.querySelectorAll(".team").forEach(card => {
         const team = teams.find(t => t.id === card.dataset.id);
         card.querySelector(".team-head").onclick = () => toggle(card, team);
+        if (openIds.has(team.id)) { card.classList.add("open"); loadPhotos(card); }
         card.querySelector(".confirm").onclick = () => setStatus(team, "confirmed");
         card.querySelector(".reject").onclick = () => setStatus(team, "rejected");
         card.querySelector(".delete").onclick = () => removeTeam(team);
@@ -377,9 +418,14 @@
     }
 
     // Open a team and load its ID photos (private links that expire after an hour)
-    async function toggle(card, team) {
+    function toggle(card, team) {
       card.classList.toggle("open");
-      if (!card.classList.contains("open") || card.dataset.loaded) return;
+      if (card.classList.contains("open")) { openIds.add(team.id); loadPhotos(card); }
+      else openIds.delete(team.id);
+    }
+
+    async function loadPhotos(card) {
+      if (card.dataset.loaded) return;
       card.dataset.loaded = "1";
       const imgs = [...card.querySelectorAll(".thumb")];
       const { data } = await db.storage.from("id-cards").createSignedUrls(imgs.map(i => i.dataset.path), 3600);
