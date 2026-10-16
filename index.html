@@ -12,6 +12,7 @@
     // Apply a saved light/dark choice before the page draws, so it doesn't flash
     try { const t = localStorage.getItem("theme"); if (t) document.documentElement.dataset.theme = t; } catch (e) {}
   </script>
+  <script src="config.js"></script>
   <style>
     :root {
       --bg: #f8f5f5;
@@ -563,6 +564,13 @@
     .done-steps li.done { color: #1f9d55; }
     .share-ids { max-width: 360px; }
 
+    .done-part { display: flex; flex-direction: column; align-items: center; gap: 8px; width: 100%; }
+    .done-part[hidden] { display: none; }
+    .reg-btn:disabled { opacity: .75; cursor: wait; transform: none; }
+    .reg-error { margin-top: 12px; padding: 12px 14px; border-radius: 10px; background: var(--tint-strong); border: 1px solid var(--brand); font-size: .9rem; }
+    .reg-error[hidden] { display: none; }
+    .reg-error a { color: var(--brand-text); font-weight: 600; }
+
     .reg-done { display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; gap: 8px; }
     .reg-done[hidden] { display: none; }
     .reg-done-icon { font-size: 3rem; }
@@ -958,7 +966,11 @@
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
               <span data-i18n="submit">Send registration on WhatsApp</span>
             </button>
-            <p data-i18n="submitNote" class="reg-note">Opens WhatsApp with your details filled in, ready to send.</p>
+            <p data-i18n="submitNote" class="reg-note" id="submit-note">Opens WhatsApp with your details filled in, ready to send.</p>
+            <p class="reg-error" id="reg-error" hidden>
+              <span data-i18n="regError">Sorry, the registration didn't go through. Check your internet and try again, or send it on WhatsApp instead.</span>
+              <a id="reg-wa" href="#" target="_blank" rel="noopener" data-i18n="regErrorLink">Send on WhatsApp</a>
+            </p>
           </div>
         </form>
 
@@ -984,13 +996,21 @@
 
         <div class="reg-done" id="reg-done" hidden>
           <span class="reg-done-icon" aria-hidden="true">✅</span>
-          <h3 data-i18n="doneTitle">Almost done!</h3>
-          <ol class="done-steps">
-            <li data-i18n="doneStep1" class="done">Team details opened in WhatsApp. Press <b>Send</b>.</li>
-            <li data-i18n="doneStep2">Send the players' ID card photos to the same chat.</li>
-          </ol>
-          <button data-i18n="shareIds" class="reg-btn share-ids" type="button" id="share-ids">📷 Send ID card photos</button>
-          <p class="reg-note" id="share-note">Choose WhatsApp, then the organiser's chat (+960 975-1808).</p>
+          <!-- Shown when registrations go to WhatsApp -->
+          <div class="done-part" id="done-wa">
+            <h3 data-i18n="doneTitle">Almost done!</h3>
+            <ol class="done-steps">
+              <li data-i18n="doneStep1" class="done">Team details opened in WhatsApp. Press <b>Send</b>.</li>
+              <li data-i18n="doneStep2">Send the players' ID card photos to the same chat.</li>
+            </ol>
+            <button data-i18n="shareIds" class="reg-btn share-ids" type="button" id="share-ids">📷 Send ID card photos</button>
+            <p class="reg-note" id="share-note">Choose WhatsApp, then the organiser's chat (+960 975-1808).</p>
+          </div>
+          <!-- Shown when registrations are saved to the database -->
+          <div class="done-part" id="done-server" hidden>
+            <h3 data-i18n="doneServerTitle">Registration received!</h3>
+            <p data-i18n="doneServerText">The organisers have your team details and ID card photos, and will contact you to confirm your place.</p>
+          </div>
           <button data-i18n="again" class="reg-again" type="button" id="reg-again">Register another team</button>
         </div>
       </div>
@@ -1130,6 +1150,13 @@
       contactLead: "ދެން އޮތް މުބާރާތުގައި ޓީމެއް ވައްދަން ބޭނުންފުޅުތޯ؟",
       contactWa: "ވަޓްސްއަޕް",
       contactCall: "ކޯލް",
+      submitServer: "ރަޖިސްޓްރޭޝަން ފޮނުއްވާ",
+      submitNoteServer: "ޓީމުގެ މަޢުލޫމާތާއި އައިޑީ ކާޑުގެ ފޮޓޯ ރައްކާތެރިކޮށް ރާވާ ފަރާތަށް ފޮނުވޭނެ.",
+      step2Server: "<b>ފޮނުއްވާ</b><span>ހުރިހާ މަޢުލޫމާތެއް ސީދާ ރާވާ ފަރާތަށް</span>",
+      regError: "މާފުކުރައްވާ، ރަޖިސްޓްރޭޝަން ނުފޮނުވުނު. އިންޓަރނެޓް ބައްލަވާފައި އަލުން މަސައްކަތް ކުރައްވާ، ނުވަތަ ވަޓްސްއަޕްގައި ފޮނުއްވާ.",
+      regErrorLink: "ވަޓްސްއަޕްގައި ފޮނުއްވާ",
+      doneServerTitle: "ރަޖިސްޓްރޭޝަން ލިބިއްޖެ!",
+      doneServerText: "ތިޔަ ޓީމުގެ މަޢުލޫމާތާއި އައިޑީ ކާޑުގެ ފޮޓޯ ރާވާ ފަރާތަށް ލިބިއްޖެ. ތަން ކަށަވަރުކުރުމަށް ގުޅުއްވާނެ.",
       secTeamShort: "ޓީމު",
       secPlayersShort: "ކުޅުންތެރިން",
       secConfirmShort: "ފޮނުވުން",
@@ -1157,7 +1184,10 @@
       shareNote: "ވަޓްސްއަޕް އިޚްތިޔާރުކޮށް، ރާވާ ފަރާތުގެ ޗެޓް (+960 975-1808) އިޚްތިޔާރުކުރައްވާ.",
       attachNote: n => "+960 975-1808 އާއި އެކު ވަޓްސްއަޕް ޗެޓްގައި އައިޑީ ކާޑުގެ " + n + " ފޮޓޯ ފޮނުއްވާ.",
       summary: s => s.needed + " ކުޅުންތެރިންގެ ތެރެއިން " + s.complete + " ފުރިހަމަ (ނަން، އުމުރު، އައިޑީ ފޮޓޯ)",
-      summaryReady: n => "✓ ފޮނުވަން ތައްޔާރު: ޓީމުގެ މަޢުލޫމާތާއި " + n + " ކުޅުންތެރިން، އައިޑީ ފޮޓޯއާއެކު"
+      summaryReady: n => "✓ ފޮނުވަން ތައްޔާރު: ޓީމުގެ މަޢުލޫމާތާއި " + n + " ކުޅުންތެރިން، އައިޑީ ފޮޓޯއާއެކު",
+      preparing: n => "އައިޑީ ފޮޓޯ އަޕްލޯޑް ކުރަނީ… " + n,
+      uploading: "ފޮނުވަނީ…",
+      submitServerLabel: "ރަޖިސްޓްރޭޝަން ފޮނުއްވާ"
     };
     const EN = {
       players: n => n + " players",
@@ -1170,7 +1200,10 @@
       shareNote: "Choose WhatsApp, then the organiser's chat (+960 975-1808).",
       attachNote: n => "Attach the " + n + " ID card photos in the WhatsApp chat with +960 975-1808.",
       summary: s => s.complete + " of " + s.needed + " players complete (name, age and ID photo)",
-      summaryReady: n => "✓ Ready to send: team details and " + n + " players with ID photos"
+      summaryReady: n => "✓ Ready to send: team details and " + n + " players with ID photos",
+      preparing: n => "Uploading ID photos… " + n,
+      uploading: "Sending…",
+      submitServerLabel: "Submit registration"
     };
 
     let lang = "en";
@@ -1237,8 +1270,84 @@
     // Close when clicking outside the photo
     pop.addEventListener("click", e => { if (e.target === pop) pop.close(); });
 
-    // Team registration: the organiser's WhatsApp number, country code first, no "+" or spaces
-    const REG_WHATSAPP = "9609751808";
+    // Team registration settings come from config.js
+    const CONFIG = window.YP_CONFIG || {};
+    const REG_WHATSAPP = CONFIG.whatsapp || "9609751808";
+    // With Supabase set up, registrations and ID photos are saved online; otherwise they go to WhatsApp
+    const USE_SERVER = !!(CONFIG.supabaseUrl && CONFIG.supabaseKey);
+    const SUPABASE_JS = "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/+esm";
+
+    if (USE_SERVER) {
+      const submitLabel = document.querySelector('.reg-submit [data-i18n="submit"]');
+      submitLabel.dataset.i18n = "submitServer";
+      submitLabel.textContent = "Submit registration";
+      const note = document.getElementById("submit-note");
+      note.dataset.i18n = "submitNoteServer";
+      note.textContent = "Your team details and ID card photos are sent securely to the organisers.";
+      document.querySelector('.reg-steps [data-i18n="step2"]').dataset.i18n = "step2Server";
+      document.querySelector('.reg-steps [data-i18n="step2Server"]').innerHTML = "<b>Submit</b><span>Everything goes straight to the organisers</span>";
+    }
+
+    // Shrink an ID photo before uploading (keeps it readable, much smaller)
+    async function shrinkPhoto(file, maxSide = 1400, quality = 0.8) {
+      try {
+        const img = await createImageBitmap(file);
+        const scale = Math.min(1, maxSide / Math.max(img.width, img.height));
+        const canvas = document.createElement("canvas");
+        canvas.width = Math.round(img.width * scale);
+        canvas.height = Math.round(img.height * scale);
+        canvas.getContext("2d").drawImage(img, 0, 0, canvas.width, canvas.height);
+        const blob = await new Promise(res => canvas.toBlob(res, "image/jpeg", quality));
+        return blob || file;
+      } catch (e) {
+        return file; // browser couldn't read it; send the original
+      }
+    }
+
+    function newId() {
+      if (crypto.randomUUID) return crypto.randomUUID();
+      const b = crypto.getRandomValues(new Uint8Array(16));
+      b[6] = (b[6] & 15) | 64; b[8] = (b[8] & 63) | 128;
+      const h = [...b].map(x => x.toString(16).padStart(2, "0")).join("");
+      return h.slice(0, 8) + "-" + h.slice(8, 12) + "-" + h.slice(12, 16) + "-" + h.slice(16, 20) + "-" + h.slice(20);
+    }
+
+    // Save a registration to Supabase: ID photos to private storage, then the team, then its players
+    async function saveRegistration(rows, f, onProgress) {
+      const { createClient } = await import(SUPABASE_JS);
+      const db = createClient(CONFIG.supabaseUrl, CONFIG.supabaseKey, { auth: { persistSession: false } });
+      const teamId = newId();
+
+      const players = [];
+      for (let i = 0; i < rows.length; i++) {
+        onProgress(t("preparing", (i + 1) + " / " + rows.length));
+        const row = rows[i];
+        const path = teamId + "/" + String(i + 1).padStart(2, "0") + ".jpg";
+        const photo = await shrinkPhoto(row.querySelector(".p-file").files[0]);
+        const up = await db.storage.from("id-cards").upload(path, photo, { contentType: "image/jpeg", upsert: false });
+        if (up.error) throw up.error;
+        players.push({
+          team_id: teamId,
+          position: i + 1,
+          name: row.querySelector(".p-name").value.trim(),
+          age: Number(row.querySelector(".p-age").value),
+          id_photo_path: path
+        });
+      }
+
+      onProgress(t("uploading"));
+      const team = await db.from("teams").insert({
+        id: teamId,
+        team_name: f.team.value.trim(),
+        manager: f.manager.value.trim(),
+        phone: f.phone.value.trim(),
+        island: f.island.value.trim(),
+        notes: f.notes.value.trim() || null
+      });
+      if (team.error) throw team.error;
+      const squad = await db.from("players").insert(players);
+      if (squad.error) throw squad.error;
+    }
 
     // Squad size limits
     const MIN_PLAYERS = 14;   // needed to register
@@ -1326,8 +1435,9 @@
 
     addBtn.addEventListener("click", () => addPlayer().querySelector(".p-name").focus());
 
-    regForm.addEventListener("submit", e => {
+    regForm.addEventListener("submit", async e => {
       e.preventDefault();
+      document.getElementById("reg-error").hidden = true;
       let ok = true;
 
       // Team fields
@@ -1385,8 +1495,32 @@
         "We confirm all players meet the age rule and agree to the tournament rules.",
         "ID card photos to follow in this chat."
       ].filter((line, i, all) => line !== "" || all[i - 1] !== "").join("\n");
+      const waLink = "https://wa.me/" + REG_WHATSAPP + "?text=" + encodeURIComponent(msg);
 
-      window.open("https://wa.me/" + REG_WHATSAPP + "?text=" + encodeURIComponent(msg), "_blank");
+      if (USE_SERVER) {
+        const btn = regForm.querySelector(".reg-submit");
+        const label = btn.querySelector("span");
+        btn.disabled = true;
+        try {
+          await saveRegistration(rows, f, text => label.textContent = text);
+          document.getElementById("done-wa").hidden = true;
+          document.getElementById("done-server").hidden = false;
+          regForm.hidden = true;
+          regDone.hidden = false;
+          regDone.scrollIntoView({ block: "center", behavior: "smooth" });
+        } catch (err) {
+          console.error("Registration failed:", err);
+          // Backup: WhatsApp with the details already typed in
+          document.getElementById("reg-wa").href = waLink;
+          document.getElementById("reg-error").hidden = false;
+        } finally {
+          btn.disabled = false;
+          label.textContent = t("submitServerLabel");
+        }
+        return;
+      }
+
+      window.open(waLink, "_blank");
 
       // Phones can share the photos straight to WhatsApp; otherwise explain how to attach them
       const canShare = navigator.canShare && navigator.canShare({ files: idFiles });
@@ -1416,6 +1550,7 @@
       resetPlayers();
       playersField.classList.remove("invalid");
       idFiles = [];
+      document.getElementById("reg-error").hidden = true;
       regDone.hidden = true;
       regForm.hidden = false;
     });

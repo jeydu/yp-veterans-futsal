@@ -1,0 +1,385 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex, nofollow">
+  <title>Organiser Dashboard</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;700&family=Inter:wght@400;600&display=swap" rel="stylesheet">
+  <script src="config.js"></script>
+  <style>
+    :root {
+      --bg: #f8f5f5;
+      --surface: #ffffff;
+      --text: #221516;
+      --muted: #6b5a5b;
+      --brand: #c8102e;
+      --brand-dark: #8a0b1f;
+      --brand-text: #c8102e;
+      --gold: #e3b23c;
+      --border: #e8dcdd;
+      --tint: #fbeef0;
+      --green: #1f9d55;
+      --amber: #b7791f;
+      color-scheme: light;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg: #120a0b;
+        --surface: #1e1214;
+        --text: #f3e8e9;
+        --muted: #b7a2a5;
+        --border: #3a2629;
+        --brand-text: #ff6b80;
+        --tint: #3a1a20;
+        --green: #3ecf7f;
+        --amber: #f0b44c;
+        color-scheme: dark;
+      }
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: "Inter", system-ui, sans-serif; background: var(--bg); color: var(--text); line-height: 1.5; }
+    h1, h2, h3 { font-family: "Oswald", sans-serif; text-transform: uppercase; letter-spacing: .02em; line-height: 1.15; }
+    button { font: inherit; cursor: pointer; }
+    .wrap { max-width: 1100px; margin: 0 auto; padding: 0 16px; }
+
+    header { background: linear-gradient(135deg, var(--brand), var(--brand-dark)); color: #fff; }
+    header .wrap { display: flex; align-items: center; justify-content: space-between; gap: 12px; min-height: 64px; }
+    .brand { display: flex; align-items: center; gap: 12px; }
+    .brand img { width: 42px; height: 42px; border-radius: 50%; background: #fff; padding: 3px; border: 2px solid var(--gold); }
+    .brand h1 { font-size: 1.15rem; }
+    .brand small { display: block; color: #f6d6db; font-family: "Inter", sans-serif; font-size: .75rem; text-transform: none; letter-spacing: 0; }
+    .ghost-btn { background: rgba(255,255,255,.12); color: #fff; border: 1px solid rgba(255,255,255,.4); border-radius: 8px; padding: 8px 14px; font-size: .85rem; }
+    .ghost-btn:hover { background: rgba(255,255,255,.2); }
+
+    main { padding: 28px 0 60px; }
+    .card { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; }
+    .notice { padding: 28px; text-align: center; color: var(--muted); }
+    .notice h2 { color: var(--text); margin-bottom: 8px; }
+    .notice code { background: var(--tint); padding: 2px 6px; border-radius: 4px; }
+
+    /* Login */
+    .login { max-width: 380px; margin: 40px auto; padding: 32px 28px; }
+    .login h2 { margin-bottom: 4px; }
+    .login p { color: var(--muted); font-size: .9rem; margin-bottom: 20px; }
+    .login label { display: block; font-size: .78rem; font-weight: 600; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); margin: 14px 0 6px; }
+    .login input { width: 100%; font: inherit; color: var(--text); background: var(--bg); border: 1.5px solid var(--border); border-radius: 10px; padding: 11px 13px; }
+    .login input:focus { outline: none; border-color: var(--brand); }
+    .primary-btn { width: 100%; margin-top: 22px; padding: 13px; border: 0; border-radius: 10px; background: var(--brand); color: #fff; font-weight: 600; }
+    .primary-btn:hover { background: var(--brand-dark); }
+    .primary-btn:disabled { opacity: .7; cursor: wait; }
+    .form-error { margin-top: 12px; color: var(--brand-text); font-size: .88rem; }
+
+    /* Stats */
+    .stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 20px; }
+    .stat { padding: 16px 18px; }
+    .stat b { display: block; font: 700 2rem "Oswald", sans-serif; line-height: 1.1; }
+    .stat span { color: var(--muted); font-size: .82rem; }
+    .stat.pending b { color: var(--amber); }
+    .stat.confirmed b { color: var(--green); }
+
+    /* Toolbar */
+    .toolbar { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; margin-bottom: 16px; }
+    .tabs { display: flex; gap: 4px; padding: 4px; border-radius: 99px; background: var(--surface); border: 1px solid var(--border); }
+    .tab { border: 0; background: none; color: var(--muted); padding: 7px 14px; border-radius: 99px; font-size: .85rem; font-weight: 600; }
+    .tab.active { background: var(--brand); color: #fff; }
+    .search { flex: 1; min-width: 180px; font: inherit; color: var(--text); background: var(--surface); border: 1px solid var(--border); border-radius: 99px; padding: 9px 16px; }
+    .search:focus { outline: none; border-color: var(--brand); }
+    .tool-btn { border: 1px solid var(--border); background: var(--surface); color: var(--text); border-radius: 99px; padding: 8px 14px; font-size: .85rem; font-weight: 600; }
+    .tool-btn:hover { border-color: var(--brand); color: var(--brand-text); }
+
+    /* Team cards */
+    .teams { display: grid; gap: 12px; }
+    .team { overflow: hidden; }
+    .team-head { display: flex; align-items: center; gap: 14px; padding: 16px 18px; cursor: pointer; }
+    .team-head:hover { background: var(--tint); }
+    .team-main { flex: 1; min-width: 0; }
+    .team-main h3 { font-size: 1.15rem; }
+    .team-meta { color: var(--muted); font-size: .85rem; display: flex; flex-wrap: wrap; gap: 4px 14px; margin-top: 2px; }
+    .pill { flex-shrink: 0; padding: 4px 12px; border-radius: 99px; font-size: .75rem; font-weight: 600; text-transform: uppercase; letter-spacing: .05em; }
+    .pill.pending { background: rgba(183, 121, 31, .15); color: var(--amber); }
+    .pill.confirmed { background: rgba(31, 157, 85, .15); color: var(--green); }
+    .pill.rejected { background: var(--tint); color: var(--brand-text); }
+    .count { flex-shrink: 0; font: 700 1.1rem "Oswald", sans-serif; color: var(--muted); }
+    .chev { flex-shrink: 0; color: var(--muted); transition: transform .2s ease; }
+    .team.open .chev { transform: rotate(180deg); }
+
+    .team-body { display: none; border-top: 1px solid var(--border); padding: 18px; }
+    .team.open .team-body { display: block; }
+    .contact { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 14px; }
+    .contact a { display: inline-flex; align-items: center; gap: 6px; padding: 7px 12px; border-radius: 99px; border: 1px solid var(--border); color: var(--text); text-decoration: none; font-size: .85rem; }
+    .contact a.wa { background: #25d366; border-color: #25d366; color: #06371a; font-weight: 600; }
+    .notes { background: var(--tint); border-radius: 10px; padding: 10px 14px; font-size: .9rem; margin-bottom: 14px; white-space: pre-wrap; }
+
+    table { width: 100%; border-collapse: collapse; font-size: .92rem; }
+    th, td { text-align: start; padding: 8px 10px; border-bottom: 1px solid var(--border); vertical-align: middle; }
+    th { color: var(--muted); font-size: .75rem; text-transform: uppercase; letter-spacing: .06em; }
+    td.num { color: var(--muted); width: 36px; }
+    .age-bad { color: var(--brand-text); font-weight: 600; }
+    .thumb { width: 64px; height: 44px; border-radius: 6px; object-fit: cover; background: var(--tint); border: 1px solid var(--border); cursor: zoom-in; display: block; }
+
+    .actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 16px; }
+    .act { border: 1.5px solid var(--border); background: none; color: var(--text); padding: 8px 16px; border-radius: 10px; font-size: .88rem; font-weight: 600; }
+    .act.confirm { border-color: var(--green); color: var(--green); }
+    .act.confirm:hover { background: var(--green); color: #fff; }
+    .act.reject { border-color: var(--amber); color: var(--amber); }
+    .act.reject:hover { background: var(--amber); color: #fff; }
+    .act.delete { margin-inline-start: auto; border-color: var(--brand); color: var(--brand-text); }
+    .act.delete:hover { background: var(--brand); color: #fff; }
+
+    dialog { border: 0; border-radius: 12px; padding: 0; max-width: min(900px, calc(100vw - 32px)); background: #111; }
+    dialog::backdrop { background: rgba(0,0,0,.8); }
+    dialog img { display: block; max-width: 100%; max-height: 85vh; }
+    dialog button { position: absolute; top: 8px; right: 8px; width: 36px; height: 36px; border-radius: 50%; border: 0; background: rgba(0,0,0,.6); color: #fff; font-size: 1.4rem; }
+
+    @media (max-width: 720px) {
+      .stats { grid-template-columns: 1fr 1fr; }
+      .team-head { flex-wrap: wrap; }
+      .count { display: none; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="wrap">
+      <div class="brand">
+        <img src="images/yp-logo.jpg" alt="">
+        <div><h1>Organiser Dashboard</h1><small>YP Veterans Futsal · Team registrations</small></div>
+      </div>
+      <button class="ghost-btn" id="logout" hidden>Log out</button>
+    </div>
+  </header>
+
+  <main class="wrap" id="app">
+    <p class="notice">Loading…</p>
+  </main>
+
+  <dialog id="photo"><img alt="ID card photo"><button aria-label="Close">&times;</button></dialog>
+
+  <script type="module">
+    const CONFIG = window.YP_CONFIG || {};
+    const app = document.getElementById("app");
+    const logoutBtn = document.getElementById("logout");
+    const photoDlg = document.getElementById("photo");
+    photoDlg.querySelector("button").onclick = () => photoDlg.close();
+    photoDlg.onclick = e => { if (e.target === photoDlg) photoDlg.close(); };
+
+    const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+    const fmtDate = d => new Date(d).toLocaleString(undefined, { day: "numeric", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit" });
+
+    if (!CONFIG.supabaseUrl || !CONFIG.supabaseKey) {
+      app.innerHTML = `<div class="card notice"><h2>Not connected yet</h2>
+        <p>Add your Supabase URL and key to <code>config.js</code>, then reload this page.</p></div>`;
+      throw new Error("Supabase not configured");
+    }
+
+    const { createClient } = await import("https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/+esm");
+    const db = createClient(CONFIG.supabaseUrl, CONFIG.supabaseKey);
+
+    let teams = [];
+    let filter = "all";
+    let query = "";
+
+    // ---------- Login ----------
+    function showLogin(message = "") {
+      logoutBtn.hidden = true;
+      app.innerHTML = `
+        <form class="card login" id="login">
+          <h2>Organiser login</h2>
+          <p>Only organisers can see registrations and ID card photos.</p>
+          <label for="email">Email</label>
+          <input id="email" type="email" autocomplete="username" required>
+          <label for="password">Password</label>
+          <input id="password" type="password" autocomplete="current-password" required>
+          <button class="primary-btn" type="submit">Log in</button>
+          <p class="form-error" id="login-error">${esc(message)}</p>
+        </form>`;
+      const form = document.getElementById("login");
+      form.onsubmit = async e => {
+        e.preventDefault();
+        const btn = form.querySelector("button");
+        btn.disabled = true;
+        const { error } = await db.auth.signInWithPassword({
+          email: form.email.value.trim(),
+          password: form.password.value
+        });
+        btn.disabled = false;
+        if (error) document.getElementById("login-error").textContent = "Wrong email or password.";
+        else start();
+      };
+    }
+
+    logoutBtn.onclick = async () => { await db.auth.signOut(); showLogin(); };
+
+    // ---------- Load data ----------
+    async function start() {
+      const { data: { session } } = await db.auth.getSession();
+      if (!session) return showLogin();
+      logoutBtn.hidden = false;
+
+      const { data: me } = await db.from("organisers").select("email");
+      if (!me || !me.length) {
+        app.innerHTML = `<div class="card notice"><h2>No access</h2>
+          <p>${esc(session.user.email)} isn't on the organiser list. Add it to the <code>organisers</code> table in Supabase.</p></div>`;
+        return;
+      }
+      await load();
+    }
+
+    async function load() {
+      app.innerHTML = `<p class="notice">Loading registrations…</p>`;
+      const { data, error } = await db
+        .from("teams")
+        .select("*, players(id, position, name, age, id_photo_path)")
+        .order("created_at", { ascending: false });
+      if (error) {
+        app.innerHTML = `<div class="card notice"><h2>Couldn't load</h2><p>${esc(error.message)}</p></div>`;
+        return;
+      }
+      teams = data.map(t => ({ ...t, players: (t.players || []).sort((a, b) => a.position - b.position) }));
+      render();
+    }
+
+    // ---------- Render ----------
+    function render() {
+      const counts = {
+        all: teams.length,
+        pending: teams.filter(t => t.status === "pending").length,
+        confirmed: teams.filter(t => t.status === "confirmed").length,
+        rejected: teams.filter(t => t.status === "rejected").length
+      };
+      const playerTotal = teams.reduce((n, t) => n + t.players.length, 0);
+      const q = query.toLowerCase();
+      const shown = teams.filter(t =>
+        (filter === "all" || t.status === filter) &&
+        (!q || [t.team_name, t.manager, t.island, t.phone].some(v => (v || "").toLowerCase().includes(q))));
+
+      app.innerHTML = `
+        <div class="stats">
+          <div class="card stat"><b>${counts.all}</b><span>Teams registered</span></div>
+          <div class="card stat pending"><b>${counts.pending}</b><span>Waiting for review</span></div>
+          <div class="card stat confirmed"><b>${counts.confirmed}</b><span>Confirmed</span></div>
+          <div class="card stat"><b>${playerTotal}</b><span>Players</span></div>
+        </div>
+        <div class="toolbar">
+          <div class="tabs">
+            ${["all", "pending", "confirmed", "rejected"].map(f =>
+              `<button class="tab ${filter === f ? "active" : ""}" data-filter="${f}">${f[0].toUpperCase() + f.slice(1)} (${counts[f]})</button>`).join("")}
+          </div>
+          <input class="search" id="search" type="search" placeholder="Search team, manager, island or phone" value="${esc(query)}">
+          <button class="tool-btn" id="refresh">↻ Refresh</button>
+          <button class="tool-btn" id="export">⬇ Export CSV</button>
+        </div>
+        <div class="teams">
+          ${shown.length ? shown.map(teamCard).join("") : `<div class="card notice">No teams here yet.</div>`}
+        </div>`;
+
+      app.querySelectorAll(".tab").forEach(b => b.onclick = () => { filter = b.dataset.filter; render(); });
+      const search = document.getElementById("search");
+      search.oninput = () => { query = search.value; render(); const s = document.getElementById("search"); s.focus(); s.setSelectionRange(s.value.length, s.value.length); };
+      document.getElementById("refresh").onclick = load;
+      document.getElementById("export").onclick = exportCsv;
+
+      app.querySelectorAll(".team").forEach(card => {
+        const team = teams.find(t => t.id === card.dataset.id);
+        card.querySelector(".team-head").onclick = () => toggle(card, team);
+        card.querySelector(".confirm").onclick = () => setStatus(team, "confirmed");
+        card.querySelector(".reject").onclick = () => setStatus(team, "rejected");
+        card.querySelector(".delete").onclick = () => removeTeam(team);
+      });
+    }
+
+    function teamCard(t) {
+      const wa = "https://wa.me/" + (t.phone || "").replace(/[^\d]/g, "").replace(/^(?!960)(\d{7})$/, "960$1");
+      return `
+        <div class="card team" data-id="${t.id}">
+          <div class="team-head">
+            <div class="team-main">
+              <h3>${esc(t.team_name)}</h3>
+              <div class="team-meta">
+                <span>👤 ${esc(t.manager)}</span>
+                <span>📍 ${esc(t.island)}</span>
+                <span>🕒 ${fmtDate(t.created_at)}</span>
+              </div>
+            </div>
+            <span class="count">${t.players.length} players</span>
+            <span class="pill ${t.status}">${t.status}</span>
+            <svg class="chev" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M6 9l6 6 6-6"/></svg>
+          </div>
+          <div class="team-body">
+            <div class="contact">
+              <a href="tel:${esc(t.phone)}">📞 ${esc(t.phone)}</a>
+              <a class="wa" href="${wa}" target="_blank" rel="noopener">💬 WhatsApp</a>
+            </div>
+            ${t.notes ? `<div class="notes">${esc(t.notes)}</div>` : ""}
+            <table>
+              <thead><tr><th>#</th><th>Player</th><th>Age</th><th>ID card</th></tr></thead>
+              <tbody>
+                ${t.players.map(p => `
+                  <tr>
+                    <td class="num">${p.position}</td>
+                    <td>${esc(p.name)}</td>
+                    <td class="${p.age < 35 ? "age-bad" : ""}">${p.age}</td>
+                    <td><img class="thumb" data-path="${esc(p.id_photo_path)}" alt="ID card of ${esc(p.name)}"></td>
+                  </tr>`).join("")}
+              </tbody>
+            </table>
+            <div class="actions">
+              <button class="act confirm">✓ Confirm team</button>
+              <button class="act reject">✕ Reject</button>
+              <button class="act delete">🗑 Delete</button>
+            </div>
+          </div>
+        </div>`;
+    }
+
+    // Open a team and load its ID photos (private links that expire after an hour)
+    async function toggle(card, team) {
+      card.classList.toggle("open");
+      if (!card.classList.contains("open") || card.dataset.loaded) return;
+      card.dataset.loaded = "1";
+      const imgs = [...card.querySelectorAll(".thumb")];
+      const { data } = await db.storage.from("id-cards").createSignedUrls(imgs.map(i => i.dataset.path), 3600);
+      (data || []).forEach((d, i) => {
+        if (!d.signedUrl) return;
+        imgs[i].src = d.signedUrl;
+        imgs[i].onclick = () => { photoDlg.querySelector("img").src = d.signedUrl; photoDlg.showModal(); };
+      });
+    }
+
+    async function setStatus(team, status) {
+      const { error } = await db.from("teams").update({ status }).eq("id", team.id);
+      if (error) return alert("Couldn't update: " + error.message);
+      team.status = status;
+      render();
+    }
+
+    async function removeTeam(team) {
+      if (!confirm(`Delete "${team.team_name}" and all its players and ID photos? This can't be undone.`)) return;
+      const paths = team.players.map(p => p.id_photo_path);
+      if (paths.length) await db.storage.from("id-cards").remove(paths);
+      const { error } = await db.from("teams").delete().eq("id", team.id);
+      if (error) return alert("Couldn't delete: " + error.message);
+      teams = teams.filter(t => t.id !== team.id);
+      render();
+    }
+
+    function exportCsv() {
+      const cell = v => `"${String(v ?? "").replace(/"/g, '""')}"`;
+      const rows = [["Team", "Status", "Manager", "Phone", "Island", "Registered", "Player #", "Player", "Age", "Notes"]];
+      teams.forEach(t => t.players.forEach(p => rows.push([
+        t.team_name, t.status, t.manager, t.phone, t.island, fmtDate(t.created_at), p.position, p.name, p.age, t.notes
+      ])));
+      const blob = new Blob(["﻿" + rows.map(r => r.map(cell).join(",")).join("\n")], { type: "text/csv;charset=utf-8" });
+      const a = document.createElement("a");
+      a.href = URL.createObjectURL(blob);
+      a.download = "yp-veterans-registrations.csv";
+      a.click();
+    }
+
+    start();
+  </script>
+</body>
+</html>
