@@ -44,13 +44,23 @@ create table if not exists public.settings (
 
 insert into public.settings (id) values (1) on conflict do nothing;
 
--- True while registration is open (used by the security rules below)
+-- Optional closing date (registration closes automatically after it)
+-- and instructions shown to teams (one per line)
+alter table public.settings add column if not exists closes_at timestamptz;
+alter table public.settings add column if not exists instructions text;
+alter table public.settings drop constraint if exists settings_instructions_length;
+alter table public.settings add constraint settings_instructions_length check (char_length(instructions) <= 1000);
+
+-- True while registration is open and the closing date hasn't passed (used by the security rules below)
 create or replace function public.registration_open()
 returns boolean
 language sql stable security definer
 set search_path = public
 as $$
-  select coalesce((select registration_open from public.settings where id = 1), false);
+  select coalesce((
+    select registration_open and (closes_at is null or now() < closes_at)
+    from public.settings where id = 1
+  ), false);
 $$;
 
 

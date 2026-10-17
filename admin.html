@@ -92,6 +92,13 @@
     .rc-msg textarea { flex: 1; font: inherit; font-size: .9rem; color: var(--text); background: var(--bg); border: 1.5px solid var(--border); border-radius: 10px; padding: 9px 12px; resize: vertical; min-height: 44px; }
     .rc-msg textarea:focus { outline: none; border-color: var(--brand); }
     .rc-saved { color: var(--green); font-size: .85rem; align-self: center; }
+    .rc-extra { flex-basis: 100%; display: grid; grid-template-columns: 1fr 1.4fr; gap: 12px 16px; padding-top: 14px; border-top: 1px dashed var(--border); }
+    .rc-extra label { display: flex; flex-direction: column; gap: 6px; font-size: .8rem; font-weight: 600; color: var(--muted); }
+    .rc-extra small { font-weight: 400; }
+    .rc-extra input, .rc-extra textarea { font: inherit; font-size: .9rem; font-weight: 400; color: var(--text); background: var(--bg); border: 1.5px solid var(--border); border-radius: 10px; padding: 9px 12px; resize: vertical; }
+    .rc-extra input:focus, .rc-extra textarea:focus { outline: none; border-color: var(--brand); }
+    .rc-extra-actions { grid-column: 1 / -1; display: flex; gap: 10px; align-items: center; }
+    @media (max-width: 720px) { .rc-extra { grid-template-columns: 1fr; } }
 
     /* Stats */
     .stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 20px; }
@@ -207,7 +214,11 @@
     const db = createClient(CONFIG.supabaseUrl, CONFIG.supabaseKey);
 
     let teams = [];
-    let settings = { registration_open: true, closed_message: "" };
+    let settings = { registration_open: true, closed_message: "", closes_at: null, instructions: "" };
+    // <input type="datetime-local"> works in local time; the tournament runs on Maldives time (UTC+5)
+    const toMvInput = iso => iso ? new Date(new Date(iso).getTime() + 5 * 3600000).toISOString().slice(0, 16) : "";
+    const fromMvInput = v => v ? new Date(v + ":00+05:00").toISOString() : null;
+    const fmtMv = iso => new Intl.DateTimeFormat("en-GB", { timeZone: "Indian/Maldives", day: "numeric", month: "long", year: "numeric", hour: "numeric", minute: "2-digit", hour12: true }).format(new Date(iso));
     let filter = "all";
     const openIds = new Set();   // teams the organiser has expanded; kept open across refreshes
     let lastSignature = "";
@@ -277,7 +288,7 @@
         if (!silent) app.innerHTML = `<div class="card notice"><h2>Couldn't load</h2><p>${esc(error.message)}</p></div>`;
         return;
       }
-      const s = await db.from("settings").select("registration_open, closed_message").eq("id", 1).single();
+      const s = await db.from("settings").select("registration_open, closed_message, closes_at, instructions").eq("id", 1).single();
 
       const signature = JSON.stringify([data.map(t => [t.id, t.status, (t.players || []).length]), s.data]);
       if (silent && signature === lastSignature) return;
@@ -320,20 +331,35 @@
         (filter === "all" || t.status === filter) &&
         (!q || [t.team_name, t.manager, t.island, t.phone].some(v => (v || "").toLowerCase().includes(q))));
 
-      const open = settings.registration_open;
+      const deadlinePassed = settings.closes_at && Date.now() >= new Date(settings.closes_at);
+      const open = settings.registration_open && !deadlinePassed;
       app.innerHTML = `
         <div class="card reg-control ${open ? "" : "closed"}">
           <div class="rc-text">
             <h2>Team registration</h2>
             <p>Registration is <span class="rc-state">${open ? "OPEN" : "CLOSED"}</span>. ${open
-              ? "Teams can register on the website."
-              : "The website shows a “Registration is closed” message instead of the form."}</p>
+              ? "Teams can register on the website." + (settings.closes_at ? ` Closes automatically on <b>${fmtMv(settings.closes_at)}</b>.` : "")
+              : deadlinePassed && settings.registration_open
+                ? `The closing date (${fmtMv(settings.closes_at)}) has passed. Clear or change it below to reopen.`
+                : "The website shows a “Registration is closed” message instead of the form."}</p>
           </div>
-          <button class="switch" id="reg-switch" role="switch" aria-checked="${open}" aria-label="Registration open"></button>
+          <button class="switch" id="reg-switch" role="switch" aria-checked="${settings.registration_open}" aria-label="Registration open"></button>
           <div class="rc-msg">
             <textarea id="closed-msg" maxlength="500" placeholder="Optional message for teams, e.g. “Registration opens on 1 December”">${esc(settings.closed_message || "")}</textarea>
             <button class="tool-btn" id="save-msg">Save message</button>
             <span class="rc-saved" id="msg-saved" hidden>✓ Saved</span>
+          </div>
+          <div class="rc-extra">
+            <label>Closing date &amp; time <small>(Maldives time · leave empty for no deadline)</small>
+              <input type="datetime-local" id="closes-at" value="${toMvInput(settings.closes_at)}">
+            </label>
+            <label>Checklist for teams <small>(one item per line · leave empty for the standard list)</small>
+              <textarea id="instructions" rows="4" maxlength="1000" placeholder="At least 14 players (up to 20)&#10;All players aged 35 or older&#10;A clear photo of each player's ID card&#10;The manager's phone number (on WhatsApp)">${esc(settings.instructions || "")}</textarea>
+            </label>
+            <div class="rc-extra-actions">
+              <button class="tool-btn" id="save-extra">Save date &amp; checklist</button>
+              <span class="rc-saved" id="extra-saved" hidden>✓ Saved</span>
+            </div>
           </div>
         </div>
         <div class="stats">
@@ -361,6 +387,7 @@
       document.getElementById("refresh").onclick = () => load();
       document.getElementById("reg-switch").onclick = toggleRegistration;
       document.getElementById("save-msg").onclick = saveClosedMessage;
+      document.getElementById("save-extra").onclick = saveDeadlineAndChecklist;
       document.getElementById("export").onclick = exportCsv;
 
       app.querySelectorAll(".team").forEach(card => {
@@ -446,6 +473,19 @@
       if (error) return alert("Couldn't change registration: " + error.message);
       settings.registration_open = next;
       render();
+    }
+
+    async function saveDeadlineAndChecklist() {
+      const closes_at = fromMvInput(document.getElementById("closes-at").value);
+      const instructions = document.getElementById("instructions").value.trim() || null;
+      const { error } = await db.from("settings").update({ closes_at, instructions, updated_at: new Date().toISOString() }).eq("id", 1);
+      if (error) return alert("Couldn't save: " + error.message);
+      settings.closes_at = closes_at;
+      settings.instructions = instructions;
+      render();
+      const saved = document.getElementById("extra-saved");
+      saved.hidden = false;
+      setTimeout(() => saved.hidden = true, 2000);
     }
 
     async function saveClosedMessage() {

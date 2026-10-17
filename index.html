@@ -388,7 +388,22 @@
     }
     .reg-steps b { display: block; }
     .reg-steps span { color: #f6d6db; font-size: .88rem; }
-    .reg-deadline { margin-top: 28px; padding: 12px 16px; border-radius: 12px; background: rgba(0,0,0,.2); font-size: .92rem; }
+    .reg-deadline { display: flex; align-items: center; gap: 12px; margin-top: 28px; padding: 14px 16px; border-radius: 12px; background: rgba(0,0,0,.22); border: 1px solid rgba(227, 178, 60, .35); }
+    .reg-deadline[hidden] { display: none; }
+    .rd-icon { font-size: 1.6rem; }
+    .rd-label { display: block; font-size: .75rem; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: #f6d6db; }
+    .rd-date { display: block; font-size: 1.05rem; }
+    .rd-left { display: inline-block; margin-top: 4px; padding: 2px 10px; border-radius: 99px; background: var(--gold); color: #2a0a0f; font-size: .75rem; font-weight: 700; }
+    .rd-left:empty { display: none; }
+    .reg-howto { margin-top: 18px; padding: 16px 18px; border-radius: 12px; background: rgba(0,0,0,.18); }
+    .reg-howto h3 { font-size: 1rem; color: var(--gold); margin-bottom: 8px; }
+    .reg-howto ul { list-style: none; display: grid; gap: 7px; }
+    .reg-howto li { position: relative; padding-inline-start: 26px; font-size: .9rem; color: #fbe9ec; line-height: 1.45; }
+    .reg-howto li::before {
+      content: "✓"; position: absolute; inset-inline-start: 0; top: 1px;
+      width: 18px; height: 18px; border-radius: 50%; background: rgba(227, 178, 60, .25); color: var(--gold);
+      display: flex; align-items: center; justify-content: center; font-size: .7rem; font-weight: 700;
+    }
 
     .reg-form, .reg-done { padding: 40px 32px; }
     .fields { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
@@ -874,7 +889,19 @@
               <li data-i18n="step2"><b>Send on WhatsApp</b><span>Your details and ID photos are ready to send</span></li>
               <li data-i18n="step3"><b>Get confirmed</b><span>The organisers will contact you</span></li>
             </ol>
-            <div data-i18n="deadline" class="reg-deadline">📅 Registration closes: [Deadline]</div>
+            <!-- Closing date and checklist: organisers set both on admin.html -->
+            <div class="reg-deadline" id="reg-deadline" hidden>
+              <span class="rd-icon" aria-hidden="true">📅</span>
+              <div>
+                <span class="rd-label" data-i18n="deadlineLabel">Registration closes</span>
+                <b class="rd-date" id="rd-date"></b>
+                <span class="rd-left" id="rd-left"></span>
+              </div>
+            </div>
+            <div class="reg-howto">
+              <h3 data-i18n="howtoTitle">Before you register</h3>
+              <ul id="howto-list" data-i18n="howtoList"><li>At least 14 players (up to 20)</li><li>All players aged 35 or older</li><li>A clear photo of each player's ID card</li><li>The manager's phone number (on WhatsApp)</li></ul>
+            </div>
           </div>
         </div>
 
@@ -1146,7 +1173,9 @@
       step1: "<b>ފޯމު ފުރުއްވާ</b><span>ޓީމުގެ މަޢުލޫމާތު، ކުޅުންތެރިން އަދި އައިޑީ ކާޑުގެ ފޮޓޯ</span>",
       step2: "<b>ވަޓްސްއަޕްގައި ފޮނުއްވާ</b><span>މަޢުލޫމާތާއި އައިޑީ ފޮޓޯ ފޮނުވަން ތައްޔާރަށް</span>",
       step3: "<b>ކަށަވަރުކޮށްދެވޭނެ</b><span>ރާވާ ފަރާތުން ގުޅުއްވާނެ</span>",
-      deadline: "📅 ރަޖިސްޓްރީ ނިމޭނީ: [ތާރީޚު]",
+      deadlineLabel: "ރަޖިސްޓްރޭޝަން ނިމޭނީ",
+      howtoTitle: "ރަޖިސްޓްރީ ކުރުމުގެ ކުރިން ތައްޔާރުކުރައްވާ",
+      howtoList: "<li>މަދުވެގެން 14 ކުޅުންތެރިން (އެންމެ ގިނަވެގެން 20)</li><li>ހުރިހާ ކުޅުންތެރިންގެ އުމުރު 35 ނުވަތަ މަތި</li><li>ކޮންމެ ކުޅުންތެރިއެއްގެ އައިޑީ ކާޑުގެ ސާފު ފޮޓޯއެއް</li><li>މެނޭޖަރުގެ ފޯނު ނަންބަރު (ވަޓްސްއަޕް)</li>",
       lblTeam: "ޓީމުގެ ނަން *",
       errTeam: "ޓީމުގެ ނަން ލިޔުއްވާ",
       lblManager: "މެނޭޖަރުގެ ނަން *",
@@ -1213,7 +1242,8 @@
       summaryReady: n => "✓ ފޮނުވަން ތައްޔާރު: ޓީމުގެ މަޢުލޫމާތާއި " + n + " ކުޅުންތެރިން، އައިޑީ ފޮޓޯއާއެކު",
       preparing: n => "އައިޑީ ފޮޓޯ އަޕްލޯޑް ކުރަނީ… " + n,
       uploading: "ފޮނުވަނީ…",
-      submitServerLabel: "ރަޖިސްޓްރޭޝަން ފޮނުއްވާ"
+      submitServerLabel: "ރަޖިސްޓްރޭޝަން ފޮނުއްވާ",
+      daysLeft: n => n === 0 ? "މިއަދު ނިމޭނެ" : n + " ދުވަސް ބާކީ"
     };
     const EN = {
       players: n => n + " players",
@@ -1229,7 +1259,8 @@
       summaryReady: n => "✓ Ready to send: team details and " + n + " players with ID photos",
       preparing: n => "Uploading ID photos… " + n,
       uploading: "Sending…",
-      submitServerLabel: "Submit registration"
+      submitServerLabel: "Submit registration",
+      daysLeft: n => n === 0 ? "Closes today" : n === 1 ? "1 day left" : n + " days left"
     };
 
     let lang = "en";
@@ -1262,6 +1293,7 @@
       document.documentElement.dir = lang === "dv" ? "rtl" : "ltr";
       applyLang();
       if (typeof renumber === "function") renumber();
+      if (typeof renderDeadline === "function") renderDeadline();
       try { localStorage.setItem("lang", lang); } catch (e) {}
     }
 
@@ -1652,13 +1684,43 @@
     });
 
     // Organisers can close registration from admin.html; if closed, show the closed panel instead of the form
+    let regSettings = null;
+
+    // Closing date in Maldives time, plus a "days left" badge
+    function renderDeadline() {
+      const box = document.getElementById("reg-deadline");
+      if (!regSettings || !regSettings.closes_at) { box.hidden = true; return; }
+      const closes = new Date(regSettings.closes_at);
+      document.getElementById("rd-date").textContent = new Intl.DateTimeFormat("en-GB", {
+        timeZone: "Indian/Maldives", day: "numeric", month: "long", year: "numeric", hour: "numeric", minute: "2-digit", hour12: true
+      }).format(closes);
+      const msLeft = closes - Date.now();
+      document.getElementById("rd-left").textContent = msLeft > 0 ? t("daysLeft", Math.floor(msLeft / 86400000)) : "";
+      box.hidden = false;
+    }
+
+    // Organisers' own checklist (one item per line) replaces the standard one
+    function renderInstructions() {
+      const lines = (regSettings && regSettings.instructions || "").split("\n").map(l => l.trim()).filter(Boolean);
+      if (!lines.length) return;
+      const list = document.getElementById("howto-list");
+      list.removeAttribute("data-i18n");
+      list.innerHTML = "";
+      lines.forEach(line => { const li = document.createElement("li"); li.textContent = line; list.appendChild(li); });
+    }
+
     async function checkRegistrationOpen() {
       if (!USE_SERVER) return;
       try {
-        const res = await fetch(CONFIG.supabaseUrl + "/rest/v1/settings?id=eq.1&select=registration_open,closed_message",
+        const res = await fetch(CONFIG.supabaseUrl + "/rest/v1/settings?id=eq.1&select=registration_open,closed_message,closes_at,instructions",
           { headers: { apikey: CONFIG.supabaseKey } });
         const [settings] = await res.json();
-        if (!settings || settings.registration_open) return;
+        if (!settings) return;
+        regSettings = settings;
+        renderDeadline();
+        renderInstructions();
+        const deadlinePassed = settings.closes_at && Date.now() >= new Date(settings.closes_at);
+        if (settings.registration_open && !deadlinePassed) return;
         regForm.hidden = true;
         regDone.hidden = true;
         document.getElementById("reg-closed").hidden = false;
