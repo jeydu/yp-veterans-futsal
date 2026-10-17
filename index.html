@@ -396,19 +396,10 @@
     .rd-left { display: inline-block; margin-top: 4px; padding: 2px 10px; border-radius: 99px; background: var(--gold); color: #2a0a0f; font-size: .75rem; font-weight: 700; }
     .rd-left:empty { display: none; }
     /* Locked: the whole card follows the "closed" state */
-    .reg-locked { display: none; align-items: center; gap: 12px; margin-top: 18px; padding: 14px 16px; border-radius: 12px; background: rgba(0,0,0,.28); border: 1px solid rgba(255,255,255,.12); }
-    .rl-icon { font-size: 1.6rem; }
-    .reg-locked b { display: block; font-size: 1.05rem; }
-    .rl-sub { display: block; font-size: .85rem; color: #e9c2c8; }
-    .rl-sub:empty { display: none; }
-    .reg.is-closed .reg-info { background: linear-gradient(160deg, #4a1820, #26090e); }
-    .reg.is-closed .reg-info-inner > p,
-    .reg.is-closed .reg-steps,
-    .reg.is-closed .reg-howto,
-    .reg.is-closed .reg-deadline { display: none; }
-    .reg.is-closed .reg-locked { display: flex; }
-    .reg.is-closed .reg-info h2 { opacity: .55; }
-    .reg.is-closed .reg-info .eyebrow { color: #c9a24a; }
+    .reg.is-closed { grid-template-columns: 1fr; max-width: 760px; margin: 0 auto; }
+    .reg.is-closed .reg-info { display: none; }
+    .closed-date { padding: 4px 14px; border-radius: 99px; background: var(--tint); color: var(--brand-text); font-size: .85rem; font-weight: 600; }
+    .closed-date:empty { display: none; }
 
     .reg-howto { margin-top: 18px; padding: 16px 18px; border-radius: 12px; background: rgba(0,0,0,.18); }
     .reg-howto h3 { font-size: 1rem; color: var(--gold); margin-bottom: 8px; }
@@ -898,13 +889,6 @@
           <div class="reg-info-inner">
             <span data-i18n="regEyebrow" class="eyebrow">Next edition</span>
             <h2 data-i18n="regTitle">Register Your Team</h2>
-            <div class="reg-locked" id="reg-locked">
-              <span class="rl-icon" aria-hidden="true">🔒</span>
-              <div>
-                <b data-i18n="lockedTitle">Registration closed</b>
-                <span class="rl-sub" id="rl-sub"></span>
-              </div>
-            </div>
             <p data-i18n="regIntro">Fill in your team and players, then send everything straight to the organisers on WhatsApp.</p>
             <ol class="reg-steps">
               <li data-i18n="step1"><b>Fill in the form</b><span>Team details, players and ID card photos</span></li>
@@ -1066,6 +1050,7 @@
         <div class="reg-closed" id="reg-closed" hidden>
           <span class="reg-closed-icon" aria-hidden="true">🔒</span>
           <h3 data-i18n="closedTitle">Registration is closed</h3>
+          <span class="closed-date" id="rl-sub"></span>
           <p data-i18n="closedText">Registration isn't open right now. Contact the organisers on WhatsApp for news about the next edition.</p>
           <p class="closed-msg" id="closed-msg" hidden></p>
           <a class="reg-btn reg-submit closed-wa" id="closed-wa" href="https://wa.me/9609763551" target="_blank" rel="noopener">
@@ -1196,7 +1181,6 @@
       step2: "<b>ވަޓްސްއަޕްގައި ފޮނުއްވާ</b><span>މަޢުލޫމާތާއި އައިޑީ ފޮޓޯ ފޮނުވަން ތައްޔާރަށް</span>",
       step3: "<b>ކަށަވަރުކޮށްދެވޭނެ</b><span>ރާވާ ފަރާތުން ގުޅުއްވާނެ</span>",
       deadlineLabel: "ރަޖިސްޓްރޭޝަން ނިމޭނީ",
-      lockedTitle: "ރަޖިސްޓްރޭޝަން ބަންދު",
       howtoTitle: "ރަޖިސްޓްރީ ކުރުމުގެ ކުރިން ތައްޔާރުކުރައްވާ",
       howtoList: "<li>މަދުވެގެން 14 ކުޅުންތެރިން (އެންމެ ގިނަވެގެން 20)</li><li>ހުރިހާ ކުޅުންތެރިންގެ އުމުރު 35 ނުވަތަ މަތި</li><li>ކޮންމެ ކުޅުންތެރިއެއްގެ އައިޑީ ކާޑުގެ ސާފު ފޮޓޯއެއް</li><li>މެނޭޖަރުގެ ފޯނު ނަންބަރު (ވަޓްސްއަޕް)</li>",
       lblTeam: "ޓީމުގެ ނަން *",
