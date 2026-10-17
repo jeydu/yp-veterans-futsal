@@ -506,6 +506,49 @@
     .reg-submit { display: flex; align-items: center; justify-content: center; gap: 10px; margin-top: 14px; background: #25d366; color: #06371a; box-shadow: 0 8px 20px rgba(37, 211, 102, .35); }
     .reg-submit:hover { background: #1ebe5a; }
     .reg-submit svg { width: 22px; height: 22px; }
+    /* Main send button: red "liquid glass" */
+    .reg-btn.glass-send {
+      position: relative; overflow: hidden; isolation: isolate; padding: 18px; border-radius: 18px;
+      color: #fff; font-weight: 700; font-size: 1.05rem; letter-spacing: .02em; text-shadow: 0 1px 2px rgba(80, 0, 15, .45);
+      background: linear-gradient(180deg, rgba(255, 92, 116, .95) 0%, rgba(214, 22, 52, .92) 45%, rgba(150, 8, 32, .95) 100%);
+      border: 1px solid rgba(255, 255, 255, .35);
+      -webkit-backdrop-filter: blur(14px) saturate(180%); backdrop-filter: blur(14px) saturate(180%);
+      box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, .7),
+        inset 0 -2px 6px rgba(90, 0, 18, .45),
+        inset 0 0 0 1px rgba(255, 255, 255, .08),
+        0 10px 26px rgba(200, 16, 46, .45),
+        0 2px 6px rgba(120, 0, 20, .3);
+      transition: transform .2s cubic-bezier(.2,.8,.2,1), box-shadow .2s ease, filter .2s ease;
+    }
+    /* Glossy reflection on the top half */
+    .reg-btn.glass-send::before {
+      content: ""; position: absolute; z-index: -1; left: 6px; right: 6px; top: 3px; height: 48%; border-radius: 14px 14px 40% 40% / 14px 14px 18px 18px;
+      background: linear-gradient(180deg, rgba(255, 255, 255, .55), rgba(255, 255, 255, .08));
+      pointer-events: none;
+    }
+    /* Light sweeping across now and then */
+    .reg-btn.glass-send::after {
+      content: ""; position: absolute; z-index: -1; top: -20%; bottom: -20%; width: 35%; left: -50%; transform: skewX(-22deg);
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, .45), transparent);
+      animation: glass-sheen 4s ease-in-out 1.5s infinite; pointer-events: none;
+    }
+    @keyframes glass-sheen { 0%, 65% { left: -50%; } 100% { left: 130%; } }
+    .reg-btn.glass-send:hover {
+      background: linear-gradient(180deg, rgba(255, 110, 132, .97) 0%, rgba(226, 28, 58, .94) 45%, rgba(160, 10, 36, .96) 100%);
+      transform: translateY(-2px);
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, .75), inset 0 -2px 6px rgba(90, 0, 18, .45), 0 16px 34px rgba(200, 16, 46, .55), 0 2px 6px rgba(120, 0, 20, .3);
+    }
+    .reg-btn.glass-send:active { transform: translateY(1px) scale(.99); box-shadow: inset 0 1px 0 rgba(255, 255, 255, .5), inset 0 2px 8px rgba(90, 0, 18, .5), 0 4px 12px rgba(200, 16, 46, .35); }
+    .reg-btn.glass-send svg { filter: drop-shadow(0 1px 2px rgba(80, 0, 15, .45)); }
+    /* Uploading: spinner instead of the icon */
+    .reg-btn.glass-send:disabled { opacity: 1; filter: saturate(.85); }
+    .reg-btn.glass-send:disabled svg { display: none; }
+    .reg-btn.glass-send:disabled span::before {
+      content: ""; display: inline-block; width: 18px; height: 18px; margin-inline-end: 10px; vertical-align: -3px;
+      border: 2.5px solid rgba(255, 255, 255, .35); border-top-color: #fff; border-radius: 50%; animation: spin .8s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
 
     /* Registration: person cards (officials and players). A card turns green once everything is in */
     .players-count { font-size: .8rem; font-weight: 600; color: var(--brand-text); }
@@ -1156,7 +1199,7 @@
               </div>
             </div>
             <p class="reg-summary" id="reg-summary"></p>
-            <button class="reg-btn reg-submit" type="submit">
+            <button class="reg-btn reg-submit glass-send" type="submit">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
               <span data-i18n="submit">Send registration on WhatsApp</span>
             </button>
@@ -1617,6 +1660,8 @@
     const SUPABASE_JS = "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/+esm";
 
     if (USE_SERVER) {
+      // Sent straight to the organisers, so a "send" arrow instead of the WhatsApp icon
+      document.querySelector(".glass-send svg").innerHTML = '<path d="M22 2L11 13"/><path d="M22 2l-7 20-4-9-9-4 20-7z"/>';
       const submitLabel = document.querySelector('.reg-submit [data-i18n="submit"]');
       submitLabel.dataset.i18n = "submitServer";
       submitLabel.textContent = "Submit registration";
