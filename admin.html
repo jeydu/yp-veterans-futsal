@@ -7,61 +7,89 @@
   <title>Organiser Dashboard</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;700&family=Inter:wght@400;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <script src="config.js"></script>
   <style>
     :root {
-      --bg: #f8f5f5;
+      --bg: #f6f2f2;
       --surface: #ffffff;
+      --surface-2: #fbf8f8;
       --text: #221516;
       --muted: #6b5a5b;
       --brand: #c8102e;
       --brand-dark: #8a0b1f;
       --brand-text: #c8102e;
       --gold: #e3b23c;
-      --border: #e8dcdd;
+      --border: #ebe1e2;
       --tint: #fbeef0;
-      --green: #1f9d55;
-      --amber: #b7791f;
+      --green: #16794a;
+      --green-bg: #e3f5eb;
+      --amber: #a1650f;
+      --amber-bg: #fdf1dc;
+      --red-bg: #fde7ea;
+      --shadow: 0 1px 2px rgba(60, 10, 20, .04), 0 6px 20px rgba(60, 10, 20, .06);
       color-scheme: light;
     }
     @media (prefers-color-scheme: dark) {
       :root {
-        --bg: #120a0b;
-        --surface: #1e1214;
+        --bg: #110a0b;
+        --surface: #1c1214;
+        --surface-2: #231719;
         --text: #f3e8e9;
         --muted: #b7a2a5;
-        --border: #3a2629;
+        --border: #362427;
         --brand-text: #ff6b80;
         --tint: #3a1a20;
-        --green: #3ecf7f;
+        --green: #4fd68b;
+        --green-bg: rgba(79, 214, 139, .12);
         --amber: #f0b44c;
+        --amber-bg: rgba(240, 180, 76, .13);
+        --red-bg: rgba(255, 107, 128, .13);
+        --shadow: 0 1px 2px rgba(0, 0, 0, .3), 0 6px 20px rgba(0, 0, 0, .25);
         color-scheme: dark;
       }
     }
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body { font-family: "Inter", system-ui, sans-serif; background: var(--bg); color: var(--text); line-height: 1.5; }
     h1, h2, h3 { font-family: "Oswald", sans-serif; text-transform: uppercase; letter-spacing: .02em; line-height: 1.15; }
-    button { font: inherit; cursor: pointer; }
-    .wrap { max-width: 1100px; margin: 0 auto; padding: 0 16px; }
+    button { font: inherit; cursor: pointer; color: inherit; }
+    button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
+    .wrap { max-width: 1120px; margin: 0 auto; padding: 0 16px; }
+    .ic { width: 1em; height: 1em; flex-shrink: 0; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; vertical-align: -.14em; }
 
-    header { background: linear-gradient(135deg, var(--brand), var(--brand-dark)); color: #fff; }
-    header .wrap { display: flex; align-items: center; justify-content: space-between; gap: 12px; min-height: 64px; }
-    .brand { display: flex; align-items: center; gap: 12px; }
-    .brand img { width: 42px; height: 42px; border-radius: 50%; background: #fff; padding: 3px; border: 2px solid var(--gold); }
-    .brand h1 { font-size: 1.15rem; }
-    .brand small { display: block; color: #f6d6db; font-family: "Inter", sans-serif; font-size: .75rem; text-transform: none; letter-spacing: 0; }
-    .ghost-btn { background: rgba(255,255,255,.12); color: #fff; border: 1px solid rgba(255,255,255,.4); border-radius: 8px; padding: 8px 14px; font-size: .85rem; }
-    .ghost-btn:hover { background: rgba(255,255,255,.2); }
+    /* Header */
+    header {
+      position: relative; overflow: hidden; color: #fff;
+      background: radial-gradient(ellipse at 85% -40%, rgba(227, 178, 60, .35), transparent 55%), linear-gradient(135deg, #d4142f, var(--brand-dark) 60%, #5a0815);
+    }
+    header .wrap { display: flex; align-items: center; justify-content: space-between; gap: 12px; min-height: 76px; }
+    .brand { display: flex; align-items: center; gap: 14px; min-width: 0; }
+    .brand img { width: 48px; height: 48px; border-radius: 50%; background: #fff; padding: 3px; border: 2px solid var(--gold); flex-shrink: 0; }
+    .brand h1 { font-size: 1.3rem; }
+    .brand small { display: block; color: #f6d6db; font-size: .78rem; }
+    .who { display: flex; align-items: center; gap: 12px; font-size: .8rem; color: #f6d6db; }
+    .who-text { text-align: end; line-height: 1.35; }
+    .who-text b { display: block; color: #fff; font-weight: 600; }
+    .live { display: inline-flex; align-items: center; gap: 6px; }
+    .live::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: #4ade80; box-shadow: 0 0 0 0 rgba(74, 222, 128, .7); animation: live 2s infinite; }
+    @keyframes live { 70% { box-shadow: 0 0 0 7px rgba(74, 222, 128, 0); } 100% { box-shadow: 0 0 0 0 rgba(74, 222, 128, 0); } }
+    .ghost-btn { display: inline-flex; align-items: center; gap: 6px; background: rgba(255,255,255,.12); color: #fff; border: 1px solid rgba(255,255,255,.35); border-radius: 10px; padding: 8px 14px; font-size: .85rem; font-weight: 600; }
+    .ghost-btn:hover { background: rgba(255,255,255,.22); }
+    @media (max-width: 640px) { .who-text { display: none; } .brand small { display: none; } }
 
-    main { padding: 28px 0 60px; }
-    .card { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; }
-    .notice { padding: 28px; text-align: center; color: var(--muted); }
+    main.wrap { padding-top: 24px; padding-bottom: 64px; }
+    .card { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; box-shadow: var(--shadow); }
+    .notice { padding: 36px 28px; text-align: center; color: var(--muted); }
     .notice h2 { color: var(--text); margin-bottom: 8px; }
     .notice code { background: var(--tint); padding: 2px 6px; border-radius: 4px; }
+    .notice .big-ic { font-size: 2.2rem; color: var(--muted); margin-bottom: 8px; }
+    .section-h { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; margin: 28px 0 12px; }
+    .section-h h2 { font-size: 1.15rem; }
+    .section-h span { color: var(--muted); font-size: .85rem; }
 
     /* Login */
-    .login { max-width: 380px; margin: 40px auto; padding: 32px 28px; }
+    .login { max-width: 400px; margin: 48px auto; padding: 36px 30px; }
+    .login .big-ic { display: grid; place-items: center; width: 52px; height: 52px; border-radius: 14px; background: var(--tint); color: var(--brand-text); font-size: 1.5rem; margin-bottom: 16px; }
     .login h2 { margin-bottom: 4px; }
     .login p { color: var(--muted); font-size: .9rem; margin-bottom: 20px; }
     .login label { display: block; font-size: .78rem; font-weight: 600; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); margin: 14px 0 6px; }
@@ -72,105 +100,167 @@
     .primary-btn:disabled { opacity: .7; cursor: wait; }
     .form-error { margin-top: 12px; color: var(--brand-text); font-size: .88rem; }
 
-    /* Registration open / closed control */
-    .reg-control { display: flex; align-items: center; gap: 18px; flex-wrap: wrap; padding: 18px 20px; margin-bottom: 16px; border-inline-start: 5px solid var(--green); }
-    .reg-control.closed { border-inline-start-color: var(--brand); }
+    /* Registration open / closed */
+    .reg-control { overflow: hidden; }
+    .rc-top { display: flex; align-items: center; gap: 18px; flex-wrap: wrap; padding: 20px 22px; background: linear-gradient(90deg, var(--green-bg), transparent 70%); }
+    .reg-control.closed .rc-top { background: linear-gradient(90deg, var(--red-bg), transparent 70%); }
+    .rc-icon { display: grid; place-items: center; width: 48px; height: 48px; border-radius: 14px; background: var(--green); color: #fff; font-size: 1.4rem; flex-shrink: 0; }
+    .reg-control.closed .rc-icon { background: var(--brand); }
     .rc-text { flex: 1; min-width: 200px; }
-    .rc-text h2 { font-size: 1.1rem; }
-    .rc-text p { color: var(--muted); font-size: .88rem; }
-    .rc-state { font-weight: 600; }
-    .reg-control .rc-state { color: var(--green); }
-    .reg-control.closed .rc-state { color: var(--brand-text); }
+    .rc-text h2 { font-size: 1.25rem; display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+    .rc-text p { color: var(--muted); font-size: .9rem; margin-top: 2px; }
+    .rc-state { font: 600 .72rem "Inter", sans-serif; letter-spacing: .08em; padding: 3px 10px; border-radius: 99px; background: var(--green); color: #fff; }
+    .reg-control.closed .rc-state { background: var(--brand); }
+    .countdown { display: inline-flex; align-items: center; gap: 6px; font-weight: 600; color: var(--text); }
+    .switch-wrap { display: flex; align-items: center; gap: 10px; font-size: .85rem; font-weight: 600; color: var(--muted); }
     .switch { position: relative; flex-shrink: 0; width: 64px; height: 34px; border: 0; padding: 0; border-radius: 99px; background: var(--border); transition: background .25s ease; }
     .switch[aria-checked="true"] { background: var(--green); }
     .switch::after { content: ""; position: absolute; top: 4px; left: 4px; width: 26px; height: 26px; border-radius: 50%; background: #fff; box-shadow: 0 2px 6px rgba(0,0,0,.3); transition: transform .25s cubic-bezier(.4, 1.4, .6, 1); }
     .switch[aria-checked="true"]::after { transform: translateX(30px); }
-    .switch:focus-visible { outline: 2px solid var(--brand); outline-offset: 3px; }
     .switch:disabled { opacity: .6; cursor: wait; }
-    .rc-msg { flex-basis: 100%; display: none; gap: 8px; align-items: flex-start; }
-    .reg-control.closed .rc-msg { display: flex; }
-    .rc-msg textarea { flex: 1; font: inherit; font-size: .9rem; color: var(--text); background: var(--bg); border: 1.5px solid var(--border); border-radius: 10px; padding: 9px 12px; resize: vertical; min-height: 44px; }
-    .rc-msg textarea:focus { outline: none; border-color: var(--brand); }
-    .rc-saved { color: var(--green); font-size: .85rem; align-self: center; }
-    .rc-extra { flex-basis: 100%; display: grid; grid-template-columns: 1fr 1.4fr; gap: 12px 16px; padding-top: 14px; border-top: 1px dashed var(--border); }
-    .rc-extra label { display: flex; flex-direction: column; gap: 6px; font-size: .8rem; font-weight: 600; color: var(--muted); }
-    .rc-extra small { font-weight: 400; }
-    .rc-extra input, .rc-extra textarea { font: inherit; font-size: .9rem; font-weight: 400; color: var(--text); background: var(--bg); border: 1.5px solid var(--border); border-radius: 10px; padding: 9px 12px; resize: vertical; }
-    .rc-extra input:focus, .rc-extra textarea:focus { outline: none; border-color: var(--brand); }
-    .rc-extra-actions { grid-column: 1 / -1; display: flex; gap: 10px; align-items: center; }
-    @media (max-width: 720px) { .rc-extra { grid-template-columns: 1fr; } }
+    .rc-body { display: grid; gap: 16px; padding: 18px 22px 20px; border-top: 1px solid var(--border); }
+    .rc-row { display: grid; grid-template-columns: 1fr 1.4fr; gap: 16px; }
+    .rc-body label { display: flex; flex-direction: column; gap: 6px; font-size: .8rem; font-weight: 600; color: var(--muted); }
+    .rc-body small { font-weight: 400; }
+    .rc-body input, .rc-body textarea { font: inherit; font-size: .9rem; font-weight: 400; color: var(--text); background: var(--surface-2); border: 1.5px solid var(--border); border-radius: 10px; padding: 9px 12px; resize: vertical; }
+    .rc-body input:focus, .rc-body textarea:focus { outline: none; border-color: var(--brand); }
+    .rc-msg { align-items: flex-end; }
+    .reg-control:not(.closed) .rc-msg { display: none; }
+    .lbl { display: inline-flex; align-items: center; gap: 6px; }
+    .rc-actions { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+    .rc-saved { color: var(--green); font-size: .85rem; font-weight: 600; }
+    @media (max-width: 720px) { .rc-row { grid-template-columns: 1fr; } }
 
-    /* Stats */
-    .stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 20px; }
-    .stat { padding: 16px 18px; }
-    .stat b { display: block; font: 700 2rem "Oswald", sans-serif; line-height: 1.1; }
-    .stat span { color: var(--muted); font-size: .82rem; }
-    .stat.pending b { color: var(--amber); }
-    .stat.confirmed b { color: var(--green); }
+    /* Overview stats */
+    .stats { display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px; margin-top: 16px; }
+    .stat { display: flex; align-items: center; gap: 14px; padding: 16px 18px; }
+    .stat-ic { display: grid; place-items: center; width: 44px; height: 44px; border-radius: 12px; font-size: 1.3rem; flex-shrink: 0; background: var(--tint); color: var(--brand-text); }
+    .stat b { display: block; font: 700 1.9rem "Oswald", sans-serif; line-height: 1.05; }
+    .stat div > span { display: block; color: var(--muted); font-size: .8rem; }
+    .stat.pending .stat-ic { background: var(--amber-bg); color: var(--amber); }
+    .stat.confirmed .stat-ic { background: var(--green-bg); color: var(--green); }
+    .stat.issues .stat-ic { background: var(--red-bg); color: var(--brand-text); }
+    .stat.issues.none .stat-ic { background: var(--green-bg); color: var(--green); }
+    .stat-bar { grid-column: 1 / -1; padding: 14px 18px; display: flex; align-items: center; gap: 14px; flex-wrap: wrap; font-size: .82rem; color: var(--muted); }
+    .bar { flex: 1; min-width: 200px; display: flex; height: 10px; border-radius: 99px; overflow: hidden; background: var(--border); }
+    .bar i { display: block; height: 100%; }
+    .bar .b-confirmed { background: var(--green); }
+    .bar .b-pending { background: var(--gold); }
+    .bar .b-rejected { background: var(--brand); }
+    .legend { display: flex; gap: 14px; flex-wrap: wrap; }
+    .legend span { display: inline-flex; align-items: center; gap: 6px; }
+    .legend span::before { content: ""; width: 10px; height: 10px; border-radius: 3px; background: var(--c); }
+    @media (max-width: 900px) { .stats { grid-template-columns: repeat(2, 1fr); } .stat.issues { grid-column: 1 / -1; } }
 
     /* Toolbar */
-    .toolbar { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; margin-bottom: 16px; }
-    .tabs { display: flex; gap: 4px; padding: 4px; border-radius: 99px; background: var(--surface); border: 1px solid var(--border); }
-    .tab { border: 0; background: none; color: var(--muted); padding: 7px 14px; border-radius: 99px; font-size: .85rem; font-weight: 600; }
+    .toolbar { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; margin-bottom: 14px; }
+    .tabs { display: flex; gap: 4px; padding: 4px; border-radius: 12px; background: var(--surface); border: 1px solid var(--border); overflow-x: auto; max-width: 100%; }
+    .tab { border: 0; background: none; color: var(--muted); padding: 7px 12px; border-radius: 9px; font-size: .85rem; font-weight: 600; white-space: nowrap; }
+    .tab:hover { color: var(--text); }
     .tab.active { background: var(--brand); color: #fff; }
-    .search { flex: 1; min-width: 180px; font: inherit; color: var(--text); background: var(--surface); border: 1px solid var(--border); border-radius: 99px; padding: 9px 16px; }
-    .search:focus { outline: none; border-color: var(--brand); }
-    .tool-btn { border: 1px solid var(--border); background: var(--surface); color: var(--text); border-radius: 99px; padding: 8px 14px; font-size: .85rem; font-weight: 600; }
+    .tab em { font-style: normal; opacity: .75; margin-inline-start: 2px; }
+    .search-box { position: relative; flex: 1; min-width: 200px; }
+    .search-box .ic { position: absolute; left: 13px; top: 50%; transform: translateY(-50%); color: var(--muted); }
+    .search { width: 100%; font: inherit; font-size: .9rem; color: var(--text); background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 9px 14px 9px 38px; }
+    .search:focus, .sort:focus { outline: none; border-color: var(--brand); }
+    .sort { font: inherit; font-size: .85rem; font-weight: 600; color: var(--text); background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 9px 12px; }
+    .tool-btn { display: inline-flex; align-items: center; gap: 6px; border: 1px solid var(--border); background: var(--surface); color: var(--text); border-radius: 12px; padding: 9px 14px; font-size: .85rem; font-weight: 600; }
     .tool-btn:hover { border-color: var(--brand); color: var(--brand-text); }
 
     /* Team cards */
     .teams { display: grid; gap: 12px; }
-    .team { overflow: hidden; }
-    .team-head { display: flex; align-items: center; gap: 14px; padding: 16px 18px; cursor: pointer; }
-    .team-head:hover { background: var(--tint); }
+    .team { overflow: hidden; border-inline-start: 4px solid var(--gold); transition: box-shadow .2s ease; }
+    .team.s-confirmed { border-inline-start-color: var(--green); }
+    .team.s-rejected { border-inline-start-color: var(--brand); }
+    .team.open { box-shadow: 0 10px 34px rgba(60, 10, 20, .12); }
+    .team-head { display: flex; align-items: center; gap: 14px; width: 100%; padding: 16px 18px; border: 0; background: none; text-align: start; }
+    .team-head:hover { background: var(--surface-2); }
+    .avatar { display: grid; place-items: center; width: 46px; height: 46px; border-radius: 14px; flex-shrink: 0; color: #fff; font: 700 1.05rem "Oswald", sans-serif; background: hsl(var(--h) 55% 42%); }
     .team-main { flex: 1; min-width: 0; }
-    .team-main h3 { font-size: 1.15rem; }
-    .team-meta { color: var(--muted); font-size: .85rem; display: flex; flex-wrap: wrap; gap: 4px 14px; margin-top: 2px; }
-    .pill { flex-shrink: 0; padding: 4px 12px; border-radius: 99px; font-size: .75rem; font-weight: 600; text-transform: uppercase; letter-spacing: .05em; }
-    .pill.pending { background: rgba(183, 121, 31, .15); color: var(--amber); }
-    .pill.confirmed { background: rgba(31, 157, 85, .15); color: var(--green); }
-    .pill.rejected { background: var(--tint); color: var(--brand-text); }
-    .count { flex-shrink: 0; font: 700 1.1rem "Oswald", sans-serif; color: var(--muted); }
-    .chev { flex-shrink: 0; color: var(--muted); transition: transform .2s ease; }
+    .team-name { display: block; font: 700 1.15rem "Oswald", sans-serif; text-transform: uppercase; letter-spacing: .02em; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .team-meta { color: var(--muted); font-size: .82rem; display: flex; flex-wrap: wrap; gap: 2px 14px; margin-top: 3px; }
+    .team-meta span { display: inline-flex; align-items: center; gap: 5px; }
+    .head-side { display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
+    .pill { display: inline-flex; align-items: center; gap: 5px; padding: 4px 11px; border-radius: 99px; font-size: .72rem; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; white-space: nowrap; }
+    .pill.pending { background: var(--amber-bg); color: var(--amber); }
+    .pill.confirmed { background: var(--green-bg); color: var(--green); }
+    .pill.rejected { background: var(--red-bg); color: var(--brand-text); }
+    .pill.ok { background: var(--green-bg); color: var(--green); text-transform: none; letter-spacing: 0; font-weight: 600; }
+    .pill.warn { background: var(--red-bg); color: var(--brand-text); text-transform: none; letter-spacing: 0; font-weight: 600; }
+    .count { font: 600 .82rem "Inter", sans-serif; color: var(--muted); white-space: nowrap; }
+    .chev { color: var(--muted); transition: transform .2s ease; font-size: 1.2rem; }
     .team.open .chev { transform: rotate(180deg); }
+    @media (max-width: 720px) {
+      .team-head { flex-wrap: wrap; }
+      .head-side { width: 100%; padding-inline-start: 60px; flex-wrap: wrap; }
+      .chev { margin-inline-start: auto; }
+    }
 
-    .team-body { display: none; border-top: 1px solid var(--border); padding: 18px; }
-    .team.open .team-body { display: block; }
-    .contact { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 14px; }
-    .contact a { display: inline-flex; align-items: center; gap: 6px; padding: 7px 12px; border-radius: 99px; border: 1px solid var(--border); color: var(--text); text-decoration: none; font-size: .85rem; }
-    .contact a.wa { background: #25d366; border-color: #25d366; color: #06371a; font-weight: 600; }
-    .notes { background: var(--tint); border-radius: 10px; padding: 10px 14px; font-size: .9rem; margin-bottom: 14px; white-space: pre-wrap; }
+    .team-body { display: none; border-top: 1px solid var(--border); padding: 20px 18px; background: var(--surface-2); }
+    .team.open .team-body { display: block; animation: open .25s ease; }
+    @keyframes open { from { opacity: 0; transform: translateY(-6px); } }
+    .sub-h { display: flex; align-items: center; gap: 8px; font: 700 .78rem "Inter", sans-serif; color: var(--muted); text-transform: uppercase; letter-spacing: .08em; margin: 22px 0 10px; }
+    .sub-h:first-child { margin-top: 0; }
+    .sub-h::after { content: ""; flex: 1; height: 1px; background: var(--border); }
 
-    table { width: 100%; border-collapse: collapse; font-size: .92rem; }
-    th, td { text-align: start; padding: 8px 10px; border-bottom: 1px solid var(--border); vertical-align: middle; }
-    th { color: var(--muted); font-size: .75rem; text-transform: uppercase; letter-spacing: .06em; }
-    td.num { color: var(--muted); width: 36px; }
-    .age-bad { color: var(--brand-text); font-weight: 600; }
-    .thumb { width: 64px; height: 44px; border-radius: 6px; object-fit: cover; background: var(--tint); border: 1px solid var(--border); cursor: zoom-in; display: block; }
-    .thumb.portrait { width: 40px; height: 52px; }
-    .no-photo { color: var(--muted); font-size: .8rem; }
-    .sub-h { font-size: .8rem; color: var(--muted); text-transform: uppercase; letter-spacing: .06em; margin: 4px 0 8px; }
+    .facts { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
+    .fact { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 10px 14px; min-width: 0; }
+    .fact small { display: block; color: var(--muted); font-size: .72rem; font-weight: 600; text-transform: uppercase; letter-spacing: .06em; }
+    .fact b { display: block; font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .contact { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+    .contact a { display: inline-flex; align-items: center; gap: 6px; padding: 8px 14px; border-radius: 10px; border: 1px solid var(--border); background: var(--surface); color: var(--text); text-decoration: none; font-size: .85rem; font-weight: 600; }
+    .contact a:hover { border-color: var(--brand); }
+    .contact a.wa { background: #25d366; border-color: #25d366; color: #06371a; }
+    .notes { background: var(--surface); border: 1px dashed var(--border); border-radius: 12px; padding: 10px 14px; font-size: .9rem; margin-top: 10px; white-space: pre-wrap; }
+    @media (max-width: 720px) { .facts { grid-template-columns: 1fr 1fr; } }
 
-    /* Officials: manager, coach, official, medic */
-    .officials { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 18px; }
-    .official { display: flex; align-items: center; gap: 10px; padding: 10px 12px; border: 1px solid var(--border); border-radius: 12px; min-width: 0; }
+    .checks { display: grid; grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); gap: 8px; }
+    .check { display: flex; align-items: flex-start; gap: 10px; padding: 10px 12px; border-radius: 12px; font-size: .85rem; background: var(--green-bg); }
+    .check .ic { font-size: 1.1rem; color: var(--green); margin-top: 1px; }
+    .check b { display: block; font-weight: 600; }
+    .check span { color: var(--muted); font-size: .8rem; }
+    .check.bad { background: var(--red-bg); }
+    .check.bad .ic { color: var(--brand-text); }
+
+    .officials { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 10px; }
+    .official { display: flex; align-items: center; gap: 12px; padding: 10px 12px; background: var(--surface); border: 1px solid var(--border); border-radius: 14px; min-width: 0; }
     .official > div { flex: 1; min-width: 0; }
-    .official small { display: block; color: var(--brand-text); font-size: .7rem; font-weight: 600; text-transform: uppercase; letter-spacing: .08em; }
+    .official small { display: inline-flex; align-items: center; gap: 5px; color: var(--brand-text); font-size: .7rem; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; }
     .official b { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-    .official a { color: var(--muted); font-size: .85rem; text-decoration: none; }
+    .official a { color: var(--muted); font-size: .82rem; text-decoration: none; }
     .official .pics { display: flex; gap: 6px; flex-shrink: 0; }
-    .official .thumb { width: 40px; height: 52px; }
-    .official .thumb.wide { width: 60px; height: 52px; }
-    @media (max-width: 720px) { .officials { grid-template-columns: 1fr; } }
+    .official.missing { border-style: dashed; color: var(--muted); }
 
-    .actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 16px; }
-    .act { border: 1.5px solid var(--border); background: none; color: var(--text); padding: 8px 16px; border-radius: 10px; font-size: .88rem; font-weight: 600; }
-    .act.confirm { border-color: var(--green); color: var(--green); }
-    .act.confirm:hover { background: var(--green); color: #fff; }
+    .players { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 12px; }
+    .player { position: relative; display: flex; flex-direction: column; background: var(--surface); border: 1px solid var(--border); border-radius: 14px; overflow: hidden; }
+    .player.bad { border-color: var(--brand-text); }
+    .player .portrait-box { position: relative; aspect-ratio: 4 / 5; background: var(--tint); display: grid; place-items: center; color: var(--muted); font-size: 2rem; }
+    .player .portrait-box img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; cursor: zoom-in; }
+    .jersey { position: absolute; top: 8px; left: 8px; z-index: 1; min-width: 34px; height: 34px; padding: 0 6px; display: grid; place-items: center; border-radius: 10px; background: var(--brand); color: #fff; font: 700 1.05rem "Oswald", sans-serif; box-shadow: 0 4px 10px rgba(0,0,0,.25); }
+    .pos { position: absolute; top: 10px; right: 10px; z-index: 1; font-size: .7rem; font-weight: 700; color: #fff; background: rgba(0,0,0,.45); padding: 2px 7px; border-radius: 99px; }
+    .player-info { padding: 10px 12px 12px; display: flex; flex-direction: column; gap: 6px; flex: 1; }
+    .player-info b { font-weight: 600; line-height: 1.3; }
+    .player-row { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-top: auto; }
+    .age { font-size: .78rem; font-weight: 600; color: var(--muted); }
+    .age.bad { color: var(--brand-text); }
+    .id-btn { display: inline-flex; align-items: center; gap: 5px; border: 1px solid var(--border); background: var(--surface-2); border-radius: 8px; padding: 3px 8px; font-size: .75rem; font-weight: 600; color: var(--muted); }
+    .id-btn:hover { border-color: var(--brand); color: var(--brand-text); }
+    .id-btn:disabled { opacity: .5; cursor: default; }
+
+    .thumb { width: 44px; height: 56px; border-radius: 8px; object-fit: cover; background: var(--tint); border: 1px solid var(--border); cursor: zoom-in; display: block; }
+    .thumb.wide { width: 66px; }
+    .thumb:not([src]) { cursor: default; }
+
+    .actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 22px; padding-top: 18px; border-top: 1px solid var(--border); }
+    .act { display: inline-flex; align-items: center; gap: 6px; border: 1.5px solid var(--border); background: var(--surface); padding: 9px 16px; border-radius: 10px; font-size: .88rem; font-weight: 600; }
+    .act.confirm { background: var(--green); border-color: var(--green); color: #fff; }
+    .act.confirm:hover { filter: brightness(1.1); }
     .act.reject { border-color: var(--amber); color: var(--amber); }
     .act.reject:hover { background: var(--amber); color: #fff; }
-    .act.delete { margin-inline-start: auto; border-color: var(--brand); color: var(--brand-text); }
-    .act.delete:hover { background: var(--brand); color: #fff; }
+    .act.undo { color: var(--muted); }
+    .act.undo:hover { border-color: var(--text); color: var(--text); }
+    .act.delete { margin-inline-start: auto; border-color: transparent; background: none; color: var(--brand-text); }
+    .act.delete:hover { background: var(--red-bg); }
 
     .toast {
       position: fixed; left: 50%; bottom: 24px; z-index: 50; transform: translate(-50%, 20px); opacity: 0;
@@ -179,26 +269,56 @@
     }
     .toast.show { transform: translate(-50%, 0); opacity: 1; }
 
-    dialog { border: 0; border-radius: 12px; padding: 0; max-width: min(900px, calc(100vw - 32px)); background: #111; }
-    dialog::backdrop { background: rgba(0,0,0,.8); }
-    dialog img { display: block; max-width: 100%; max-height: 85vh; }
+    dialog { border: 0; border-radius: 14px; padding: 0; max-width: min(900px, calc(100vw - 32px)); background: #111; color: #fff; overflow: hidden; }
+    dialog::backdrop { background: rgba(0,0,0,.82); }
+    dialog img { display: block; max-width: 100%; max-height: 80vh; margin: 0 auto; }
+    dialog p { padding: 10px 16px; font-size: .9rem; text-align: center; }
     dialog button { position: absolute; top: 8px; right: 8px; width: 36px; height: 36px; border-radius: 50%; border: 0; background: rgba(0,0,0,.6); color: #fff; font-size: 1.4rem; }
 
-    @media (max-width: 720px) {
-      .stats { grid-template-columns: 1fr 1fr; }
-      .team-head { flex-wrap: wrap; }
-      .count { display: none; }
-    }
+    @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important; } }
   </style>
 </head>
 <body>
+  <svg width="0" height="0" style="position:absolute" aria-hidden="true">
+    <symbol id="i-users" viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></symbol>
+    <symbol id="i-team" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></symbol>
+    <symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></symbol>
+    <symbol id="i-check-circle" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M8.5 12.5l2.5 2.5 4.5-5"/></symbol>
+    <symbol id="i-alert" viewBox="0 0 24 24"><path d="M10.3 3.9L1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/><path d="M12 9v4M12 17h.01"/></symbol>
+    <symbol id="i-check" viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5"/></symbol>
+    <symbol id="i-x" viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12"/></symbol>
+    <symbol id="i-undo" viewBox="0 0 24 24"><path d="M3 7v6h6"/><path d="M21 17a9 9 0 0 0-15-6.7L3 13"/></symbol>
+    <symbol id="i-trash" viewBox="0 0 24 24"><path d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></symbol>
+    <symbol id="i-refresh" viewBox="0 0 24 24"><path d="M21 12a9 9 0 1 1-2.6-6.4L21 8"/><path d="M21 3v5h-5"/></symbol>
+    <symbol id="i-download" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/></symbol>
+    <symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></symbol>
+    <symbol id="i-pin" viewBox="0 0 24 24"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></symbol>
+    <symbol id="i-user" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></symbol>
+    <symbol id="i-phone" viewBox="0 0 24 24"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1.9.4 1.8.7 2.7a2 2 0 0 1-.5 2.1L8 9.8a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.8.6 2.7.7a2 2 0 0 1 1.7 2z"/></symbol>
+    <symbol id="i-chat" viewBox="0 0 24 24"><path d="M21 11.5a8.4 8.4 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.4 8.4 0 0 1-3.8-.9L3 21l1.9-5.7a8.4 8.4 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.4 8.4 0 0 1 3.8-.9h.5a8.5 8.5 0 0 1 8 8v.5z"/></symbol>
+    <symbol id="i-lock" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></symbol>
+    <symbol id="i-unlock" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 9.9-1"/></symbol>
+    <symbol id="i-logout" viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9"/></symbol>
+    <symbol id="i-chev" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></symbol>
+    <symbol id="i-portrait" viewBox="0 0 24 24"><rect x="4" y="2" width="16" height="20" rx="2"/><circle cx="12" cy="10" r="3.2"/><path d="M7.5 19a4.5 4.5 0 0 1 9 0"/></symbol>
+    <symbol id="i-idcard" viewBox="0 0 24 24"><rect x="2" y="5" width="20" height="14" rx="2"/><circle cx="8" cy="11" r="2"/><path d="M5 16a3 3 0 0 1 6 0M14 10h5M14 14h3"/></symbol>
+    <symbol id="i-briefcase" viewBox="0 0 24 24"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></symbol>
+    <symbol id="i-clipboard" viewBox="0 0 24 24"><rect x="8" y="2" width="8" height="4" rx="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2M9 12h6M9 16h6"/></symbol>
+    <symbol id="i-shield" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="M9 12l2 2 4-4"/></symbol>
+    <symbol id="i-medic" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="3"/><path d="M12 8v8M8 12h8"/></symbol>
+    <symbol id="i-calendar" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></symbol>
+  </svg>
+
   <header>
     <div class="wrap">
       <div class="brand">
         <img src="images/yp-logo.jpg" alt="">
         <div><h1>Organiser Dashboard</h1><small>YP Veterans Futsal · Team registrations</small></div>
       </div>
-      <button class="ghost-btn" id="logout" hidden>Log out</button>
+      <div class="who" id="who" hidden>
+        <div class="who-text"><b id="who-email"></b><span class="live" id="updated">Live</span></div>
+        <button class="ghost-btn" id="logout"><svg class="ic" aria-hidden="true"><use href="#i-logout"/></svg>Log out</button>
+      </div>
     </div>
   </header>
 
@@ -206,18 +326,28 @@
     <p class="notice">Loading…</p>
   </main>
 
-  <dialog id="photo"><img alt="Photo"><button aria-label="Close">&times;</button></dialog>
+  <dialog id="photo"><img alt="Photo"><p></p><button aria-label="Close">&times;</button></dialog>
 
   <script type="module">
     const CONFIG = window.YP_CONFIG || {};
     const app = document.getElementById("app");
-    const logoutBtn = document.getElementById("logout");
+    const who = document.getElementById("who");
     const photoDlg = document.getElementById("photo");
     photoDlg.querySelector("button").onclick = () => photoDlg.close();
     photoDlg.onclick = e => { if (e.target === photoDlg) photoDlg.close(); };
 
     const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+    const icon = name => `<svg class="ic" aria-hidden="true"><use href="#i-${name}"/></svg>`;
     const fmtDate = d => new Date(d).toLocaleString(undefined, { day: "numeric", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit" });
+    const ago = d => {
+      const m = Math.round((Date.now() - new Date(d)) / 60000);
+      if (m < 1) return "just now";
+      if (m < 60) return m + " min ago";
+      const h = Math.round(m / 60);
+      if (h < 24) return h + (h === 1 ? " hour ago" : " hours ago");
+      const days = Math.round(h / 24);
+      return days + (days === 1 ? " day ago" : " days ago");
+    };
 
     if (!CONFIG.supabaseUrl || !CONFIG.supabaseKey) {
       app.innerHTML = `<div class="card notice"><h2>Not connected yet</h2>
@@ -228,23 +358,62 @@
     const { createClient } = await import("https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/+esm");
     const db = createClient(CONFIG.supabaseUrl, CONFIG.supabaseKey);
 
+    // Squad rules (same as the registration form)
+    const MIN_PLAYERS = 10, MAX_PLAYERS = 12, MIN_AGE = 35;
+    const ROLES = [
+      { role: "manager", label: "Manager", icon: "briefcase" },
+      { role: "coach", label: "Coach", icon: "clipboard" },
+      { role: "official", label: "Official", icon: "shield" },
+      { role: "medic", label: "Medic", icon: "medic" }
+    ];
+    const roleInfo = r => ROLES.find(x => x.role === (r === "assistant" ? "official" : r)) || { role: r, label: r, icon: "user" };
+
     let teams = [];
     let settings = { registration_open: true, closed_message: "", closes_at: null, instructions: "" };
     // <input type="datetime-local"> works in local time; the tournament runs on Maldives time (UTC+5)
     const toMvInput = iso => iso ? new Date(new Date(iso).getTime() + 5 * 3600000).toISOString().slice(0, 16) : "";
     const fromMvInput = v => v ? new Date(v + ":00+05:00").toISOString() : null;
     const fmtMv = iso => new Intl.DateTimeFormat("en-GB", { timeZone: "Indian/Maldives", day: "numeric", month: "long", year: "numeric", hour: "numeric", minute: "2-digit", hour12: true }).format(new Date(iso));
+    const timeLeft = iso => {
+      const ms = new Date(iso) - Date.now();
+      const d = Math.floor(ms / 86400000), h = Math.floor(ms / 3600000) % 24, m = Math.floor(ms / 60000) % 60;
+      return d > 0 ? `${d} day${d === 1 ? "" : "s"} ${h} h` : h > 0 ? `${h} h ${m} min` : `${m} min`;
+    };
     let filter = "all";
+    let sortBy = "newest";
     const openIds = new Set();   // teams the organiser has expanded; kept open across refreshes
     let lastSignature = "";
     let signedIn = false;
     let query = "";
+    let lastLoaded = null;
+
+    // ---------- Checks: what's missing or wrong in a team ----------
+    function teamChecks(t) {
+      const n = t.players.length;
+      const young = t.players.filter(p => p.age < MIN_AGE);
+      const roles = new Set(t.officials.map(o => o.role === "assistant" ? "official" : o.role));
+      const missingRoles = ROLES.filter(r => !roles.has(r.role)).map(r => r.label);
+      const people = [...t.officials, ...t.players];
+      const missingPhotos = people.filter(p => !p.passport_photo_path || !p.id_photo_path);
+      const nums = t.players.map(p => p.jersey_number).filter(v => v !== null && v !== undefined);
+      const dupes = [...new Set(nums.filter((v, i) => nums.indexOf(v) !== i))];
+      const noNumber = t.players.filter(p => p.jersey_number === null || p.jersey_number === undefined).length;
+      const list = [
+        { ok: n >= MIN_PLAYERS && n <= MAX_PLAYERS, title: `${n} players`, detail: n < MIN_PLAYERS ? `Needs at least ${MIN_PLAYERS}` : n > MAX_PLAYERS ? `Maximum is ${MAX_PLAYERS}` : `${MIN_PLAYERS}–${MAX_PLAYERS} allowed` },
+        { ok: !young.length, title: young.length ? `${young.length} under ${MIN_AGE}` : `All aged ${MIN_AGE}+`, detail: young.length ? young.map(p => p.name).join(", ") : "Age rule met" },
+        { ok: !missingRoles.length, title: `${ROLES.length - missingRoles.length} of ${ROLES.length} officials`, detail: missingRoles.length ? "Missing: " + missingRoles.join(", ") : "Manager, coach, official, medic" },
+        { ok: !missingPhotos.length, title: missingPhotos.length ? `${missingPhotos.length} ${missingPhotos.length === 1 ? "person" : "people"} missing a photo` : "All photos uploaded", detail: missingPhotos.length ? missingPhotos.map(p => p.name).join(", ") : "Passport-size + ID for everyone" },
+        { ok: !dupes.length && !noNumber, title: dupes.length ? "Same jersey number twice" : noNumber ? `${noNumber} without a number` : "Jersey numbers OK", detail: dupes.length ? "No. " + dupes.join(", ") : noNumber ? "Ask the team for the numbers" : "Every player has their own number" }
+      ];
+      return { list, issues: list.filter(c => !c.ok).length };
+    }
 
     // ---------- Login ----------
     function showLogin(message = "") {
-      logoutBtn.hidden = true;
+      who.hidden = true;
       app.innerHTML = `
         <form class="card login" id="login">
+          <div class="big-ic">${icon("lock")}</div>
           <h2>Organiser login</h2>
           <p>Only organisers can see registrations and ID card photos.</p>
           <label for="email">Email</label>
@@ -269,13 +438,14 @@
       };
     }
 
-    logoutBtn.onclick = async () => { signedIn = false; await db.auth.signOut(); showLogin(); };
+    document.getElementById("logout").onclick = async () => { signedIn = false; await db.auth.signOut(); showLogin(); };
 
     // ---------- Load data ----------
     async function start() {
       const { data: { session } } = await db.auth.getSession();
       if (!session) return showLogin();
-      logoutBtn.hidden = false;
+      who.hidden = false;
+      document.getElementById("who-email").textContent = session.user.email;
 
       const { data: me } = await db.from("organisers").select("email");
       if (!me || !me.length) {
@@ -304,6 +474,8 @@
         return;
       }
       const s = await db.from("settings").select("registration_open, closed_message, closes_at, instructions").eq("id", 1).single();
+      lastLoaded = new Date();
+      updateClock();
 
       const signature = JSON.stringify([data.map(t => [t.id, t.status, (t.players || []).length, (t.officials || []).length]), s.data]);
       if (silent && signature === lastSignature) return;
@@ -311,17 +483,22 @@
       const newTeams = silent ? data.filter(t => !knownIds.has(t.id)) : [];
       lastSignature = signature;
 
-      const roleOrder = ["manager", "coach", "official", "medic"];
+      const roleOrder = ["manager", "coach", "official", "assistant", "medic"];
       teams = data.map(t => ({
         ...t,
         players: (t.players || []).sort((a, b) => a.position - b.position),
         officials: (t.officials || []).sort((a, b) => roleOrder.indexOf(a.role) - roleOrder.indexOf(b.role))
       }));
+      teams.forEach(t => t.checks = teamChecks(t));
       if (s.data) settings = s.data;
       render();
       if (newTeams.length) toast(newTeams.length === 1
         ? "🔔 New registration: " + newTeams[0].team_name
         : "🔔 " + newTeams.length + " new registrations");
+    }
+
+    function updateClock() {
+      if (lastLoaded) document.getElementById("updated").textContent = "Live · updated " + lastLoaded.toLocaleTimeString(undefined, { hour: "2-digit", minute: "2-digit" });
     }
 
     // Check for new registrations every 30 seconds, and when coming back to this tab
@@ -343,69 +520,112 @@
         all: teams.length,
         pending: teams.filter(t => t.status === "pending").length,
         confirmed: teams.filter(t => t.status === "confirmed").length,
-        rejected: teams.filter(t => t.status === "rejected").length
+        rejected: teams.filter(t => t.status === "rejected").length,
+        issues: teams.filter(t => t.checks.issues && t.status !== "rejected").length
       };
+      const confirmedPlayers = teams.filter(t => t.status === "confirmed").reduce((n, t) => n + t.players.length, 0);
       const playerTotal = teams.reduce((n, t) => n + t.players.length, 0);
       const q = query.toLowerCase();
+      const sorters = {
+        newest: (a, b) => new Date(b.created_at) - new Date(a.created_at),
+        oldest: (a, b) => new Date(a.created_at) - new Date(b.created_at),
+        name: (a, b) => a.team_name.localeCompare(b.team_name),
+        issues: (a, b) => b.checks.issues - a.checks.issues || new Date(b.created_at) - new Date(a.created_at)
+      };
       const shown = teams.filter(t =>
-        (filter === "all" || t.status === filter) &&
-        (!q || [t.team_name, t.manager, t.island, t.phone].some(v => (v || "").toLowerCase().includes(q))));
+        (filter === "all" || (filter === "issues" ? t.checks.issues && t.status !== "rejected" : t.status === filter)) &&
+        (!q || [t.team_name, t.manager, t.island, t.phone, ...t.players.map(p => p.name), ...t.officials.map(o => o.name)].some(v => (v || "").toLowerCase().includes(q))))
+        .sort(sorters[sortBy]);
 
       const deadlinePassed = settings.closes_at && Date.now() >= new Date(settings.closes_at);
       const open = settings.registration_open && !deadlinePassed;
+      const pct = n => counts.all ? (n / counts.all * 100) + "%" : "0";
+      const tabNames = { all: "All teams", pending: "Waiting", confirmed: "Confirmed", rejected: "Rejected", issues: "Need attention" };
+
       app.innerHTML = `
         <div class="card reg-control ${open ? "" : "closed"}">
-          <div class="rc-text">
-            <h2>Team registration</h2>
-            <p>Registration is <span class="rc-state">${open ? "OPEN" : "CLOSED"}</span>. ${open
-              ? "Teams can register on the website." + (settings.closes_at ? ` Closes automatically on <b>${fmtMv(settings.closes_at)}</b>.` : "")
-              : deadlinePassed && settings.registration_open
-                ? `The closing date (${fmtMv(settings.closes_at)}) has passed. Clear or change it below to reopen.`
-                : "The website shows a “Registration is closed” message instead of the form."}</p>
-          </div>
-          <button class="switch" id="reg-switch" role="switch" aria-checked="${settings.registration_open}" aria-label="Registration open"></button>
-          <div class="rc-msg">
-            <textarea id="closed-msg" maxlength="500" placeholder="Optional message for teams, e.g. “Registration opens on 1 December”">${esc(settings.closed_message || "")}</textarea>
-            <button class="tool-btn" id="save-msg">Save message</button>
-            <span class="rc-saved" id="msg-saved" hidden>✓ Saved</span>
-          </div>
-          <div class="rc-extra">
-            <label>Closing date &amp; time <small>(Maldives time · leave empty for no deadline)</small>
-              <input type="datetime-local" id="closes-at" value="${toMvInput(settings.closes_at)}">
+          <div class="rc-top">
+            <span class="rc-icon">${icon(open ? "unlock" : "lock")}</span>
+            <div class="rc-text">
+              <h2>Team registration <span class="rc-state">${open ? "OPEN" : "CLOSED"}</span></h2>
+              <p>${open
+                ? (settings.closes_at
+                  ? `<span class="countdown">${icon("clock")} Closes in ${timeLeft(settings.closes_at)}</span> · ${fmtMv(settings.closes_at)}`
+                  : "Teams can register on the website. No closing date set.")
+                : deadlinePassed && settings.registration_open
+                  ? `The closing date (${fmtMv(settings.closes_at)}) has passed. Clear or change it below to reopen.`
+                  : "The website shows a “Registration is closed” message instead of the form."}</p>
+            </div>
+            <label class="switch-wrap">${settings.registration_open ? "On" : "Off"}
+              <button class="switch" id="reg-switch" role="switch" aria-checked="${settings.registration_open}" aria-label="Registration open"></button>
             </label>
-            <label>Checklist for teams <small>(one item per line · leave empty for the standard list)</small>
-              <textarea id="instructions" rows="4" maxlength="1000" placeholder="10 to 12 players, all aged 35 or older&#10;4 officials: manager, coach, official and medic&#10;A passport-size photo and an ID card photo for everyone&#10;The manager's phone number (on WhatsApp)">${esc(settings.instructions || "")}</textarea>
-            </label>
-            <div class="rc-extra-actions">
+          </div>
+          <div class="rc-body">
+            <div class="rc-msg rc-actions">
+              <label style="flex:1">Message shown to teams while closed
+                <textarea id="closed-msg" rows="2" maxlength="500" placeholder="Optional, e.g. “Registration opens on 1 December”">${esc(settings.closed_message || "")}</textarea>
+              </label>
+              <button class="tool-btn" id="save-msg">Save message</button>
+              <span class="rc-saved" id="msg-saved" hidden>✓ Saved</span>
+            </div>
+            <div class="rc-row">
+              <label><span class="lbl">${icon("calendar")} Closing date &amp; time</span><small>Maldives time · leave empty for no deadline</small>
+                <input type="datetime-local" id="closes-at" value="${toMvInput(settings.closes_at)}">
+              </label>
+              <label><span class="lbl">${icon("clipboard")} Checklist for teams</span><small>One item per line · leave empty for the standard list</small>
+                <textarea id="instructions" rows="4" maxlength="1000" placeholder="10 to 12 players, all aged 35 or older&#10;4 officials: manager, coach, official and medic&#10;A passport-size photo and an ID card photo for everyone&#10;The manager's phone number (on WhatsApp)">${esc(settings.instructions || "")}</textarea>
+              </label>
+            </div>
+            <div class="rc-actions">
               <button class="tool-btn" id="save-extra">Save date &amp; checklist</button>
               <span class="rc-saved" id="extra-saved" hidden>✓ Saved</span>
             </div>
           </div>
         </div>
+
         <div class="stats">
-          <div class="card stat"><b>${counts.all}</b><span>Teams registered</span></div>
-          <div class="card stat pending"><b>${counts.pending}</b><span>Waiting for review</span></div>
-          <div class="card stat confirmed"><b>${counts.confirmed}</b><span>Confirmed</span></div>
-          <div class="card stat"><b>${playerTotal}</b><span>Players</span></div>
+          <div class="card stat"><span class="stat-ic">${icon("team")}</span><div><b>${counts.all}</b><span>Teams registered</span></div></div>
+          <div class="card stat pending"><span class="stat-ic">${icon("clock")}</span><div><b>${counts.pending}</b><span>Waiting for review</span></div></div>
+          <div class="card stat confirmed"><span class="stat-ic">${icon("check-circle")}</span><div><b>${counts.confirmed}</b><span>Confirmed teams</span></div></div>
+          <div class="card stat"><span class="stat-ic">${icon("users")}</span><div><b>${playerTotal}</b><span>Players · ${confirmedPlayers} confirmed</span></div></div>
+          <div class="card stat issues ${counts.issues ? "" : "none"}"><span class="stat-ic">${icon(counts.issues ? "alert" : "check")}</span><div><b>${counts.issues}</b><span>${counts.issues ? "Teams need attention" : "No problems found"}</span></div></div>
+          ${counts.all ? `
+          <div class="card stat-bar">
+            <div class="bar">
+              <i class="b-confirmed" style="width:${pct(counts.confirmed)}"></i><i class="b-pending" style="width:${pct(counts.pending)}"></i><i class="b-rejected" style="width:${pct(counts.rejected)}"></i>
+            </div>
+            <div class="legend">
+              <span style="--c:var(--green)">Confirmed ${counts.confirmed}</span>
+              <span style="--c:var(--gold)">Waiting ${counts.pending}</span>
+              <span style="--c:var(--brand)">Rejected ${counts.rejected}</span>
+            </div>
+          </div>` : ""}
         </div>
+
+        <div class="section-h"><h2>Teams</h2><span>Showing ${shown.length} of ${counts.all}</span></div>
         <div class="toolbar">
           <div class="tabs">
-            ${["all", "pending", "confirmed", "rejected"].map(f =>
-              `<button class="tab ${filter === f ? "active" : ""}" data-filter="${f}">${f[0].toUpperCase() + f.slice(1)} (${counts[f]})</button>`).join("")}
+            ${["all", "pending", "confirmed", "rejected", "issues"].map(f =>
+              `<button class="tab ${filter === f ? "active" : ""}" data-filter="${f}">${tabNames[f]} <em>${counts[f]}</em></button>`).join("")}
           </div>
-          <input class="search" id="search" type="search" placeholder="Search team, manager, island or phone" value="${esc(query)}">
-          <button class="tool-btn" id="refresh">↻ Refresh</button>
-          <button class="tool-btn" id="export">⬇ Export CSV</button>
+          <div class="search-box">${icon("search")}<input class="search" id="search" type="search" placeholder="Search team, player, manager, island or phone" value="${esc(query)}"></div>
+          <select class="sort" id="sort" aria-label="Sort teams">
+            ${[["newest", "Newest first"], ["oldest", "Oldest first"], ["name", "Team name A–Z"], ["issues", "Problems first"]].map(([v, l]) =>
+              `<option value="${v}" ${sortBy === v ? "selected" : ""}>${l}</option>`).join("")}
+          </select>
+          <button class="tool-btn" id="refresh">${icon("refresh")} Refresh</button>
+          <button class="tool-btn" id="export">${icon("download")} Export CSV</button>
         </div>
         <div class="teams">
-          ${shown.length ? shown.map(teamCard).join("") : `<div class="card notice">No teams here yet.</div>`}
+          ${shown.length ? shown.map(teamCard).join("") : `<div class="card notice"><div class="big-ic">${icon("team")}</div>${counts.all ? "No teams match." : "No teams have registered yet."}</div>`}
         </div>`;
 
       app.querySelectorAll(".tab").forEach(b => b.onclick = () => { filter = b.dataset.filter; render(); });
       const search = document.getElementById("search");
       search.oninput = () => { query = search.value; render(); const s = document.getElementById("search"); s.focus(); s.setSelectionRange(s.value.length, s.value.length); };
+      document.getElementById("sort").onchange = e => { sortBy = e.target.value; render(); };
       document.getElementById("refresh").onclick = () => load();
-      document.getElementById("reg-switch").onclick = toggleRegistration;
+      document.getElementById("reg-switch").onclick = e => { e.preventDefault(); toggleRegistration(); };
       document.getElementById("save-msg").onclick = saveClosedMessage;
       document.getElementById("save-extra").onclick = saveDeadlineAndChecklist;
       document.getElementById("export").onclick = exportCsv;
@@ -413,71 +633,105 @@
       app.querySelectorAll(".team").forEach(card => {
         const team = teams.find(t => t.id === card.dataset.id);
         card.querySelector(".team-head").onclick = () => toggle(card, team);
-        if (openIds.has(team.id)) { card.classList.add("open"); loadPhotos(card); }
-        card.querySelector(".confirm").onclick = () => setStatus(team, "confirmed");
-        card.querySelector(".reject").onclick = () => setStatus(team, "rejected");
+        if (openIds.has(team.id)) { card.classList.add("open"); card.querySelector(".team-head").setAttribute("aria-expanded", "true"); loadPhotos(card); }
+        card.querySelectorAll("[data-status]").forEach(b => b.onclick = () => setStatus(team, b.dataset.status));
         card.querySelector(".delete").onclick = () => removeTeam(team);
       });
     }
 
+    const initials = name => name.trim().split(/\s+/).filter(w => /\w/.test(w)).slice(0, 2).map(w => w[0]).join("").toUpperCase() || "?";
+    const hue = name => [...name].reduce((h, c) => (h * 31 + c.charCodeAt(0)) % 360, 7);
+
     function teamCard(t) {
       const wa = "https://wa.me/" + (t.phone || "").replace(/[^\d]/g, "").replace(/^(?!960)(\d{7})$/, "960$1");
+      const c = t.checks;
+      const ages = t.players.map(p => p.age);
+      const avgAge = ages.length ? Math.round(ages.reduce((a, b) => a + b, 0) / ages.length) : "—";
+      const photo = (path, cls, alt, label) => path
+        ? `<img class="thumb ${cls}" data-path="${esc(path)}" data-label="${esc(label)}" alt="${esc(alt)}">`
+        : `<span class="thumb ${cls}" title="Missing"></span>`;
+      const statusLabel = { pending: "Waiting", confirmed: "Confirmed", rejected: "Rejected" }[t.status] || t.status;
       return `
-        <div class="card team" data-id="${t.id}">
-          <div class="team-head">
-            <div class="team-main">
-              <h3>${esc(t.team_name)}</h3>
-              <div class="team-meta">
-                <span>👤 ${esc(t.manager)}</span>
-                <span>📍 ${esc(t.island)}</span>
-                <span>🕒 ${fmtDate(t.created_at)}</span>
-              </div>
-            </div>
-            <span class="count">${t.players.length} players</span>
-            <span class="pill ${t.status}">${t.status}</span>
-            <svg class="chev" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M6 9l6 6 6-6"/></svg>
-          </div>
+        <div class="card team s-${t.status}" data-id="${t.id}">
+          <button class="team-head" aria-expanded="false">
+            <span class="avatar" style="--h:${hue(t.team_name)}">${esc(initials(t.team_name))}</span>
+            <span class="team-main">
+              <span class="team-name">${esc(t.team_name)}</span>
+              <span class="team-meta">
+                <span>${icon("user")} ${esc(t.manager)}</span>
+                <span>${icon("pin")} ${esc(t.island)}</span>
+                <span title="${esc(fmtDate(t.created_at))}">${icon("clock")} ${ago(t.created_at)}</span>
+              </span>
+            </span>
+            <span class="head-side">
+              <span class="count">${t.players.length} players</span>
+              ${c.issues ? `<span class="pill warn">${icon("alert")} ${c.issues} ${c.issues === 1 ? "problem" : "problems"}</span>` : `<span class="pill ok">${icon("check")} All good</span>`}
+              <span class="pill ${t.status}">${statusLabel}</span>
+              <svg class="ic chev" aria-hidden="true"><use href="#i-chev"/></svg>
+            </span>
+          </button>
           <div class="team-body">
+            <h4 class="sub-h">Team details</h4>
+            <div class="facts">
+              <div class="fact"><small>Manager</small><b>${esc(t.manager)}</b></div>
+              <div class="fact"><small>Island</small><b>${esc(t.island)}</b></div>
+              <div class="fact"><small>Registered</small><b>${fmtDate(t.created_at)}</b></div>
+              <div class="fact"><small>Average age</small><b>${avgAge}</b></div>
+            </div>
             <div class="contact">
-              <a href="tel:${esc(t.phone)}">📞 ${esc(t.phone)}</a>
-              <a class="wa" href="${wa}" target="_blank" rel="noopener">💬 WhatsApp</a>
+              <a href="tel:${esc(t.phone)}">${icon("phone")} ${esc(t.phone)}</a>
+              <a class="wa" href="${wa}" target="_blank" rel="noopener">${icon("chat")} WhatsApp manager</a>
             </div>
             ${t.notes ? `<div class="notes">${esc(t.notes)}</div>` : ""}
-            ${t.officials.length ? `
-              <h4 class="sub-h">Officials</h4>
-              <div class="officials">
-                ${t.officials.map(o => `
-                  <div class="official">
-                    <div>
-                      <small>${esc(o.role)}</small>
-                      <b>${esc(o.name)}</b>
-                      ${o.phone ? `<a href="tel:${esc(o.phone)}">${esc(o.phone)}</a>` : ""}
+
+            <h4 class="sub-h">Checks</h4>
+            <div class="checks">
+              ${c.list.map(k => `<div class="check ${k.ok ? "" : "bad"}">${icon(k.ok ? "check-circle" : "alert")}<div><b>${esc(k.title)}</b><span>${esc(k.detail)}</span></div></div>`).join("")}
+            </div>
+
+            <h4 class="sub-h">Officials · ${t.officials.length}</h4>
+            <div class="officials">
+              ${t.officials.map(o => { const r = roleInfo(o.role); return `
+                <div class="official">
+                  <div>
+                    <small>${icon(r.icon)} ${esc(r.label)}</small>
+                    <b>${esc(o.name)}</b>
+                    ${o.phone ? `<a href="tel:${esc(o.phone)}">${esc(o.phone)}</a>` : ""}
+                  </div>
+                  <span class="pics">
+                    ${photo(o.passport_photo_path, "", "Passport-size photo of " + o.name, r.label + " · " + o.name + " · passport-size photo")}
+                    ${photo(o.id_photo_path, "wide", "ID card of " + o.name, r.label + " · " + o.name + " · ID card")}
+                  </span>
+                </div>`; }).join("")}
+              ${ROLES.filter(r => !t.officials.some(o => o.role === r.role || (r.role === "official" && o.role === "assistant"))).map(r => `
+                <div class="official missing"><div><small>${icon(r.icon)} ${r.label}</small><b>Not given</b></div></div>`).join("")}
+            </div>
+
+            <h4 class="sub-h">Players · ${t.players.length}</h4>
+            <div class="players">
+              ${t.players.map(p => `
+                <div class="player ${p.age < MIN_AGE ? "bad" : ""}">
+                  <div class="portrait-box">
+                    <span class="jersey">${p.jersey_number ?? "–"}</span>
+                    <span class="pos">#${p.position}</span>
+                    ${icon("portrait")}
+                    ${p.passport_photo_path ? `<img class="thumb-fill" data-path="${esc(p.passport_photo_path)}" data-label="${esc("No. " + (p.jersey_number ?? "–") + " · " + p.name + " · passport-size photo")}" alt="Passport-size photo of ${esc(p.name)}">` : ""}
+                  </div>
+                  <div class="player-info">
+                    <b>${esc(p.name)}</b>
+                    <div class="player-row">
+                      <span class="age ${p.age < MIN_AGE ? "bad" : ""}">Age ${p.age}</span>
+                      <button class="id-btn" data-path="${esc(p.id_photo_path || "")}" data-label="${esc("No. " + (p.jersey_number ?? "–") + " · " + p.name + " · ID card")}" ${p.id_photo_path ? "" : "disabled"}>${icon("idcard")} ID</button>
                     </div>
-                    <span class="pics">
-                      <img class="thumb" data-path="${esc(o.passport_photo_path)}" alt="Passport-size photo of ${esc(o.name)}">
-                      <img class="thumb wide" data-path="${esc(o.id_photo_path)}" alt="ID card of ${esc(o.name)}">
-                    </span>
-                  </div>`).join("")}
-              </div>` : ""}
-            <h4 class="sub-h">Players</h4>
-            <table>
-              <thead><tr><th>#</th><th>Jersey</th><th>Player</th><th>Age</th><th>Passport-size photo</th><th>ID card</th></tr></thead>
-              <tbody>
-                ${t.players.map(p => `
-                  <tr>
-                    <td class="num">${p.position}</td>
-                    <td><b>${p.jersey_number ?? "—"}</b></td>
-                    <td>${esc(p.name)}</td>
-                    <td class="${p.age < 35 ? "age-bad" : ""}">${p.age}</td>
-                    <td>${p.passport_photo_path ? `<img class="thumb portrait" data-path="${esc(p.passport_photo_path)}" alt="Passport-size photo of ${esc(p.name)}">` : `<span class="no-photo">—</span>`}</td>
-                    <td><img class="thumb" data-path="${esc(p.id_photo_path)}" alt="ID card of ${esc(p.name)}"></td>
-                  </tr>`).join("")}
-              </tbody>
-            </table>
+                  </div>
+                </div>`).join("")}
+            </div>
+
             <div class="actions">
-              <button class="act confirm">✓ Confirm team</button>
-              <button class="act reject">✕ Reject</button>
-              <button class="act delete">🗑 Delete</button>
+              ${t.status !== "confirmed" ? `<button class="act confirm" data-status="confirmed">${icon("check")} Confirm team</button>` : ""}
+              ${t.status !== "rejected" ? `<button class="act reject" data-status="rejected">${icon("x")} Reject</button>` : ""}
+              ${t.status !== "pending" ? `<button class="act undo" data-status="pending">${icon("undo")} Move back to waiting</button>` : ""}
+              <button class="act delete">${icon("trash")} Delete team</button>
             </div>
           </div>
         </div>`;
@@ -488,20 +742,29 @@
 
     // Open a team and load its photos (private links that expire after an hour)
     function toggle(card, team) {
-      card.classList.toggle("open");
-      if (card.classList.contains("open")) { openIds.add(team.id); loadPhotos(card); }
+      const isOpen = card.classList.toggle("open");
+      card.querySelector(".team-head").setAttribute("aria-expanded", isOpen);
+      if (isOpen) { openIds.add(team.id); loadPhotos(card); }
       else openIds.delete(team.id);
+    }
+
+    function showPhoto(url, label) {
+      photoDlg.querySelector("img").src = url;
+      photoDlg.querySelector("p").textContent = label || "";
+      photoDlg.showModal();
     }
 
     async function loadPhotos(card) {
       if (card.dataset.loaded) return;
       card.dataset.loaded = "1";
-      const imgs = [...card.querySelectorAll(".thumb")];
-      const { data } = await db.storage.from("id-cards").createSignedUrls(imgs.map(i => i.dataset.path), 3600);
+      const els = [...card.querySelectorAll("[data-path]")].filter(el => el.dataset.path);
+      if (!els.length) return;
+      const { data } = await db.storage.from("id-cards").createSignedUrls(els.map(el => el.dataset.path), 3600);
       (data || []).forEach((d, i) => {
         if (!d.signedUrl) return;
-        imgs[i].src = d.signedUrl;
-        imgs[i].onclick = () => { photoDlg.querySelector("img").src = d.signedUrl; photoDlg.showModal(); };
+        const el = els[i];
+        if (el.tagName === "IMG") el.src = d.signedUrl;
+        el.onclick = e => { e.stopPropagation(); showPhoto(d.signedUrl, el.dataset.label); };
       });
     }
 
@@ -545,6 +808,7 @@
       if (error) return alert("Couldn't update: " + error.message);
       team.status = status;
       render();
+      toast({ confirmed: "✓ " + team.team_name + " confirmed", rejected: team.team_name + " rejected", pending: team.team_name + " moved back to waiting" }[status]);
     }
 
     async function removeTeam(team) {
@@ -554,16 +818,18 @@
       const { error } = await db.from("teams").delete().eq("id", team.id);
       if (error) return alert("Couldn't delete: " + error.message);
       teams = teams.filter(t => t.id !== team.id);
+      openIds.delete(team.id);
       render();
     }
 
     function exportCsv() {
       const cell = v => `"${String(v ?? "").replace(/"/g, '""')}"`;
-      const rows = [["Team", "Status", "Manager", "Phone", "Coach", "Official", "Medic", "Island", "Registered", "Player #", "Jersey", "Player", "Age", "Notes"]];
+      const rows = [["Team", "Status", "Problems", "Manager", "Phone", "Coach", "Official", "Medic", "Island", "Registered", "Player #", "Jersey", "Player", "Age", "Notes"]];
       teams.forEach(t => {
         const off = role => t.officials.find(o => o.role === role) || {};
+        const problems = t.checks.list.filter(k => !k.ok).map(k => k.title).join("; ");
         t.players.forEach(p => rows.push([
-          t.team_name, t.status, t.manager, t.phone, off("coach").name, off("official").name, off("medic").name,
+          t.team_name, t.status, problems, t.manager, t.phone, off("coach").name, off("official").name || off("assistant").name, off("medic").name,
           t.island, fmtDate(t.created_at), p.position, p.jersey_number, p.name, p.age, t.notes
         ]));
       });
