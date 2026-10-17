@@ -131,28 +131,18 @@ alter table public.players    enable row level security;
 alter table public.officials  enable row level security;
 alter table public.settings   enable row level security;
 
-grant insert                 on public.teams, public.players, public.officials to anon, authenticated;
+-- Nobody writes teams, officials or players directly: the website uses register_team() (section 6)
+revoke insert on public.teams, public.players, public.officials from anon, authenticated;
 grant select, update, delete on public.teams                 to authenticated;
 grant select, delete         on public.players, public.officials to authenticated;
 grant select                 on public.organisers            to authenticated;
 grant select                 on public.settings              to anon, authenticated;
 grant update                 on public.settings              to authenticated;
 
--- The public can register while registration is open, but can't read anything back
+-- Old direct-insert rules (before 2026-10-18), removed
 drop policy if exists "public can register teams" on public.teams;
-create policy "public can register teams" on public.teams
-  for insert to anon, authenticated
-  with check (status = 'pending' and (public.registration_open() or public.is_organiser()));
-
 drop policy if exists "public can add players" on public.players;
-create policy "public can add players" on public.players
-  for insert to anon, authenticated
-  with check (public.registration_open() or public.is_organiser());
-
 drop policy if exists "public can add officials" on public.officials;
-create policy "public can add officials" on public.officials
-  for insert to anon, authenticated
-  with check (public.registration_open() or public.is_organiser());
 
 -- Anyone can see whether registration is open; only organisers can change it
 drop policy if exists "anyone reads settings" on public.settings;
@@ -209,10 +199,7 @@ on conflict (id) do update
       file_size_limit = excluded.file_size_limit,
       allowed_mime_types = excluded.allowed_mime_types;
 
-drop policy if exists "public can upload id cards" on storage.objects;
-create policy "public can upload id cards" on storage.objects
-  for insert to anon, authenticated
-  with check (bucket_id = 'id-cards' and (public.registration_open() or public.is_organiser()));
+-- Who can upload photos: see section 6
 
 drop policy if exists "organisers read id cards" on storage.objects;
 create policy "organisers read id cards" on storage.objects
@@ -223,3 +210,96 @@ drop policy if exists "organisers delete id cards" on storage.objects;
 create policy "organisers delete id cards" on storage.objects
   for delete to authenticated
   using (bucket_id = 'id-cards' and public.is_organiser());
+
+
+-- 6. Registering a team: one checked, all-or-nothing step ---------------------
+-- The website calls register_team(). It saves the team, its 4 officials and 10-12 players together,
+-- or nothing at all, and only after checking the squad rules and that every photo was uploaded.
+
+create or replace function public.team_exists(team text)
+returns boolean
+language sql stable security definer
+set search_path = public
+as $$
+  select exists (select 1 from public.teams where id::text = team);
+$$;
+
+create or replace function public.register_team(p jsonb)
+returns uuid
+language plpgsql security definer
+set search_path = public
+as $$
+declare
+  tid  uuid  := nullif(p->>'id', '')::uuid;
+  pl   jsonb := coalesce(p->'players', '[]'::jsonb);
+  ofs  jsonb := coalesce(p->'officials', '[]'::jsonb);
+  n    int   := jsonb_array_length(coalesce(p->'players', '[]'::jsonb));
+  missing int;
+begin
+  if not (public.registration_open() or public.is_organiser()) then
+    raise exception 'Registration is closed' using errcode = '42501';
+  end if;
+  if tid is null then raise exception 'Missing team id'; end if;
+  if exists (select 1 from public.teams where id = tid) then raise exception 'This team was already sent'; end if;
+  if n < 10 or n > 12 then raise exception 'A team needs 10 to 12 players'; end if;
+  if jsonb_array_length(ofs) <> 4
+     or (select count(distinct x->>'role') from jsonb_array_elements(ofs) x
+         where x->>'role' in ('manager', 'coach', 'official', 'medic')) <> 4 then
+    raise exception 'A team needs a manager, coach, official and medic';
+  end if;
+  if (select count(distinct (x->>'jersey_number')::int) from jsonb_array_elements(pl) x) <> n then
+    raise exception 'Each player needs a different jersey number';
+  end if;
+
+  -- Every passport-size photo and ID photo must already be uploaded
+  select count(*) into missing from (
+    select tid::text || '/players/' || lpad(i::text, 2, '0') || '-' || k || '.jpg' as path
+      from generate_series(1, n) i, unnest(array['photo', 'id']) k
+    union all
+    select tid::text || '/officials/' || r || '-' || k || '.jpg'
+      from unnest(array['manager', 'coach', 'official', 'medic']) r, unnest(array['photo', 'id']) k
+  ) want
+  where not exists (select 1 from storage.objects o where o.bucket_id = 'id-cards' and o.name = want.path);
+  if missing > 0 then raise exception '% photos are missing', missing; end if;
+
+  insert into public.teams (id, team_name, manager, phone, island)
+  select tid, trim(p->>'team_name'), trim(m->>'name'), trim(m->>'phone'), trim(p->>'island')
+    from jsonb_array_elements(ofs) m where m->>'role' = 'manager';
+
+  insert into public.officials (team_id, role, name, phone, passport_photo_path, id_photo_path)
+  select tid, x->>'role', trim(x->>'name'),
+         case when x->>'role' = 'manager' then trim(x->>'phone') end,
+         tid::text || '/officials/' || (x->>'role') || '-photo.jpg',
+         tid::text || '/officials/' || (x->>'role') || '-id.jpg'
+    from jsonb_array_elements(ofs) x;
+
+  insert into public.players (team_id, position, name, age, jersey_number, passport_photo_path, id_photo_path)
+  select tid, i, trim(x->>'name'), (x->>'age')::int, (x->>'jersey_number')::int,
+         tid::text || '/players/' || lpad(i::text, 2, '0') || '-photo.jpg',
+         tid::text || '/players/' || lpad(i::text, 2, '0') || '-id.jpg'
+    from jsonb_array_elements(pl) with ordinality as t(x, i);
+
+  return tid;
+end;
+$$;
+
+revoke all on function public.register_team(jsonb) from public;
+grant execute on function public.register_team(jsonb) to anon, authenticated;
+
+-- No two players in a team share a jersey number or a place in the list
+create unique index if not exists players_team_jersey_key on public.players (team_id, jersey_number) where jersey_number is not null;
+create unique index if not exists players_team_position_key on public.players (team_id, position);
+
+-- Photo uploads: only the exact names the form uses, and only for a team that isn't saved yet
+drop policy if exists "public can upload id cards" on storage.objects;
+create policy "public can upload id cards" on storage.objects
+  for insert to anon, authenticated
+  with check (
+    bucket_id = 'id-cards' and (
+      public.is_organiser() or (
+        public.registration_open()
+        and name ~ '^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/(players/(0[1-9]|1[0-2])|officials/(manager|coach|official|medic))-(photo|id)\.jpg$'
+        and not public.team_exists(split_part(name, '/', 1))
+      )
+    )
+  );
