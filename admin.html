@@ -567,6 +567,14 @@
     }
 
     // ---------- Login ----------
+    // A phone number logs in as <960 + number>@phone.ypveterans.com (how those accounts are stored)
+    function loginEmail(value) {
+      const v = value.trim();
+      if (v.includes("@")) return v;
+      let digits = v.replace(/\D/g, "");
+      if (digits.length === 7) digits = "960" + digits;
+      return digits + "@phone.ypveterans.com";
+    }
     function showLogin(message = "") {
       who.hidden = true;
       document.body.classList.add("login-mode");
@@ -575,8 +583,8 @@
           <div class="login-crest"><img src="images/yp-logo.jpg" alt="Young Players SC"></div>
           <h2>Organiser Portal</h2>
           <p class="lead-txt">YP Veterans Futsal · registrations and ID photos</p>
-          <label for="email">Email</label>
-          <div class="field-glass">${icon("mail")}<input id="email" type="email" autocomplete="username" placeholder="you@example.com" required></div>
+          <label for="email">Email or phone number</label>
+          <div class="field-glass">${icon("user")}<input id="email" type="text" inputmode="email" autocapitalize="off" spellcheck="false" autocomplete="username" placeholder="you@example.com or 7XX XXXX" required></div>
           <label for="password">Password</label>
           <div class="field-glass">${icon("lock")}<input id="password" type="password" autocomplete="current-password" placeholder="••••••••" required>
             <button type="button" class="eye" id="eye" aria-label="Show password">${icon("eye")}</button></div>
@@ -604,13 +612,13 @@
         btn.disabled = true;
         btn.textContent = "Logging in…";
         const { error } = await db.auth.signInWithPassword({
-          email: form.email.value.trim(),
+          email: loginEmail(form.email.value),
           password: form.password.value
         });
         btn.disabled = false;
         btn.textContent = "Log in";
         if (error) {
-          document.getElementById("login-error").textContent = "Wrong email or password.";
+          document.getElementById("login-error").textContent = "Wrong email, phone number or password.";
           form.classList.remove("shake"); void form.offsetWidth; form.classList.add("shake");
         }
         else start();
@@ -625,7 +633,9 @@
       if (!session) return showLogin();
       document.body.classList.remove("login-mode");
       who.hidden = false;
-      document.getElementById("who-email").textContent = session.user.email;
+      const em = session.user.email || "";
+      document.getElementById("who-email").textContent = em.endsWith("@phone.ypveterans.com")
+        ? "+" + em.slice(0, 3) + " " + em.slice(3, 6) + "-" + em.slice(6, em.indexOf("@")) : em;
 
       const { data: me } = await db.from("organisers").select("email");
       if (!me || !me.length) {

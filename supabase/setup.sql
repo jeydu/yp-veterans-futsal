@@ -16,8 +16,9 @@ create table if not exists public.organisers (
   email text primary key
 );
 
+-- Phone-number logins are stored as <960 + number>@phone.ypveterans.com (admin.html converts the number)
 insert into public.organisers (email)
-values ('jadhullo7@gmail.com')
+values ('jadhullo7@gmail.com'), ('9609751808@phone.ypveterans.com')
 on conflict do nothing;
 
 create or replace function public.is_organiser()
