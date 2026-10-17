@@ -3,7 +3,7 @@
 -- Run this once in Supabase: SQL Editor -> New query -> paste everything -> Run.
 -- It is safe to run again; it won't duplicate anything.
 --
--- What the public (the website) can do:  register a team, its players and ID photos.
+-- What the public (the website) can do:  register a team, its officials, players and their photos.
 -- What the public can NOT do:             read, change or delete anything.
 -- What organisers can do (after logging in on admin.html): read, confirm/reject, delete.
 
@@ -92,17 +92,37 @@ create table if not exists public.players (
 
 create index if not exists players_team_id_idx on public.players (team_id);
 
+-- Passport-size photo for each player (older registrations don't have one)
+alter table public.players add column if not exists passport_photo_path text check (char_length(passport_photo_path) <= 200);
+
+
+-- 3b. Team officials: manager, coach and assistant ---------------------------
+
+create table if not exists public.officials (
+  id                   uuid primary key default gen_random_uuid(),
+  team_id              uuid not null references public.teams (id) on delete cascade,
+  role                 text not null check (role in ('manager', 'coach', 'assistant')),
+  name                 text not null check (char_length(name) between 1 and 100),
+  phone                text not null check (char_length(phone) between 7 and 20),
+  passport_photo_path  text not null check (char_length(passport_photo_path) <= 200),
+  id_photo_path        text not null check (char_length(id_photo_path) <= 200),
+  unique (team_id, role)
+);
+
+create index if not exists officials_team_id_idx on public.officials (team_id);
+
 
 -- 4. Who can do what --------------------------------------------------------
 
 alter table public.organisers enable row level security;
 alter table public.teams      enable row level security;
 alter table public.players    enable row level security;
+alter table public.officials  enable row level security;
 alter table public.settings   enable row level security;
 
-grant insert                 on public.teams, public.players to anon, authenticated;
+grant insert                 on public.teams, public.players, public.officials to anon, authenticated;
 grant select, update, delete on public.teams                 to authenticated;
-grant select, delete         on public.players               to authenticated;
+grant select, delete         on public.players, public.officials to authenticated;
 grant select                 on public.organisers            to authenticated;
 grant select                 on public.settings              to anon, authenticated;
 grant update                 on public.settings              to authenticated;
@@ -115,6 +135,11 @@ create policy "public can register teams" on public.teams
 
 drop policy if exists "public can add players" on public.players;
 create policy "public can add players" on public.players
+  for insert to anon, authenticated
+  with check (public.registration_open() or public.is_organiser());
+
+drop policy if exists "public can add officials" on public.officials;
+create policy "public can add officials" on public.officials
   for insert to anon, authenticated
   with check (public.registration_open() or public.is_organiser());
 
@@ -150,13 +175,21 @@ drop policy if exists "organisers delete players" on public.players;
 create policy "organisers delete players" on public.players
   for delete to authenticated using (public.is_organiser());
 
+drop policy if exists "organisers read officials" on public.officials;
+create policy "organisers read officials" on public.officials
+  for select to authenticated using (public.is_organiser());
+
+drop policy if exists "organisers delete officials" on public.officials;
+create policy "organisers delete officials" on public.officials
+  for delete to authenticated using (public.is_organiser());
+
 drop policy if exists "organisers read organisers" on public.organisers;
 create policy "organisers read organisers" on public.organisers
   for select to authenticated using (public.is_organiser());
 
 
--- 5. ID card photos (private storage) ----------------------------------------
--- Private bucket: photos are never public. Max 3 MB each, images only.
+-- 5. Photos: passport and ID card (private storage) --------------------------
+-- Private bucket (named id-cards): photos are never public. Max 3 MB each, images only.
 
 insert into storage.buckets (id, name, public, file_size_limit, allowed_mime_types)
 values ('id-cards', 'id-cards', false, 3145728, array['image/jpeg', 'image/png', 'image/webp'])

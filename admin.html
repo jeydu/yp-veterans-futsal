@@ -147,6 +147,21 @@
     td.num { color: var(--muted); width: 36px; }
     .age-bad { color: var(--brand-text); font-weight: 600; }
     .thumb { width: 64px; height: 44px; border-radius: 6px; object-fit: cover; background: var(--tint); border: 1px solid var(--border); cursor: zoom-in; display: block; }
+    .thumb.portrait { width: 40px; height: 52px; }
+    .no-photo { color: var(--muted); font-size: .8rem; }
+    .sub-h { font-size: .8rem; color: var(--muted); text-transform: uppercase; letter-spacing: .06em; margin: 4px 0 8px; }
+
+    /* Officials: manager, coach, assistant */
+    .officials { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 18px; }
+    .official { display: flex; align-items: center; gap: 10px; padding: 10px 12px; border: 1px solid var(--border); border-radius: 12px; min-width: 0; }
+    .official > div { flex: 1; min-width: 0; }
+    .official small { display: block; color: var(--brand-text); font-size: .7rem; font-weight: 600; text-transform: uppercase; letter-spacing: .08em; }
+    .official b { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .official a { color: var(--muted); font-size: .85rem; text-decoration: none; }
+    .official .pics { display: flex; gap: 6px; flex-shrink: 0; }
+    .official .thumb { width: 40px; height: 52px; }
+    .official .thumb.wide { width: 60px; height: 52px; }
+    @media (max-width: 720px) { .officials { grid-template-columns: 1fr; } }
 
     .actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 16px; }
     .act { border: 1.5px solid var(--border); background: none; color: var(--text); padding: 8px 16px; border-radius: 10px; font-size: .88rem; font-weight: 600; }
@@ -191,7 +206,7 @@
     <p class="notice">Loading…</p>
   </main>
 
-  <dialog id="photo"><img alt="ID card photo"><button aria-label="Close">&times;</button></dialog>
+  <dialog id="photo"><img alt="Photo"><button aria-label="Close">&times;</button></dialog>
 
   <script type="module">
     const CONFIG = window.YP_CONFIG || {};
@@ -282,7 +297,7 @@
       }
       const { data, error } = await db
         .from("teams")
-        .select("*, players(id, position, name, age, id_photo_path)")
+        .select("*, players(id, position, name, age, id_photo_path, passport_photo_path), officials(role, name, phone, passport_photo_path, id_photo_path)")
         .order("created_at", { ascending: false });
       if (error) {
         if (!silent) app.innerHTML = `<div class="card notice"><h2>Couldn't load</h2><p>${esc(error.message)}</p></div>`;
@@ -290,13 +305,18 @@
       }
       const s = await db.from("settings").select("registration_open, closed_message, closes_at, instructions").eq("id", 1).single();
 
-      const signature = JSON.stringify([data.map(t => [t.id, t.status, (t.players || []).length]), s.data]);
+      const signature = JSON.stringify([data.map(t => [t.id, t.status, (t.players || []).length, (t.officials || []).length]), s.data]);
       if (silent && signature === lastSignature) return;
       const knownIds = new Set(teams.map(t => t.id));
       const newTeams = silent ? data.filter(t => !knownIds.has(t.id)) : [];
       lastSignature = signature;
 
-      teams = data.map(t => ({ ...t, players: (t.players || []).sort((a, b) => a.position - b.position) }));
+      const roleOrder = ["manager", "coach", "assistant"];
+      teams = data.map(t => ({
+        ...t,
+        players: (t.players || []).sort((a, b) => a.position - b.position),
+        officials: (t.officials || []).sort((a, b) => roleOrder.indexOf(a.role) - roleOrder.indexOf(b.role))
+      }));
       if (s.data) settings = s.data;
       render();
       if (newTeams.length) toast(newTeams.length === 1
@@ -354,7 +374,7 @@
               <input type="datetime-local" id="closes-at" value="${toMvInput(settings.closes_at)}">
             </label>
             <label>Checklist for teams <small>(one item per line · leave empty for the standard list)</small>
-              <textarea id="instructions" rows="4" maxlength="1000" placeholder="At least 12 players (up to 20)&#10;All players aged 35 or older&#10;A clear photo of each player's ID card&#10;The manager's phone number (on WhatsApp)">${esc(settings.instructions || "")}</textarea>
+              <textarea id="instructions" rows="4" maxlength="1000" placeholder="10 to 12 players, all aged 35 or older&#10;3 officials: manager, coach and assistant&#10;A passport-size photo and an ID card photo for everyone&#10;The manager's phone number (on WhatsApp)">${esc(settings.instructions || "")}</textarea>
             </label>
             <div class="rc-extra-actions">
               <button class="tool-btn" id="save-extra">Save date &amp; checklist</button>
@@ -423,14 +443,32 @@
               <a class="wa" href="${wa}" target="_blank" rel="noopener">💬 WhatsApp</a>
             </div>
             ${t.notes ? `<div class="notes">${esc(t.notes)}</div>` : ""}
+            ${t.officials.length ? `
+              <h4 class="sub-h">Officials</h4>
+              <div class="officials">
+                ${t.officials.map(o => `
+                  <div class="official">
+                    <div>
+                      <small>${esc(o.role)}</small>
+                      <b>${esc(o.name)}</b>
+                      <a href="tel:${esc(o.phone)}">${esc(o.phone)}</a>
+                    </div>
+                    <span class="pics">
+                      <img class="thumb" data-path="${esc(o.passport_photo_path)}" alt="Passport photo of ${esc(o.name)}">
+                      <img class="thumb wide" data-path="${esc(o.id_photo_path)}" alt="ID card of ${esc(o.name)}">
+                    </span>
+                  </div>`).join("")}
+              </div>` : ""}
+            <h4 class="sub-h">Players</h4>
             <table>
-              <thead><tr><th>#</th><th>Player</th><th>Age</th><th>ID card</th></tr></thead>
+              <thead><tr><th>#</th><th>Player</th><th>Age</th><th>Photo</th><th>ID card</th></tr></thead>
               <tbody>
                 ${t.players.map(p => `
                   <tr>
                     <td class="num">${p.position}</td>
                     <td>${esc(p.name)}</td>
                     <td class="${p.age < 35 ? "age-bad" : ""}">${p.age}</td>
+                    <td>${p.passport_photo_path ? `<img class="thumb portrait" data-path="${esc(p.passport_photo_path)}" alt="Passport photo of ${esc(p.name)}">` : `<span class="no-photo">—</span>`}</td>
                     <td><img class="thumb" data-path="${esc(p.id_photo_path)}" alt="ID card of ${esc(p.name)}"></td>
                   </tr>`).join("")}
               </tbody>
@@ -444,7 +482,10 @@
         </div>`;
     }
 
-    // Open a team and load its ID photos (private links that expire after an hour)
+    // Every stored photo of a team (passport and ID, officials and players)
+    const teamPaths = t => [...t.officials, ...t.players].flatMap(p => [p.passport_photo_path, p.id_photo_path]).filter(Boolean);
+
+    // Open a team and load its photos (private links that expire after an hour)
     function toggle(card, team) {
       card.classList.toggle("open");
       if (card.classList.contains("open")) { openIds.add(team.id); loadPhotos(card); }
@@ -506,8 +547,8 @@
     }
 
     async function removeTeam(team) {
-      if (!confirm(`Delete "${team.team_name}" and all its players and ID photos? This can't be undone.`)) return;
-      const paths = team.players.map(p => p.id_photo_path);
+      if (!confirm(`Delete "${team.team_name}" with its officials, players and photos? This can't be undone.`)) return;
+      const paths = teamPaths(team);
       if (paths.length) await db.storage.from("id-cards").remove(paths);
       const { error } = await db.from("teams").delete().eq("id", team.id);
       if (error) return alert("Couldn't delete: " + error.message);
@@ -517,10 +558,14 @@
 
     function exportCsv() {
       const cell = v => `"${String(v ?? "").replace(/"/g, '""')}"`;
-      const rows = [["Team", "Status", "Manager", "Phone", "Island", "Registered", "Player #", "Player", "Age", "Notes"]];
-      teams.forEach(t => t.players.forEach(p => rows.push([
-        t.team_name, t.status, t.manager, t.phone, t.island, fmtDate(t.created_at), p.position, p.name, p.age, t.notes
-      ])));
+      const rows = [["Team", "Status", "Manager", "Phone", "Coach", "Coach phone", "Assistant", "Assistant phone", "Island", "Registered", "Player #", "Player", "Age", "Notes"]];
+      teams.forEach(t => {
+        const off = role => t.officials.find(o => o.role === role) || {};
+        t.players.forEach(p => rows.push([
+          t.team_name, t.status, t.manager, t.phone, off("coach").name, off("coach").phone, off("assistant").name, off("assistant").phone,
+          t.island, fmtDate(t.created_at), p.position, p.name, p.age, t.notes
+        ]));
+      });
       const blob = new Blob(["﻿" + rows.map(r => r.map(cell).join(",")).join("\n")], { type: "text/csv;charset=utf-8" });
       const a = document.createElement("a");
       a.href = URL.createObjectURL(blob);

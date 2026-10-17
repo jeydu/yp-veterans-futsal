@@ -497,71 +497,93 @@
     .reg-submit:hover { background: #1ebe5a; }
     .reg-submit svg { width: 22px; height: 22px; }
 
-    /* A player row turns green once name, age and ID photo are all in */
-    .player.complete { border-color: rgba(31, 157, 85, .5); }
-    .player.complete .player-num { background: #1f9d55; }
+    /* Registration: person cards (officials and players). A card turns green once everything is in */
     .players-count { font-size: .8rem; font-weight: 600; color: var(--brand-text); }
-    .players-hint { margin: -2px 0 4px; font-size: .85rem; color: var(--muted); }
-    .players { display: grid; gap: 10px; }
-    .player {
-      display: flex; align-items: center; gap: 10px;
-      padding: 10px; border: 1.5px solid var(--border); border-radius: 12px; background: var(--bg);
-      transition: border-color .15s ease;
+    .people { display: grid; gap: 12px; }
+    .pcard {
+      padding: 14px; border: 1.5px solid var(--border); border-radius: 16px; background: var(--bg);
+      transition: border-color .2s ease, box-shadow .2s ease;
     }
-    .player:focus-within { border-color: var(--brand); }
-    .player-num {
-      flex-shrink: 0; width: 30px; height: 30px; border-radius: 50%;
-      display: flex; align-items: center; justify-content: center;
-      background: var(--brand); color: #fff; font: 700 .85rem "Oswald", sans-serif;
-    }
-    .player-fields { flex: 1; display: grid; grid-template-columns: 1fr 76px 150px; gap: 8px; min-width: 0; }
-    .player input[type="text"], .player input[type="number"] {
-      font: inherit; color: var(--text); background: var(--surface); min-width: 0;
-      border: 1.5px solid var(--border); border-radius: 8px; padding: 9px 11px;
-    }
-    .player input:focus { outline: none; border-color: var(--brand); }
-    /* ID card upload button */
-    .p-id {
-      position: relative; display: flex; align-items: center; gap: 8px; min-width: 0; min-height: 40px;
-      padding-block: 4px; padding-inline: 5px 12px;
-      border: 1.5px solid transparent; border-radius: 99px; cursor: pointer;
-      background: var(--tint); color: var(--brand-text); font-size: .82rem; font-weight: 600;
-      transition: background .15s ease, border-color .15s ease, color .15s ease;
-    }
-    .p-id:hover { background: var(--tint-strong); border-color: var(--brand); }
-    .p-id:focus-within { outline: 2px solid var(--brand); outline-offset: 2px; }
-    .p-id-icon {
+    .pcard:focus-within { border-color: var(--brand-text); box-shadow: 0 0 0 4px rgba(200, 16, 46, .08); }
+    .pcard.complete { border-color: rgba(31, 157, 85, .55); }
+    .pc-head { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
+    .pc-badge {
       display: flex; align-items: center; justify-content: center; flex-shrink: 0;
-      width: 28px; height: 28px; border-radius: 50%; background: var(--brand); color: #fff;
-      box-shadow: 0 3px 8px rgba(200, 16, 46, .3); transition: transform .15s ease, background .15s ease;
+      width: 34px; height: 34px; border-radius: 10px; background: var(--brand); color: #fff;
+      font: 700 .95rem "Oswald", sans-serif; transition: background .2s ease;
     }
-    .p-id-icon svg { width: 14px; height: 14px; }
-    .p-id:hover .p-id-icon { transform: translateY(-2px); }
-    .p-id .ic-check { display: none; }
-    .p-id-text { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-    .p-file { position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; }
-    .p-thumb { display: none; flex-shrink: 0; width: 30px; height: 30px; border-radius: 7px; object-fit: cover; border: 2px solid #fff; box-shadow: 0 2px 6px rgba(0,0,0,.2); }
-    /* Photo added: green, tick, and a preview of the photo */
-    .p-id.has-file { background: rgba(31, 157, 85, .12); border-color: rgba(31, 157, 85, .45); color: var(--ok-text); }
-    .p-id.has-file .p-id-icon { background: #1f9d55; box-shadow: 0 3px 8px rgba(31, 157, 85, .35); }
-    .p-id.has-file .ic-up { display: none; }
-    .p-id.has-file .ic-check { display: block; }
-    .p-id.has-file .p-thumb { display: block; }
-    .player .bad { border-color: var(--brand) !important; background: var(--tint-strong); }
+    .pc-badge .ic { font-size: 1.1rem; }
+    .pcard.complete .pc-badge { background: #1f9d55; }
+    .pc-title { flex: 1; min-width: 0; display: flex; flex-direction: column; line-height: 1.25; }
+    .pc-title b { font: 600 1rem "Oswald", sans-serif; text-transform: uppercase; letter-spacing: .03em; }
+    .pc-title small { color: var(--muted); font-size: .8rem; }
+    .pc-title small:empty { display: none; }
+    .pc-state {
+      flex-shrink: 0; display: inline-flex; align-items: center; gap: 4px; padding: 3px 10px; border-radius: 99px;
+      background: var(--tint); color: var(--muted); font-size: .78rem; font-weight: 700;
+    }
+    .pcard.complete .pc-state { background: rgba(31, 157, 85, .14); color: var(--ok-text); }
+    .pc-body { display: grid; grid-template-columns: 1fr auto; gap: 14px; align-items: start; }
+    .pc-fields { display: grid; gap: 10px; min-width: 0; }
+    .pc-lbl { display: flex; flex-direction: column; gap: 5px; font-size: .75rem; font-weight: 600; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); }
+    .pc-lbl input {
+      width: 100%; min-width: 0; font: inherit; font-size: 1rem; font-weight: 400; text-transform: none; letter-spacing: 0; color: var(--text);
+      background: var(--surface); border: 1.5px solid var(--border); border-radius: 10px; padding: 10px 12px;
+    }
+    .pc-lbl input:focus { outline: none; border-color: var(--brand-text); }
+    .pc-age input { max-width: 110px; }
+    .pcard input.bad { border-color: var(--brand-text); background: var(--tint-strong); }
+
+    /* Photo tiles: tap to add, then they show the photo with a green tick */
+    .pc-photos { display: flex; gap: 10px; }
+    .ph-tile {
+      position: relative; display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+      width: 100px; height: 132px; border-radius: 12px; overflow: hidden; cursor: pointer;
+      border: 1.5px dashed var(--off); background: var(--surface); color: var(--brand-text);
+      transition: border-color .15s ease, background .15s ease;
+    }
+    .ph-id { width: 156px; }
+    .ph-tile:hover { border-color: var(--brand-text); background: var(--tint-strong); }
+    .ph-tile:focus-within { outline: 3px solid var(--gold); outline-offset: 2px; }
+    .ph-tile input { position: absolute; inset: 0; width: 100%; opacity: 0; cursor: pointer; z-index: 2; }
+    .ph-empty { display: flex; flex-direction: column; align-items: center; gap: 5px; padding: 8px; text-align: center; font-size: .78rem; font-weight: 600; line-height: 1.2; }
+    .ph-empty .ic { font-size: 1.7rem; stroke-width: 1.7; }
+    .ph-empty small { color: var(--muted); font-weight: 400; font-size: .72rem; }
+    .ph-prev, .ph-done, .ph-cap { display: none; }
+    .ph-prev { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+    .ph-done {
+      position: absolute; top: 6px; inset-inline-end: 6px; z-index: 1; align-items: center; justify-content: center;
+      width: 24px; height: 24px; border-radius: 50%; background: #1f9d55; color: #fff; box-shadow: 0 2px 6px rgba(0,0,0,.3);
+    }
+    .ph-done .ic { font-size: .85rem; stroke-width: 3; }
+    .ph-cap {
+      position: absolute; inset-inline: 0; bottom: 0; z-index: 1; padding: 14px 6px 6px; text-align: center;
+      background: linear-gradient(to top, rgba(0,0,0,.7), transparent); color: #fff; font-size: .72rem; font-weight: 600;
+    }
+    .ph-tile.has-file { border: 2px solid #1f9d55; }
+    .ph-tile.has-file .ph-empty { display: none; }
+    .ph-tile.has-file .ph-prev { display: block; }
+    .ph-tile.has-file .ph-done, .ph-tile.has-file .ph-cap { display: flex; }
+    .ph-tile.has-file .ph-cap { display: block; }
+    .ph-tile.bad { border: 2px solid var(--brand-text); background: var(--tint-strong); }
+
     .p-remove {
-      flex-shrink: 0; width: 40px; height: 40px; border-radius: 50%; border: 0; cursor: pointer;
-      background: transparent; color: var(--muted); font-size: 1.5rem; line-height: 1;
+      display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+      width: 40px; height: 40px; border-radius: 50%; border: 0; cursor: pointer;
+      background: transparent; color: var(--muted); font-size: 1.2rem;
     }
+    .p-remove[hidden] { display: none; }
     .p-remove:hover { background: var(--tint); color: var(--brand-text); }
     .add-player {
-      align-self: flex-start; display: inline-flex; align-items: center; gap: 8px; margin-top: 2px;
-      padding: 9px 16px; border-radius: 99px; border: 1.5px solid var(--brand); cursor: pointer;
-      background: transparent; color: var(--brand-text); font: 600 .88rem "Inter", sans-serif;
+      display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; margin-top: 12px;
+      padding: 14px 16px; border-radius: 16px; border: 1.5px dashed var(--brand-text); cursor: pointer;
+      background: transparent; color: var(--brand-text); font: 600 .95rem "Inter", sans-serif;
       transition: background .15s ease;
     }
-    .add-player span { font-size: 1.1rem; line-height: 1; }
+    .add-player .ic { font-size: 1.15rem; }
     .add-player:hover { background: var(--tint); }
-    .add-player:disabled { opacity: .4; cursor: not-allowed; }
+    .add-player[hidden] { display: none; }
+    .people-field .err { margin-top: 10px; }
     .done-steps { text-align: start; margin: 8px 0 4px; padding-inline-start: 20px; color: var(--muted); max-width: 360px; }
     .done-steps li { margin: 6px 0; }
     .done-steps li.done { color: var(--ok-text); }
@@ -691,14 +713,16 @@
       .reg { grid-template-columns: 1fr; }
       .reg-info-inner { position: static; }
       .reg-progress { margin: -28px -20px 8px; padding: 12px 20px; }
-      .rp-step { font-size: .78rem; gap: 5px; }
+      .rp-step { font-size: .74rem; gap: 4px; }
+      .rp-steps .rp-dot { width: 22px; height: 22px; }
       .rp-count { display: none; }
       .sec-title { flex-wrap: wrap; }
       .reg-info, .reg-form, .reg-done { padding: 28px 20px; }
       .fields { grid-template-columns: 1fr; }
-      .player { align-items: flex-start; }
-      .player-fields { grid-template-columns: 1fr 70px; }
-      .p-id { grid-column: 1 / -1; padding-block: 6px; }
+      .pcard { padding: 12px; }
+      .pc-body { grid-template-columns: 1fr; gap: 12px; }
+      .pc-photos .ph-tile { flex: 1; width: auto; height: 120px; }
+      .pc-photos .ph-passport { flex: .75; }
       .winners { grid-template-columns: 1fr 1fr; gap: 12px; }
       .champ-link.current { grid-row: auto; }
       .champ-link.current .w-photo { flex: none; min-height: 0; aspect-ratio: 4 / 3; }
@@ -726,6 +750,14 @@
     <symbol id="i-lock" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></symbol>
     <symbol id="i-check-circle" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M8.5 12.5l2.5 2.5 4.5-5"/></symbol>
     <symbol id="i-arrow" viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></symbol>
+    <symbol id="i-briefcase" viewBox="0 0 24 24"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></symbol>
+    <symbol id="i-clipboard" viewBox="0 0 24 24"><rect x="8" y="2" width="8" height="4" rx="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2M9 12h6M9 16h6"/></symbol>
+    <symbol id="i-user-plus" viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M19 8v6M22 11h-6"/></symbol>
+    <symbol id="i-portrait" viewBox="0 0 24 24"><rect x="4" y="2" width="16" height="20" rx="2"/><circle cx="12" cy="10" r="3.2"/><path d="M7.5 19a4.5 4.5 0 0 1 9 0"/></symbol>
+    <symbol id="i-idcard" viewBox="0 0 24 24"><rect x="2" y="5" width="20" height="14" rx="2"/><circle cx="8" cy="11" r="2"/><path d="M5 16a3 3 0 0 1 6 0M14 10h5M14 14h3"/></symbol>
+    <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
+    <symbol id="i-check" viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5"/></symbol>
+    <symbol id="i-x" viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12"/></symbol>
     <symbol id="i-camera" viewBox="0 0 24 24"><path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z"/><circle cx="12" cy="13" r="3"/></symbol>
   </svg>
 
@@ -837,7 +869,7 @@
         <div class="card">
           <span class="card-icon"><svg class="ic" aria-hidden="true"><use href="#i-users"/></svg></span>
           <h3 data-i18n="whoTitle">Who can play</h3>
-          <p data-i18n="whoText">Players aged 35 and over. Each team needs at least 12 players.</p>
+          <p data-i18n="whoText">Players aged 35 and over. Each team registers 10 to 12 players and 3 officials.</p>
         </div>
         <div class="card">
           <span class="card-icon"><svg class="ic" aria-hidden="true"><use href="#i-calendar"/></svg></span>
@@ -945,8 +977,8 @@
             <h2 data-i18n="regTitle">Register Your Team</h2>
             <p data-i18n="regIntro">Fill in your team and players, then send everything straight to the organisers on WhatsApp.</p>
             <ol class="reg-steps">
-              <li data-i18n="step1"><b>Fill in the form</b><span>Team details, players and ID card photos</span></li>
-              <li data-i18n="step2"><b>Send on WhatsApp</b><span>Your details and ID photos are ready to send</span></li>
+              <li data-i18n="step1"><b>Fill in the form</b><span>Team, officials, players and their photos</span></li>
+              <li data-i18n="step2"><b>Send on WhatsApp</b><span>Your details and photos are ready to send</span></li>
               <li data-i18n="step3"><b>Get confirmed</b><span>The organisers will contact you</span></li>
             </ol>
             <!-- Closing date and checklist: organisers set both on admin.html -->
@@ -960,7 +992,7 @@
             </div>
             <div class="reg-howto">
               <h3 data-i18n="howtoTitle">Before you register</h3>
-              <ul id="howto-list" data-i18n="howtoList"><li>At least 12 players (up to 20)</li><li>All players aged 35 or older</li><li>A clear photo of each player's ID card</li><li>The manager's phone number (on WhatsApp)</li></ul>
+              <ul id="howto-list" data-i18n="howtoList"><li>10 to 12 players, all aged 35 or older</li><li>3 officials: manager, coach and assistant</li><li>A passport-size photo and an ID card photo for everyone</li><li>The manager's phone number (on WhatsApp)</li></ul>
             </div>
           </div>
         </div>
@@ -970,8 +1002,9 @@
           <div class="reg-progress">
             <div class="rp-steps">
               <span class="rp-step" id="rp-team"><span class="rp-dot">1</span><span data-i18n="secTeamShort">Team</span></span>
-              <span class="rp-step" id="rp-players"><span class="rp-dot">2</span><span data-i18n="secPlayersShort">Players</span> <span class="rp-count" id="rp-count" dir="ltr"></span></span>
-              <span class="rp-step" id="rp-confirm"><span class="rp-dot">3</span><span data-i18n="secConfirmShort">Send</span></span>
+              <span class="rp-step" id="rp-officials"><span class="rp-dot">2</span><span data-i18n="secOfficialsShort">Officials</span></span>
+              <span class="rp-step" id="rp-players"><span class="rp-dot">3</span><span data-i18n="secPlayersShort">Players</span> <span class="rp-count" id="rp-count" dir="ltr"></span></span>
+              <span class="rp-step" id="rp-confirm"><span class="rp-dot">4</span><span data-i18n="secConfirmShort">Send</span></span>
             </div>
             <div class="rp-bar"><span class="rp-fill" id="rp-fill"></span></div>
           </div>
@@ -982,7 +1015,7 @@
               <span class="sec-num">1</span>
               <div>
                 <h3 data-i18n="secTeam">Team details</h3>
-                <p data-i18n="secTeamSub">Your team and how the organisers can reach you</p>
+                <p data-i18n="secTeamSub">Your team's name and home island</p>
               </div>
             </div>
             <div class="fields">
@@ -990,16 +1023,6 @@
                 <label data-i18n="lblTeam" for="r-team">Team name *</label>
                 <input id="r-team" name="team" type="text" placeholder="e.g. Young Players" data-i18n-ph="phTeam" required>
                 <span data-i18n="errTeam" class="err">Please enter your team name</span>
-              </div>
-              <div class="field">
-                <label data-i18n="lblManager" for="r-manager">Manager name *</label>
-                <input id="r-manager" name="manager" type="text" placeholder="Full name" data-i18n-ph="phManager" required>
-                <span data-i18n="errManager" class="err">Please enter a contact name</span>
-              </div>
-              <div class="field">
-                <label data-i18n="lblPhone" for="r-phone">Phone number *</label>
-                <input id="r-phone" dir="ltr" name="phone" type="tel" inputmode="tel" placeholder="e.g. 7XX XXXX" data-i18n-ph="phPhone" pattern="[0-9+ \-]{7,}" required>
-                <span data-i18n="errPhone" class="err">Please enter a valid phone number</span>
               </div>
               <div class="field full">
                 <label data-i18n="lblIsland" for="r-island">Island / Atoll *</label>
@@ -1009,20 +1032,35 @@
             </div>
           </div>
 
-          <!-- Step 2: players (name, age and ID card photo for each) -->
-          <div class="reg-sec" id="sec-players">
+          <!-- Step 2: officials (manager, coach, assistant) -->
+          <div class="reg-sec" id="sec-officials">
             <div class="sec-title">
               <span class="sec-num">2</span>
               <div>
+                <h3 data-i18n="secOfficials">Team officials</h3>
+                <p data-i18n="secOfficialsSub">Manager, coach and assistant · the manager is the team's contact</p>
+              </div>
+            </div>
+            <div class="field people-field" id="officials-field">
+              <div class="people" id="officials"></div>
+              <span data-i18n="errOfficials" class="err">Fill in each official's name, phone number and both photos</span>
+            </div>
+          </div>
+
+          <!-- Step 3: players (10 to 12, each with name, age, passport photo and ID card photo) -->
+          <div class="reg-sec" id="sec-players">
+            <div class="sec-title">
+              <span class="sec-num">3</span>
+              <div>
                 <h3 data-i18n="secPlayers">Players</h3>
-                <p data-i18n="playersHint">Minimum 12 players · all players must be 35 or older</p>
+                <p data-i18n="playersHint">10 to 12 players · all must be 35 or older</p>
               </div>
               <span class="players-count" id="players-count" dir="ltr"></span>
             </div>
-            <div class="field players-field" id="players-field">
-              <div class="players" id="players"></div>
+            <div class="field people-field" id="players-field">
+              <div class="people" id="players"></div>
               <button type="button" class="add-player" id="add-player">
-                <span aria-hidden="true">+</span> <span data-i18n="addPlayer">Add player</span>
+                <svg class="ic" aria-hidden="true"><use href="#i-plus"/></svg> <span data-i18n="addPlayer">Add player</span>
               </button>
               <span class="err" id="players-err"></span>
             </div>
@@ -1031,7 +1069,7 @@
           <!-- Step 3: confirm and send -->
           <div class="reg-sec" id="sec-confirm">
             <div class="sec-title">
-              <span class="sec-num">3</span>
+              <span class="sec-num">4</span>
               <div>
                 <h3 data-i18n="secConfirm">Confirm &amp; send</h3>
                 <p data-i18n="secConfirmSub">Check everything, then send it on WhatsApp</p>
@@ -1060,23 +1098,38 @@
           </div>
         </form>
 
-        <template id="player-tpl">
-          <div class="player">
-            <span class="player-num"></span>
-            <div class="player-fields">
-              <input class="p-name" type="text" placeholder="Player name" data-i18n-ph="phPlayer" aria-label="Player name" required>
-              <input class="p-age" type="number" min="35" max="99" inputmode="numeric" placeholder="Age" data-i18n-ph="phAge" aria-label="Age" required>
-              <label class="p-id">
-                <input class="p-file" type="file" accept="image/*" required>
-                <span class="p-id-icon" aria-hidden="true">
-                  <svg class="ic-up" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 16V4M6 10l6-6 6 6M4 20h16"/></svg>
-                  <svg class="ic-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>
-                </span>
-                <span class="p-id-text">ID card photo</span>
-                <img class="p-thumb" alt="">
-              </label>
+        <!-- One card per official or player; the script fills in the title and removes the field that doesn't apply -->
+        <template id="person-tpl">
+          <div class="pcard">
+            <div class="pc-head">
+              <span class="pc-badge"></span>
+              <span class="pc-title"><b class="pc-name"></b><small class="pc-sub"></small></span>
+              <span class="pc-state" dir="ltr"></span>
+              <button type="button" class="p-remove" data-i18n-label="removePlayer" aria-label="Remove player"><svg class="ic" aria-hidden="true"><use href="#i-x"/></svg></button>
             </div>
-            <button type="button" class="p-remove" aria-label="Remove player">&times;</button>
+            <div class="pc-body">
+              <div class="pc-fields">
+                <label class="pc-lbl"><span data-i18n="lblFullName">Full name</span><input class="p-name" type="text" autocomplete="off" required></label>
+                <label class="pc-lbl pc-age"><span data-i18n="lblAge">Age</span><input class="p-age" type="number" min="35" max="99" inputmode="numeric" required></label>
+                <label class="pc-lbl pc-phone"><span data-i18n="lblPhoneShort">Phone (WhatsApp)</span><input class="p-phone" type="tel" dir="ltr" inputmode="tel" placeholder="7XX XXXX" pattern="[0-9+ \-]{7,}" required></label>
+              </div>
+              <div class="pc-photos">
+                <label class="ph-tile ph-passport">
+                  <input class="f-passport" type="file" accept="image/*" required>
+                  <img class="ph-prev" alt="">
+                  <span class="ph-empty"><svg class="ic" aria-hidden="true"><use href="#i-portrait"/></svg><span data-i18n="phPassport">Passport photo</span><small data-i18n="phTap">Tap to add</small></span>
+                  <span class="ph-done"><svg class="ic" aria-hidden="true"><use href="#i-check"/></svg></span>
+                  <span class="ph-cap" data-i18n="phPassportShort">Passport photo</span>
+                </label>
+                <label class="ph-tile ph-id">
+                  <input class="f-id" type="file" accept="image/*" required>
+                  <img class="ph-prev" alt="">
+                  <span class="ph-empty"><svg class="ic" aria-hidden="true"><use href="#i-idcard"/></svg><span data-i18n="phIdCard">ID card photo</span><small data-i18n="phTap">Tap to add</small></span>
+                  <span class="ph-done"><svg class="ic" aria-hidden="true"><use href="#i-check"/></svg></span>
+                  <span class="ph-cap" data-i18n="phIdShort">ID card</span>
+                </label>
+              </div>
+            </div>
           </div>
         </template>
 
@@ -1087,15 +1140,15 @@
             <h3 data-i18n="doneTitle">Almost done!</h3>
             <ol class="done-steps">
               <li data-i18n="doneStep1" class="done">Team details opened in WhatsApp. Press <b>Send</b>.</li>
-              <li data-i18n="doneStep2">Send the players' ID card photos to the same chat.</li>
+              <li data-i18n="doneStep2">Send everyone's passport and ID card photos to the same chat.</li>
             </ol>
-            <button class="reg-btn share-ids" type="button" id="share-ids"><svg class="ic" aria-hidden="true"><use href="#i-camera"/></svg><span data-i18n="shareIds">Send ID card photos</span></button>
+            <button class="reg-btn share-ids" type="button" id="share-ids"><svg class="ic" aria-hidden="true"><use href="#i-camera"/></svg><span data-i18n="shareIds">Send the photos</span></button>
             <p class="reg-note" id="share-note">Choose WhatsApp, then the organiser's chat (+960 976-3551).</p>
           </div>
           <!-- Shown when registrations are saved to the database -->
           <div class="done-part" id="done-server" hidden>
             <h3 data-i18n="doneServerTitle">Registration received!</h3>
-            <p data-i18n="doneServerText">The organisers have your team details and ID card photos, and will contact you to confirm your place.</p>
+            <p data-i18n="doneServerText">The organisers have your team details and photos, and will contact you to confirm your place.</p>
           </div>
           <button data-i18n="again" class="reg-again" type="button" id="reg-again">Register another team</button>
         </div>
@@ -1217,7 +1270,7 @@
       kkName: "ކޭ.ކޭ ކަނޑުމަތި",
       ftName: "އެފް.ޓީ ނަކަސޯލް",
       whoTitle: "ކުޅެވޭނީ ކާކަށް",
-      whoText: "35 އަހަރާއި އެއަށްވުރެ މަތީގެ ކުޅުންތެރިން. ކޮންމެ ޓީމެއްގައި މަދުވެގެން 12 ކުޅުންތެރިން ހުންނަން ޖެހޭނެ.",
+      whoText: "35 އަހަރާއި އެއަށްވުރެ މަތީގެ ކުޅުންތެރިން. ކޮންމެ ޓީމަކުން 10 އާއި 12 އާ ދެމެދުގެ ކުޅުންތެރިންނާއި 3 އޮފިޝަލުން ރަޖިސްޓްރީ ކުރަންވާނެ.",
       whenTitle: "ކޮންއިރަކު",
       whenText: "ތާރީޚު އަދި ކަނޑައަޅާފައެއް ނުވޭ",
       whereTitle: "ކޮންތާކު",
@@ -1231,12 +1284,12 @@
       regEyebrow: "ދެން އޮތް މުބާރާތް",
       regTitle: "ޓީމު ރަޖިސްޓްރީ ކުރައްވާ",
       regIntro: "ޓީމާއި ކުޅުންތެރިންގެ މަޢުލޫމާތު ފުރުއްވާފައި، ވަޓްސްއަޕް މެދުވެރިކޮށް ރާވާ ފަރާތަށް ފޮނުއްވާ.",
-      step1: "<b>ފޯމު ފުރުއްވާ</b><span>ޓީމުގެ މަޢުލޫމާތު، ކުޅުންތެރިން އަދި އައިޑީ ކާޑުގެ ފޮޓޯ</span>",
-      step2: "<b>ވަޓްސްއަޕްގައި ފޮނުއްވާ</b><span>މަޢުލޫމާތާއި އައިޑީ ފޮޓޯ ފޮނުވަން ތައްޔާރަށް</span>",
+      step1: "<b>ފޯމު ފުރުއްވާ</b><span>ޓީމު، އޮފިޝަލުން، ކުޅުންތެރިން އަދި ފޮޓޯތައް</span>",
+      step2: "<b>ވަޓްސްއަޕްގައި ފޮނުއްވާ</b><span>މަޢުލޫމާތާއި ފޮޓޯތައް ފޮނުވަން ތައްޔާރަށް</span>",
       step3: "<b>ކަށަވަރުކޮށްދެވޭނެ</b><span>ރާވާ ފަރާތުން ގުޅުއްވާނެ</span>",
       deadlineLabel: "ރަޖިސްޓްރޭޝަން ނިމޭނީ",
       howtoTitle: "ރަޖިސްޓްރީ ކުރުމުގެ ކުރިން ތައްޔާރުކުރައްވާ",
-      howtoList: "<li>މަދުވެގެން 12 ކުޅުންތެރިން (އެންމެ ގިނަވެގެން 20)</li><li>ހުރިހާ ކުޅުންތެރިންގެ އުމުރު 35 ނުވަތަ މަތި</li><li>ކޮންމެ ކުޅުންތެރިއެއްގެ އައިޑީ ކާޑުގެ ސާފު ފޮޓޯއެއް</li><li>މެނޭޖަރުގެ ފޯނު ނަންބަރު (ވަޓްސްއަޕް)</li>",
+      howtoList: "<li>10 އާއި 12 އާ ދެމެދުގެ ކުޅުންތެރިން، ހުރިހާ ކުޅުންތެރިންގެ އުމުރު 35 ނުވަތަ މަތި</li><li>3 އޮފިޝަލުން: މެނޭޖަރު، ކޯޗު އަދި އެސިސްޓަންޓް</li><li>ކޮންމެ މީހެއްގެ ޕާސްޕޯޓް ސައިޒުގެ ފޮޓޯއަކާއި އައިޑީ ކާޑުގެ ފޮޓޯއެއް</li><li>މެނޭޖަރުގެ ފޯނު ނަންބަރު (ވަޓްސްއަޕް)</li>",
       lblTeam: "ޓީމުގެ ނަން *",
       errTeam: "ޓީމުގެ ނަން ލިޔުއްވާ",
       lblManager: "މެނޭޖަރުގެ ނަން *",
@@ -1246,7 +1299,7 @@
       lblIsland: "ރަށް / އަތޮޅު *",
       errIsland: "ރަށުގެ ނަން ލިޔުއްވާ",
       lblPlayers: "ކުޅުންތެރިން *",
-      playersHint: "މަދުވެގެން 12 ކުޅުންތެރިން · ހުރިހާ ކުޅުންތެރިންގެ އުމުރު 35 ނުވަތަ މަތި",
+      playersHint: "10 އާއި 12 އާ ދެމެދުގެ ކުޅުންތެރިން · ހުރިހާ ކުޅުންތެރިންގެ އުމުރު 35 ނުވަތަ މަތި",
       addPlayer: "ކުޅުންތެރިއަކު އިތުރުކުރައްވާ",
       lblNotes: "ނޯޓު <small>(ލާޒިމެއް ނޫން)</small>",
       agree: "އަހަރެމެންގެ ހުރިހާ ކުޅުންތެރިންނަށް އުމުރުގެ ޝަރުތު ހަމަވާ ކަމަށާއި މުބާރާތުގެ ޤަވާޢިދަށް އެއްބަސްވާ ކަމަށް ކަށަވަރުކުރަމެވެ.",
@@ -1255,8 +1308,8 @@
       submitNote: "ތިޔަ މަޢުލޫމާތު ފުރިފައި ވަޓްސްއަޕް ހުޅުވޭނެ.",
       doneTitle: "ގާތްގަނޑަކަށް ނިމުނީ!",
       doneStep1: "ޓީމުގެ މަޢުލޫމާތު ވަޓްސްއަޕްގައި ހުޅުވިއްޖެ. <b>Send</b> އަށް ފިއްތަވާ.",
-      doneStep2: "ކުޅުންތެރިންގެ އައިޑީ ކާޑުގެ ފޮޓޯ ހަމަ އެ ޗެޓަށް ފޮނުއްވާ.",
-      shareIds: "އައިޑީ ކާޑުގެ ފޮޓޯ ފޮނުއްވާ",
+      doneStep2: "ހުރިހާ މީހުންގެ ޕާސްޕޯޓް ފޮޓޯއާއި އައިޑީ ކާޑުގެ ފޮޓޯ ހަމަ އެ ޗެޓަށް ފޮނުއްވާ.",
+      shareIds: "ފޮޓޯތައް ފޮނުއްވާ",
       again: "އިތުރު ޓީމެއް ރަޖިސްޓްރީ ކުރައްވާ",
       contactTitle: "ގުޅުއްވާ",
       contactLead: "ދެން އޮތް މުބާރާތުގައި ޓީމެއް ވައްދަން ބޭނުންފުޅުތޯ؟",
@@ -1264,20 +1317,32 @@
       contactCall: "ކޯލް",
       submitServer: "ރަޖިސްޓްރޭޝަން ފޮނުއްވާ",
       regIntroServer: "ޓީމާއި ކުޅުންތެރިންގެ މަޢުލޫމާތު ފުރުއްވާފައި ފޮނުއްވާ. ހުރިހާ މަޢުލޫމާތެއް ސީދާ ރާވާ ފަރާތަށް ދާނެ.",
-      submitNoteServer: "ޓީމުގެ މަޢުލޫމާތާއި އައިޑީ ކާޑުގެ ފޮޓޯ ރައްކާތެރިކޮށް ރާވާ ފަރާތަށް ފޮނުވޭނެ.",
+      submitNoteServer: "ޓީމުގެ މަޢުލޫމާތާއި ފޮޓޯތައް ރައްކާތެރިކޮށް ރާވާ ފަރާތަށް ފޮނުވޭނެ.",
       step2Server: "<b>ފޮނުއްވާ</b><span>ހުރިހާ މަޢުލޫމާތެއް ސީދާ ރާވާ ފަރާތަށް</span>",
       regError: "މާފުކުރައްވާ، ރަޖިސްޓްރޭޝަން ނުފޮނުވުނު. އިންޓަރނެޓް ބައްލަވާފައި އަލުން މަސައްކަތް ކުރައްވާ، ނުވަތަ ވަޓްސްއަޕްގައި ފޮނުއްވާ.",
       regErrorLink: "ވަޓްސްއަޕްގައި ފޮނުއްވާ",
       doneServerTitle: "ރަޖިސްޓްރޭޝަން ލިބިއްޖެ!",
-      doneServerText: "ތިޔަ ޓީމުގެ މަޢުލޫމާތާއި އައިޑީ ކާޑުގެ ފޮޓޯ ރާވާ ފަރާތަށް ލިބިއްޖެ. ތަން ކަށަވަރުކުރުމަށް ގުޅުއްވާނެ.",
+      doneServerText: "ތިޔަ ޓީމުގެ މަޢުލޫމާތާއި ފޮޓޯތައް ރާވާ ފަރާތަށް ލިބިއްޖެ. ތަން ކަށަވަރުކުރުމަށް ގުޅުއްވާނެ.",
       closedTitle: "ރަޖިސްޓްރޭޝަން ބަންދު",
       closedText: "މިހާރު ރަޖިސްޓްރޭޝަން ހުޅުވިފައެއް ނެތް. ދެން އޮތް މުބާރާތާ ބެހޭ ޚަބަރަށް ވަޓްސްއަޕްގައި ރާވާ ފަރާތާ ގުޅުއްވާ.",
       closedWa: "ރާވާ ފަރާތަށް މެސެޖް ކުރައްވާ",
       secTeamShort: "ޓީމު",
       secPlayersShort: "ކުޅުންތެރިން",
       secConfirmShort: "ފޮނުވުން",
+      secOfficialsShort: "އޮފިޝަލުން",
+      secOfficials: "ޓީމުގެ އޮފިޝަލުން",
+      secOfficialsSub: "މެނޭޖަރު، ކޯޗު އަދި އެސިސްޓަންޓް · ޓީމާ ގުޅޭނީ މެނޭޖަރާ",
+      errOfficials: "ކޮންމެ އޮފިޝަލެއްގެ ނަމާއި ފޯނު ނަންބަރާއި ދެ ފޮޓޯ ފުރުއްވާ",
+      lblFullName: "ފުރިހަމަ ނަން",
+      lblAge: "އުމުރު",
+      lblPhoneShort: "ފޯނު (ވަޓްސްއަޕް)",
+      phPassport: "ޕާސްޕޯޓް ފޮޓޯ",
+      phPassportShort: "ޕާސްޕޯޓް ފޮޓޯ",
+      phIdCard: "އައިޑީ ކާޑުގެ ފޮޓޯ",
+      phIdShort: "އައިޑީ ކާޑު",
+      phTap: "އިތުރުކުރައްވާ",
       secTeam: "ޓީމުގެ މަޢުލޫމާތު",
-      secTeamSub: "ތިޔަ ޓީމާއި، ރާވާ ފަރާތުން ގުޅޭނެ ގޮތް",
+      secTeamSub: "ޓީމުގެ ނަމާއި ރަށް",
       secPlayers: "ކުޅުންތެރިން",
       secConfirm: "ކަށަވަރުކޮށް ފޮނުއްވާ",
       secConfirmSub: "ހުރިހާ ކަމެއް ބައްލަވާފައި ވަޓްސްއަޕްގައި ފޮނުއްވާ",
@@ -1291,17 +1356,22 @@
       phAge: "އުމުރު",
       // made by the script
       players: n => "ކުޅުންތެރިން " + n,
-      idPhoto: "އައިޑީ ކާޑުގެ ފޮޓޯ",
-      idAdded: "އައިޑީ އެޅިއްޖެ",
+      playerN: n => "ކުޅުންތެރިޔާ " + n,
+      roleManager: "މެނޭޖަރު",
+      roleManagerSub: "ޓީމާ ގުޅޭނެ ފަރާތް",
+      roleCoach: "ކޯޗު",
+      roleAssistant: "އެސިސްޓަންޓް",
+      cardDone: "ފުރިހަމަ",
+      removePlayer: "ކުޅުންތެރިޔާ ނައްތާލާ",
       errMinPlayers: n => "މަދުވެގެން " + n + " ކުޅުންތެރިން އިތުރުކުރައްވާ",
-      errPlayerRows: "ކޮންމެ ކުޅުންތެރިއެއްގެ ނަމާއި އުމުރާއި އައިޑީ ކާޑުގެ ފޮޓޯ ފުރުއްވާ. ހުރިހާ ކުޅުންތެރިންގެ އުމުރު 35 ނުވަތަ މަތި ވާން ޖެހޭނެ.",
+      errPlayerRows: "ކޮންމެ ކުޅުންތެރިއެއްގެ ނަމާއި އުމުރާއި ދެ ފޮޓޯ ފުރުއްވާ. ހުރިހާ ކުޅުންތެރިންގެ އުމުރު 35 ނުވަތަ މަތި ވާން ޖެހޭނެ.",
       popChampions: year => year + " ގެ ޗެމްޕިއަނުން",
       photoSoon: "ފޮޓޯ ދެން ލިބޭނެ",
       shareNote: "ވަޓްސްއަޕް އިޚްތިޔާރުކޮށް، ރާވާ ފަރާތުގެ ޗެޓް (+960 976-3551) އިޚްތިޔާރުކުރައްވާ.",
-      attachNote: n => "+960 976-3551 އާއި އެކު ވަޓްސްއަޕް ޗެޓްގައި އައިޑީ ކާޑުގެ " + n + " ފޮޓޯ ފޮނުއްވާ.",
-      summary: s => s.needed + " ކުޅުންތެރިންގެ ތެރެއިން " + s.complete + " ފުރިހަމަ (ނަން، އުމުރު، އައިޑީ ފޮޓޯ)",
-      summaryReady: n => "✓ ފޮނުވަން ތައްޔާރު: ޓީމުގެ މަޢުލޫމާތާއި " + n + " ކުޅުންތެރިން، އައިޑީ ފޮޓޯއާއެކު",
-      preparing: n => "އައިޑީ ފޮޓޯ އަޕްލޯޑް ކުރަނީ… " + n,
+      attachNote: n => "+960 976-3551 އާއި އެކު ވަޓްސްއަޕް ޗެޓްގައި " + n + " ފޮޓޯ ފޮނުއްވާ.",
+      summary: s => "އޮފިޝަލުން " + s.o + "/3 · ކުޅުންތެރިން " + s.p + "/" + s.n + " ފުރިހަމަ",
+      summaryReady: n => "✓ ފޮނުވަން ތައްޔާރު: ޓީމު، 3 އޮފިޝަލުން އަދި " + n + " ކުޅުންތެރިން، ފޮޓޯތަކާއެކު",
+      preparing: n => "ފޮޓޯ އަޕްލޯޑް ކުރަނީ… " + n,
       uploading: "ފޮނުވަނީ…",
       submitServerLabel: "ރަޖިސްޓްރޭޝަން ފޮނުއްވާ",
       daysLeft: n => n === 0 ? "މިއަދު ނިމޭނެ" : n + " ދުވަސް ބާކީ",
@@ -1309,17 +1379,22 @@
     };
     const EN = {
       players: n => n + " players",
-      idPhoto: "ID card photo",
-      idAdded: "ID added",
+      playerN: n => "Player " + n,
+      roleManager: "Manager",
+      roleManagerSub: "Team contact",
+      roleCoach: "Coach",
+      roleAssistant: "Assistant",
+      cardDone: "Done",
+      removePlayer: "Remove player",
       errMinPlayers: n => "Add at least " + n + " players",
-      errPlayerRows: "Fill in every player's name, age and ID card photo. All players must be 35 or older.",
+      errPlayerRows: "Fill in every player's name, age and both photos. All players must be 35 or older.",
       popChampions: year => year + " Champions",
       photoSoon: "Photo coming soon",
       shareNote: "Choose WhatsApp, then the organiser's chat (+960 976-3551).",
-      attachNote: n => "Attach the " + n + " ID card photos in the WhatsApp chat with +960 976-3551.",
-      summary: s => s.complete + " of " + s.needed + " players complete (name, age and ID photo)",
-      summaryReady: n => "✓ Ready to send: team details and " + n + " players with ID photos",
-      preparing: n => "Uploading ID photos… " + n,
+      attachNote: n => "Attach the " + n + " photos in the WhatsApp chat with +960 976-3551.",
+      summary: s => "Officials " + s.o + "/3 · Players " + s.p + "/" + s.n + " complete",
+      summaryReady: n => "✓ Ready to send: team, 3 officials and " + n + " players with photos",
+      preparing: n => "Uploading photos… " + n,
       uploading: "Sending…",
       submitServerLabel: "Submit registration",
       daysLeft: n => n === 0 ? "Closes today" : n === 1 ? "1 day left" : n + " days left",
@@ -1345,9 +1420,7 @@
         if (el.dataset.enPh === undefined) el.dataset.enPh = el.placeholder;
         el.placeholder = lang === "dv" ? DV[el.dataset.i18nPh] : el.dataset.enPh;
       });
-      root.querySelectorAll(".p-id-text").forEach(el => {
-        el.textContent = t(el.closest(".p-id").classList.contains("has-file") ? "idAdded" : "idPhoto");
-      });
+      root.querySelectorAll("[data-i18n-label]").forEach(el => el.setAttribute("aria-label", t(el.dataset.i18nLabel)));
     }
 
     function setLang(next) {
@@ -1355,7 +1428,7 @@
       document.documentElement.lang = lang === "dv" ? "dv" : "en";
       document.documentElement.dir = lang === "dv" ? "rtl" : "ltr";
       applyLang();
-      if (typeof renumber === "function") renumber();
+      if (typeof refreshPeople === "function") refreshPeople();
       if (typeof renderDeadline === "function") renderDeadline();
       if (typeof renderLocked === "function") renderLocked();
       try { localStorage.setItem("lang", lang); } catch (e) {}
@@ -1472,7 +1545,7 @@
       submitLabel.textContent = "Submit registration";
       const note = document.getElementById("submit-note");
       note.dataset.i18n = "submitNoteServer";
-      note.textContent = "Your team details and ID card photos are sent securely to the organisers.";
+      note.textContent = "Your team details and photos are sent securely to the organisers.";
       const intro = document.querySelector('[data-i18n="regIntro"]');
       intro.dataset.i18n = "regIntroServer";
       intro.textContent = "Fill in your team and players, then submit. Everything goes straight to the organisers.";
@@ -1504,180 +1577,298 @@
       return h.slice(0, 8) + "-" + h.slice(8, 12) + "-" + h.slice(12, 16) + "-" + h.slice(16, 20) + "-" + h.slice(20);
     }
 
-    // Save a registration to Supabase: ID photos to private storage, then the team, then its players
-    async function saveRegistration(rows, f, onProgress) {
-      const { createClient } = await import(SUPABASE_JS);
-      const db = createClient(CONFIG.supabaseUrl, CONFIG.supabaseKey, { auth: { persistSession: false } });
-      const teamId = newId();
-
-      const players = [];
-      for (let i = 0; i < rows.length; i++) {
-        onProgress(t("preparing", (i + 1) + " / " + rows.length));
-        const row = rows[i];
-        const path = teamId + "/" + String(i + 1).padStart(2, "0") + ".jpg";
-        const photo = await shrinkPhoto(row.querySelector(".p-file").files[0]);
-        const up = await db.storage.from("id-cards").upload(path, photo, { contentType: "image/jpeg", upsert: false });
-        if (up.error) throw up.error;
-        players.push({
-          team_id: teamId,
-          position: i + 1,
-          name: row.querySelector(".p-name").value.trim(),
-          age: Number(row.querySelector(".p-age").value),
-          id_photo_path: path
-        });
-      }
-
-      onProgress(t("uploading"));
-      const team = await db.from("teams").insert({
-        id: teamId,
-        team_name: f.team.value.trim(),
-        manager: f.manager.value.trim(),
-        phone: f.phone.value.trim(),
-        island: f.island.value.trim(),
-        notes: f.notes.value.trim() || null
-      });
-      if (team.error) throw team.error;
-      const squad = await db.from("players").insert(players);
-      if (squad.error) throw squad.error;
-    }
-
     // Squad size limits
-    const MIN_PLAYERS = 12;   // needed to register
-    const START_PLAYERS = 5;  // empty rows shown at first; teams add the rest
-    const MAX_PLAYERS = 20;
+    const MIN_PLAYERS = 10;   // needed to register (also the number of cards shown at first)
+    const MAX_PLAYERS = 12;
+    // The three team officials; the manager is the team's contact
+    const OFFICIALS = [
+      { role: "manager", icon: "briefcase", title: "roleManager", sub: "roleManagerSub" },
+      { role: "coach", icon: "clipboard", title: "roleCoach" },
+      { role: "assistant", icon: "user-plus", title: "roleAssistant" }
+    ];
 
     const regForm = document.getElementById("reg-form");
     const regDone = document.getElementById("reg-done");
+    const officialsBox = document.getElementById("officials");
     const playersBox = document.getElementById("players");
+    const officialsField = document.getElementById("officials-field");
     const playersField = document.getElementById("players-field");
     const playersErr = document.getElementById("players-err");
     const addBtn = document.getElementById("add-player");
-    const tpl = document.getElementById("player-tpl");
-    let idFiles = []; // ID photos kept for the "Send ID card photos" step
+    const tpl = document.getElementById("person-tpl");
+    let shareFiles = []; // photos kept for the "Send the photos" step (WhatsApp)
 
-    function renumber() {
-      const rows = playersBox.querySelectorAll(".player");
-      rows.forEach((row, i) => row.querySelector(".player-num").textContent = i + 1);
+    const playerCards = () => [...playersBox.querySelectorAll(".pcard")];
+    const officialCards = () => [...officialsBox.querySelectorAll(".pcard")];
+    const val = (card, sel) => card.querySelector(sel).value.trim();
+    const file = (card, sel) => card.querySelector(sel).files[0];
+
+    // Name, age or phone, passport photo and ID photo: how many are filled in
+    function cardProgress(card) {
+      const second = card.querySelector(".p-age, .p-phone");
+      const parts = [
+        !!val(card, ".p-name"),
+        !!(second.value.trim() && second.checkValidity()),
+        !!file(card, ".f-passport"),
+        !!file(card, ".f-id")
+      ];
+      return parts.filter(Boolean).length;
+    }
+
+    function updateCard(card) {
+      const done = cardProgress(card) === 4;
+      card.classList.toggle("complete", done);
+      const state = card.querySelector(".pc-state");
+      if (done) state.innerHTML = '<svg class="ic" aria-hidden="true"><use href="#i-check"/></svg>' + t("cardDone");
+      else state.textContent = cardProgress(card) + " / 4";
+      return done;
+    }
+
+    // Card titles and counters, in the current language
+    function refreshPeople() {
+      officialCards().forEach((card, i) => {
+        const o = OFFICIALS[i];
+        card.querySelector(".pc-name").textContent = t(o.title);
+        card.querySelector(".pc-sub").textContent = o.sub ? t(o.sub) : "";
+      });
+      const rows = playerCards();
+      rows.forEach((card, i) => {
+        card.querySelector(".pc-badge").textContent = i + 1;
+        card.querySelector(".pc-name").textContent = t("playerN", i + 1);
+        // Players above the minimum can be removed
+        card.querySelector(".p-remove").hidden = rows.length <= MIN_PLAYERS;
+      });
       document.getElementById("players-count").textContent = t("players", rows.length + " / " + MAX_PLAYERS);
-      addBtn.disabled = rows.length >= MAX_PLAYERS;
+      addBtn.hidden = rows.length >= MAX_PLAYERS;
       updateProgress();
     }
 
-    // Progress bar, step ticks, green player rows and the summary above the send button
+    // Progress bar, step ticks, green cards and the summary above the send button
     function updateProgress() {
       const teamInputs = [...document.querySelectorAll("#sec-team [required]")];
       const teamFilled = teamInputs.filter(el => el.value.trim() && el.checkValidity()).length;
       const teamOk = teamFilled === teamInputs.length;
 
-      const rows = [...playersBox.querySelectorAll(".player")];
-      const complete = rows.filter(row => {
-        const age = row.querySelector(".p-age");
-        const ok = !!(row.querySelector(".p-name").value.trim() && age.value && age.checkValidity() && row.querySelector(".p-file").files.length);
-        row.classList.toggle("complete", ok);
-        return ok;
-      }).length;
+      const officialsDone = officialCards().filter(updateCard).length;
+      const officialsOk = officialsDone === OFFICIALS.length;
+      const rows = playerCards();
+      const complete = rows.filter(updateCard).length;
       const needed = Math.max(rows.length, MIN_PLAYERS);
       const playersOk = rows.length >= MIN_PLAYERS && complete === rows.length;
       const agreeOk = regForm.elements.agree.checked;
 
-      const pct = Math.round((teamFilled + complete + (agreeOk ? 1 : 0)) / (teamInputs.length + needed + 1) * 100);
+      const pct = Math.round((teamFilled + officialsDone + complete + (agreeOk ? 1 : 0)) / (teamInputs.length + OFFICIALS.length + needed + 1) * 100);
       const fill = document.getElementById("rp-fill");
       fill.style.width = pct + "%";
       fill.classList.toggle("full", pct === 100);
 
       document.getElementById("rp-count").textContent = complete + "/" + needed;
-      document.getElementById("rp-team").classList.toggle("done", teamOk);
-      document.getElementById("rp-players").classList.toggle("done", playersOk);
-      document.getElementById("rp-confirm").classList.toggle("done", agreeOk && teamOk && playersOk);
-      document.getElementById("sec-team").classList.toggle("done", teamOk);
-      document.getElementById("sec-players").classList.toggle("done", playersOk);
-      document.getElementById("sec-confirm").classList.toggle("done", agreeOk);
+      const ready = teamOk && officialsOk && playersOk && agreeOk;
+      [["team", teamOk], ["officials", officialsOk], ["players", playersOk], ["confirm", ready]].forEach(([k, ok]) =>
+        document.getElementById("rp-" + k).classList.toggle("done", ok));
+      [["team", teamOk], ["officials", officialsOk], ["players", playersOk], ["confirm", agreeOk]].forEach(([k, ok]) =>
+        document.getElementById("sec-" + k).classList.toggle("done", ok));
 
-      const ready = teamOk && playersOk && agreeOk;
       const summary = document.getElementById("reg-summary");
-      summary.textContent = ready ? t("summaryReady", rows.length) : t("summary", { complete, needed });
+      summary.textContent = ready ? t("summaryReady", rows.length) : t("summary", { o: officialsDone, p: complete, n: needed });
       summary.classList.toggle("ready", ready);
     }
     regForm.addEventListener("input", updateProgress);
     regForm.addEventListener("change", updateProgress);
 
-    function addPlayer() {
-      const row = tpl.content.firstElementChild.cloneNode(true);
-      const file = row.querySelector(".p-file");
-      const idLabel = row.querySelector(".p-id");
-      file.addEventListener("change", () => {
-        const f = file.files[0];
-        idLabel.classList.toggle("has-file", !!f);
-        idLabel.classList.remove("bad");
-        row.querySelector(".p-id-text").textContent = t(f ? "idAdded" : "idPhoto");
-        if (f) row.querySelector(".p-thumb").src = URL.createObjectURL(f);
+    // A new official or player card
+    function makeCard(kind, official) {
+      const card = tpl.content.firstElementChild.cloneNode(true);
+      card.dataset.kind = kind;
+      card.querySelector(kind === "player" ? ".pc-phone" : ".pc-age").remove();
+      if (kind === "official") {
+        card.dataset.role = official.role;
+        card.querySelector(".pc-badge").innerHTML = '<svg class="ic" aria-hidden="true"><use href="#i-' + official.icon + '"/></svg>';
+        card.querySelector(".p-remove").remove();
+      } else {
+        card.querySelector(".p-remove").addEventListener("click", () => { card.remove(); refreshPeople(); });
+      }
+      // Photo tiles: show the chosen photo with a tick
+      card.querySelectorAll(".ph-tile").forEach(tile => {
+        const input = tile.querySelector("input");
+        input.addEventListener("change", () => {
+          const f = input.files[0];
+          tile.classList.toggle("has-file", !!f);
+          tile.classList.remove("bad");
+          const img = tile.querySelector(".ph-prev");
+          if (img.src) URL.revokeObjectURL(img.src);
+          if (f) img.src = URL.createObjectURL(f); else img.removeAttribute("src");
+        });
       });
-      row.querySelector(".p-remove").addEventListener("click", () => { row.remove(); renumber(); });
-      applyLang(row);
-      playersBox.appendChild(row);
-      renumber();
-      return row;
+      applyLang(card);
+      return card;
     }
 
-    function resetPlayers() {
-      playersBox.innerHTML = "";
-      for (let i = 0; i < START_PLAYERS; i++) addPlayer();
+    function addPlayer() {
+      const card = makeCard("player");
+      playersBox.appendChild(card);
+      refreshPeople();
+      return card;
     }
-    resetPlayers();
+
+    function resetPeople() {
+      officialsBox.innerHTML = "";
+      OFFICIALS.forEach(o => officialsBox.appendChild(makeCard("official", o)));
+      playersBox.innerHTML = "";
+      for (let i = 0; i < MIN_PLAYERS; i++) playersBox.appendChild(makeCard("player"));
+      refreshPeople();
+    }
+    resetPeople();
 
     addBtn.addEventListener("click", () => addPlayer().querySelector(".p-name").focus());
+
+    // Mark empty or wrong fields in a group of cards; true if all are fine
+    function checkCards(cards) {
+      let ok = true;
+      cards.forEach(card => card.querySelectorAll("[required]").forEach(el => {
+        const bad = !el.checkValidity() || (el.type !== "file" && !el.value.trim());
+        (el.type === "file" ? el.closest(".ph-tile") : el).classList.toggle("bad", bad);
+        if (bad) ok = false;
+      }));
+      return ok;
+    }
+
+    // Every photo, named so the organisers can tell them apart
+    function collectPhotos() {
+      const slug = v => v.replace(/[^\w]+/g, "-").replace(/^-|-$/g, "") || "x";
+      const list = [];
+      officialCards().forEach(card => {
+        const who = card.dataset.role;
+        list.push({ card, input: ".f-passport", kind: "photo", path: "officials/" + who + "-photo.jpg", name: who + "-" + slug(val(card, ".p-name")) + "-photo" });
+        list.push({ card, input: ".f-id", kind: "id", path: "officials/" + who + "-id.jpg", name: who + "-" + slug(val(card, ".p-name")) + "-ID" });
+      });
+      playerCards().forEach((card, i) => {
+        const n = String(i + 1).padStart(2, "0");
+        list.push({ card, input: ".f-passport", kind: "photo", path: "players/" + n + "-photo.jpg", name: n + "-" + slug(val(card, ".p-name")) + "-photo" });
+        list.push({ card, input: ".f-id", kind: "id", path: "players/" + n + "-id.jpg", name: n + "-" + slug(val(card, ".p-name")) + "-ID" });
+      });
+      return list;
+    }
+
+    // Shrink a photo before uploading (keeps it readable, much smaller)
+    async function shrinkPhoto(file, maxSide = 1400, quality = 0.8) {
+      try {
+        const img = await createImageBitmap(file);
+        const scale = Math.min(1, maxSide / Math.max(img.width, img.height));
+        const canvas = document.createElement("canvas");
+        canvas.width = Math.round(img.width * scale);
+        canvas.height = Math.round(img.height * scale);
+        canvas.getContext("2d").drawImage(img, 0, 0, canvas.width, canvas.height);
+        const blob = await new Promise(res => canvas.toBlob(res, "image/jpeg", quality));
+        return blob || file;
+      } catch (e) {
+        return file; // browser couldn't read it; send the original
+      }
+    }
+
+    function newId() {
+      if (crypto.randomUUID) return crypto.randomUUID();
+      const b = crypto.getRandomValues(new Uint8Array(16));
+      b[6] = (b[6] & 15) | 64; b[8] = (b[8] & 63) | 128;
+      const h = [...b].map(x => x.toString(16).padStart(2, "0")).join("");
+      return h.slice(0, 8) + "-" + h.slice(8, 12) + "-" + h.slice(12, 16) + "-" + h.slice(16, 20) + "-" + h.slice(20);
+    }
+
+    // Save a registration to Supabase: photos to private storage, then the team, its officials and its players
+    async function saveRegistration(f, onProgress) {
+      const { createClient } = await import(SUPABASE_JS);
+      const db = createClient(CONFIG.supabaseUrl, CONFIG.supabaseKey, { auth: { persistSession: false } });
+      const teamId = newId();
+
+      const photos = collectPhotos();
+      for (let i = 0; i < photos.length; i++) {
+        onProgress(t("preparing", (i + 1) + " / " + photos.length));
+        const ph = photos[i];
+        const blob = await shrinkPhoto(file(ph.card, ph.input), ph.kind === "photo" ? 900 : 1400);
+        const up = await db.storage.from("id-cards").upload(teamId + "/" + ph.path, blob, { contentType: "image/jpeg", upsert: false });
+        if (up.error) throw up.error;
+      }
+      const pathOf = (card, kind) => teamId + "/" + photos.find(ph => ph.card === card && ph.kind === kind).path;
+
+      onProgress(t("uploading"));
+      const manager = officialCards()[0];
+      const team = await db.from("teams").insert({
+        id: teamId,
+        team_name: f.team.value.trim(),
+        manager: val(manager, ".p-name"),
+        phone: val(manager, ".p-phone"),
+        island: f.island.value.trim(),
+        notes: f.notes.value.trim() || null
+      });
+      if (team.error) throw team.error;
+      const officials = await db.from("officials").insert(officialCards().map(card => ({
+        team_id: teamId,
+        role: card.dataset.role,
+        name: val(card, ".p-name"),
+        phone: val(card, ".p-phone"),
+        passport_photo_path: pathOf(card, "photo"),
+        id_photo_path: pathOf(card, "id")
+      })));
+      if (officials.error) throw officials.error;
+      const squad = await db.from("players").insert(playerCards().map((card, i) => ({
+        team_id: teamId,
+        position: i + 1,
+        name: val(card, ".p-name"),
+        age: Number(val(card, ".p-age")),
+        passport_photo_path: pathOf(card, "photo"),
+        id_photo_path: pathOf(card, "id")
+      })));
+      if (squad.error) throw squad.error;
+    }
 
     regForm.addEventListener("submit", async e => {
       e.preventDefault();
       document.getElementById("reg-error").hidden = true;
       let ok = true;
 
-      // Team fields
-      regForm.querySelectorAll(".field:not(.players-field) [required]").forEach(el => {
+      // Team fields and the agree box
+      regForm.querySelectorAll(".field:not(.people-field) [required]").forEach(el => {
         const bad = !el.checkValidity() || (el.type !== "checkbox" && !el.value.trim());
         el.closest(".field").classList.toggle("invalid", bad);
         if (bad) ok = false;
       });
 
-      // Player rows
-      const rows = [...playersBox.querySelectorAll(".player")];
-      let playersBad = rows.length < MIN_PLAYERS;
-      rows.forEach(row => {
-        row.querySelectorAll("[required]").forEach(el => {
-          const bad = !el.checkValidity() || (el.type !== "file" && !el.value.trim());
-          (el.type === "file" ? el.closest(".p-id") : el).classList.toggle("bad", bad);
-          if (bad) playersBad = true;
-        });
-      });
-      playersErr.textContent = rows.length < MIN_PLAYERS
-        ? t("errMinPlayers", MIN_PLAYERS)
-        : t("errPlayerRows");
+      const officialsBad = !checkCards(officialCards());
+      officialsField.classList.toggle("invalid", officialsBad);
+
+      const rows = playerCards();
+      const playersBad = !checkCards(rows) || rows.length < MIN_PLAYERS;
+      playersErr.textContent = rows.length < MIN_PLAYERS ? t("errMinPlayers", MIN_PLAYERS) : t("errPlayerRows");
       playersField.classList.toggle("invalid", playersBad);
-      if (playersBad) ok = false;
+      if (officialsBad || playersBad) ok = false;
 
       if (!ok) {
-        const first = regForm.querySelector(".field.invalid:not(.players-field) input, .player .bad");
-        if (first) { first.focus(); first.scrollIntoView({ block: "center", behavior: "smooth" }); }
+        const first = regForm.querySelector(".field.invalid:not(.people-field) input, .pcard input.bad, .pcard .ph-tile.bad input");
+        if (first) {
+          first.focus({ preventScroll: true });
+          (first.closest(".ph-tile") || first).scrollIntoView({ block: "center", behavior: "smooth" });
+        }
         return;
       }
 
       const f = regForm.elements;
-      const playerLines = rows.map((row, i) =>
-        (i + 1) + ". " + row.querySelector(".p-name").value.trim() + " (" + row.querySelector(".p-age").value + ")");
-      idFiles = rows.map((row, i) => {
-        const file = row.querySelector(".p-file").files[0];
-        const ext = (file.name.split(".").pop() || "jpg").toLowerCase();
-        const name = String(i + 1).padStart(2, "0") + "-" + row.querySelector(".p-name").value.trim().replace(/[^\w]+/g, "-") + "-ID." + ext;
-        return new File([file], name, { type: file.type });
+      const officialLines = officialCards().map((card, i) =>
+        t(OFFICIALS[i].title) + ": " + val(card, ".p-name") + " (" + val(card, ".p-phone") + ")");
+      const playerLines = rows.map((card, i) => (i + 1) + ". " + val(card, ".p-name") + " (" + val(card, ".p-age") + ")");
+      shareFiles = collectPhotos().map(ph => {
+        const src = file(ph.card, ph.input);
+        const ext = (src.name.split(".").pop() || "jpg").toLowerCase();
+        return new File([src], ph.name + "." + ext, { type: src.type });
       });
 
       const msg = [
         "*YP Veterans Futsal: Team Registration*",
         "",
         "Team: " + f.team.value.trim(),
-        "Manager: " + f.manager.value.trim(),
-        "Phone: " + f.phone.value.trim(),
         "Island: " + f.island.value.trim(),
+        "",
+        "*Officials*",
+        ...officialLines,
         "",
         "*Players (" + rows.length + ")*",
         ...playerLines,
@@ -1685,7 +1876,7 @@
         f.notes.value.trim() ? "Notes: " + f.notes.value.trim() : "",
         "",
         "We confirm all players meet the age rule and agree to the tournament rules.",
-        "ID card photos to follow in this chat."
+        "Passport and ID card photos to follow in this chat."
       ].filter((line, i, all) => line !== "" || all[i - 1] !== "").join("\n");
       const waLink = "https://wa.me/" + REG_WHATSAPP + "?text=" + encodeURIComponent(msg);
 
@@ -1694,7 +1885,7 @@
         const label = btn.querySelector("span");
         btn.disabled = true;
         try {
-          await saveRegistration(rows, f, text => label.textContent = text);
+          await saveRegistration(f, text => label.textContent = text);
           document.getElementById("done-wa").hidden = true;
           document.getElementById("done-server").hidden = false;
           regForm.hidden = true;
@@ -1715,33 +1906,34 @@
       window.open(waLink, "_blank");
 
       // Phones can share the photos straight to WhatsApp; otherwise explain how to attach them
-      const canShare = navigator.canShare && navigator.canShare({ files: idFiles });
+      const canShare = navigator.canShare && navigator.canShare({ files: shareFiles });
       document.getElementById("share-ids").hidden = !canShare;
       document.getElementById("share-note").textContent = canShare
         ? t("shareNote")
-        : t("attachNote", idFiles.length);
+        : t("attachNote", shareFiles.length);
       regForm.hidden = true;
       regDone.hidden = false;
     });
 
     document.getElementById("share-ids").addEventListener("click", async () => {
       try {
-        await navigator.share({ files: idFiles, title: "Player ID cards", text: "ID cards: " + regForm.elements.team.value.trim() });
+        await navigator.share({ files: shareFiles, title: "Team photos", text: "Photos: " + regForm.elements.team.value.trim() });
       } catch (err) { /* share cancelled */ }
     });
 
     // Clear an error as soon as the field is fixed
     regForm.addEventListener("input", e => {
       e.target.classList.remove("bad");
-      const field = e.target.closest(".field:not(.players-field)");
+      const field = e.target.closest(".field:not(.people-field)");
       if (field && field.classList.contains("invalid") && e.target.checkValidity()) field.classList.remove("invalid");
     });
 
     document.getElementById("reg-again").addEventListener("click", () => {
       regForm.reset();
-      resetPlayers();
+      resetPeople();
+      officialsField.classList.remove("invalid");
       playersField.classList.remove("invalid");
-      idFiles = [];
+      shareFiles = [];
       document.getElementById("reg-error").hidden = true;
       regDone.hidden = true;
       regForm.hidden = false;
