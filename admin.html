@@ -151,8 +151,8 @@
     .no-photo { color: var(--muted); font-size: .8rem; }
     .sub-h { font-size: .8rem; color: var(--muted); text-transform: uppercase; letter-spacing: .06em; margin: 4px 0 8px; }
 
-    /* Officials: manager, coach, assistant */
-    .officials { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 18px; }
+    /* Officials: manager, coach, official, medic */
+    .officials { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 18px; }
     .official { display: flex; align-items: center; gap: 10px; padding: 10px 12px; border: 1px solid var(--border); border-radius: 12px; min-width: 0; }
     .official > div { flex: 1; min-width: 0; }
     .official small { display: block; color: var(--brand-text); font-size: .7rem; font-weight: 600; text-transform: uppercase; letter-spacing: .08em; }
@@ -297,7 +297,7 @@
       }
       const { data, error } = await db
         .from("teams")
-        .select("*, players(id, position, name, age, id_photo_path, passport_photo_path), officials(role, name, phone, passport_photo_path, id_photo_path)")
+        .select("*, players(id, position, name, age, jersey_number, id_photo_path, passport_photo_path), officials(role, name, phone, passport_photo_path, id_photo_path)")
         .order("created_at", { ascending: false });
       if (error) {
         if (!silent) app.innerHTML = `<div class="card notice"><h2>Couldn't load</h2><p>${esc(error.message)}</p></div>`;
@@ -311,7 +311,7 @@
       const newTeams = silent ? data.filter(t => !knownIds.has(t.id)) : [];
       lastSignature = signature;
 
-      const roleOrder = ["manager", "coach", "assistant"];
+      const roleOrder = ["manager", "coach", "official", "medic"];
       teams = data.map(t => ({
         ...t,
         players: (t.players || []).sort((a, b) => a.position - b.position),
@@ -374,7 +374,7 @@
               <input type="datetime-local" id="closes-at" value="${toMvInput(settings.closes_at)}">
             </label>
             <label>Checklist for teams <small>(one item per line · leave empty for the standard list)</small>
-              <textarea id="instructions" rows="4" maxlength="1000" placeholder="10 to 12 players, all aged 35 or older&#10;3 officials: manager, coach and assistant&#10;A passport-size photo and an ID card photo for everyone&#10;The manager's phone number (on WhatsApp)">${esc(settings.instructions || "")}</textarea>
+              <textarea id="instructions" rows="4" maxlength="1000" placeholder="10 to 12 players, all aged 35 or older&#10;4 officials: manager, coach, official and medic&#10;A passport-size photo and an ID card photo for everyone&#10;The manager's phone number (on WhatsApp)">${esc(settings.instructions || "")}</textarea>
             </label>
             <div class="rc-extra-actions">
               <button class="tool-btn" id="save-extra">Save date &amp; checklist</button>
@@ -461,11 +461,12 @@
               </div>` : ""}
             <h4 class="sub-h">Players</h4>
             <table>
-              <thead><tr><th>#</th><th>Player</th><th>Age</th><th>Photo</th><th>ID card</th></tr></thead>
+              <thead><tr><th>#</th><th>Jersey</th><th>Player</th><th>Age</th><th>Photo</th><th>ID card</th></tr></thead>
               <tbody>
                 ${t.players.map(p => `
                   <tr>
                     <td class="num">${p.position}</td>
+                    <td><b>${p.jersey_number ?? "—"}</b></td>
                     <td>${esc(p.name)}</td>
                     <td class="${p.age < 35 ? "age-bad" : ""}">${p.age}</td>
                     <td>${p.passport_photo_path ? `<img class="thumb portrait" data-path="${esc(p.passport_photo_path)}" alt="Passport photo of ${esc(p.name)}">` : `<span class="no-photo">—</span>`}</td>
@@ -558,12 +559,12 @@
 
     function exportCsv() {
       const cell = v => `"${String(v ?? "").replace(/"/g, '""')}"`;
-      const rows = [["Team", "Status", "Manager", "Phone", "Coach", "Coach phone", "Assistant", "Assistant phone", "Island", "Registered", "Player #", "Player", "Age", "Notes"]];
+      const rows = [["Team", "Status", "Manager", "Phone", "Coach", "Coach phone", "Official", "Official phone", "Medic", "Medic phone", "Island", "Registered", "Player #", "Jersey", "Player", "Age", "Notes"]];
       teams.forEach(t => {
         const off = role => t.officials.find(o => o.role === role) || {};
         t.players.forEach(p => rows.push([
-          t.team_name, t.status, t.manager, t.phone, off("coach").name, off("coach").phone, off("assistant").name, off("assistant").phone,
-          t.island, fmtDate(t.created_at), p.position, p.name, p.age, t.notes
+          t.team_name, t.status, t.manager, t.phone, off("coach").name, off("coach").phone, off("official").name, off("official").phone, off("medic").name, off("medic").phone,
+          t.island, fmtDate(t.created_at), p.position, p.jersey_number, p.name, p.age, t.notes
         ]));
       });
       const blob = new Blob(["﻿" + rows.map(r => r.map(cell).join(",")).join("\n")], { type: "text/csv;charset=utf-8" });

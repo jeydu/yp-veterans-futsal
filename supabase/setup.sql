@@ -92,16 +92,19 @@ create table if not exists public.players (
 
 create index if not exists players_team_id_idx on public.players (team_id);
 
+-- Jersey number for each player (older registrations don't have one)
+alter table public.players add column if not exists jersey_number int check (jersey_number between 0 and 99);
+
 -- Passport-size photo for each player (older registrations don't have one)
 alter table public.players add column if not exists passport_photo_path text check (char_length(passport_photo_path) <= 200);
 
 
--- 3b. Team officials: manager, coach and assistant ---------------------------
+-- 3b. Team officials: manager, coach, official and medic ----------------------
 
 create table if not exists public.officials (
   id                   uuid primary key default gen_random_uuid(),
   team_id              uuid not null references public.teams (id) on delete cascade,
-  role                 text not null check (role in ('manager', 'coach', 'assistant')),
+  role                 text not null,
   name                 text not null check (char_length(name) between 1 and 100),
   phone                text not null check (char_length(phone) between 7 and 20),
   passport_photo_path  text not null check (char_length(passport_photo_path) <= 200),
@@ -110,6 +113,10 @@ create table if not exists public.officials (
 );
 
 create index if not exists officials_team_id_idx on public.officials (team_id);
+
+-- The four roles. 'assistant' was used before 2026-10-17 and is kept so older registrations stay valid
+alter table public.officials drop constraint if exists officials_role_check;
+alter table public.officials add constraint officials_role_check check (role in ('manager', 'coach', 'official', 'medic', 'assistant'));
 
 
 -- 4. Who can do what --------------------------------------------------------

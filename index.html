@@ -531,7 +531,7 @@
       background: var(--surface); border: 1.5px solid var(--border); border-radius: 10px; padding: 10px 12px;
     }
     .pc-lbl input:focus { outline: none; border-color: var(--brand-text); }
-    .pc-age input { max-width: 110px; }
+    .pc-pair { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
     .pcard input.bad { border-color: var(--brand-text); background: var(--tint-strong); }
 
     /* Photo tiles: tap to add, then they show the photo with a green tick */
@@ -753,6 +753,8 @@
     <symbol id="i-briefcase" viewBox="0 0 24 24"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></symbol>
     <symbol id="i-clipboard" viewBox="0 0 24 24"><rect x="8" y="2" width="8" height="4" rx="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2M9 12h6M9 16h6"/></symbol>
     <symbol id="i-user-plus" viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M19 8v6M22 11h-6"/></symbol>
+    <symbol id="i-shield" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="M9 12l2 2 4-4"/></symbol>
+    <symbol id="i-medic" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="3"/><path d="M12 8v8M8 12h8"/></symbol>
     <symbol id="i-portrait" viewBox="0 0 24 24"><rect x="4" y="2" width="16" height="20" rx="2"/><circle cx="12" cy="10" r="3.2"/><path d="M7.5 19a4.5 4.5 0 0 1 9 0"/></symbol>
     <symbol id="i-idcard" viewBox="0 0 24 24"><rect x="2" y="5" width="20" height="14" rx="2"/><circle cx="8" cy="11" r="2"/><path d="M5 16a3 3 0 0 1 6 0M14 10h5M14 14h3"/></symbol>
     <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
@@ -869,7 +871,7 @@
         <div class="card">
           <span class="card-icon"><svg class="ic" aria-hidden="true"><use href="#i-users"/></svg></span>
           <h3 data-i18n="whoTitle">Who can play</h3>
-          <p data-i18n="whoText">Players aged 35 and over. Each team registers 10 to 12 players and 3 officials.</p>
+          <p data-i18n="whoText">Players aged 35 and over. Each team registers 10 to 12 players and 4 officials.</p>
         </div>
         <div class="card">
           <span class="card-icon"><svg class="ic" aria-hidden="true"><use href="#i-calendar"/></svg></span>
@@ -992,7 +994,7 @@
             </div>
             <div class="reg-howto">
               <h3 data-i18n="howtoTitle">Before you register</h3>
-              <ul id="howto-list" data-i18n="howtoList"><li>10 to 12 players, all aged 35 or older</li><li>3 officials: manager, coach and assistant</li><li>A passport-size photo and an ID card photo for everyone</li><li>The manager's phone number (on WhatsApp)</li></ul>
+              <ul id="howto-list" data-i18n="howtoList"><li>10 to 12 players, all aged 35 or older</li><li>4 officials: manager, coach, official and medic</li><li>A passport-size photo and an ID card photo for everyone</li><li>The manager's phone number (on WhatsApp)</li></ul>
             </div>
           </div>
         </div>
@@ -1032,13 +1034,13 @@
             </div>
           </div>
 
-          <!-- Step 2: officials (manager, coach, assistant) -->
+          <!-- Step 2: officials (manager, coach, official, medic) -->
           <div class="reg-sec" id="sec-officials">
             <div class="sec-title">
               <span class="sec-num">2</span>
               <div>
                 <h3 data-i18n="secOfficials">Team officials</h3>
-                <p data-i18n="secOfficialsSub">Manager, coach and assistant · the manager is the team's contact</p>
+                <p data-i18n="secOfficialsSub">Manager, coach, official and medic · the manager is the team's contact</p>
               </div>
             </div>
             <div class="field people-field" id="officials-field">
@@ -1110,7 +1112,10 @@
             <div class="pc-body">
               <div class="pc-fields">
                 <label class="pc-lbl"><span data-i18n="lblFullName">Full name</span><input class="p-name" type="text" autocomplete="off" required></label>
-                <label class="pc-lbl pc-age"><span data-i18n="lblAge">Age</span><input class="p-age" type="number" min="35" max="99" inputmode="numeric" required></label>
+                <div class="pc-pair">
+                  <label class="pc-lbl"><span data-i18n="lblAge">Age</span><input class="p-age" type="number" min="35" max="99" inputmode="numeric" required></label>
+                  <label class="pc-lbl"><span data-i18n="lblJersey">Jersey no.</span><input class="p-jersey" type="number" min="0" max="99" inputmode="numeric" required></label>
+                </div>
                 <label class="pc-lbl pc-phone"><span data-i18n="lblPhoneShort">Phone (WhatsApp)</span><input class="p-phone" type="tel" dir="ltr" inputmode="tel" placeholder="7XX XXXX" pattern="[0-9+ \-]{7,}" required></label>
               </div>
               <div class="pc-photos">
@@ -1270,7 +1275,7 @@
       kkName: "ކޭ.ކޭ ކަނޑުމަތި",
       ftName: "އެފް.ޓީ ނަކަސޯލް",
       whoTitle: "ކުޅެވޭނީ ކާކަށް",
-      whoText: "35 އަހަރާއި އެއަށްވުރެ މަތީގެ ކުޅުންތެރިން. ކޮންމެ ޓީމަކުން 10 އާއި 12 އާ ދެމެދުގެ ކުޅުންތެރިންނާއި 3 އޮފިޝަލުން ރަޖިސްޓްރީ ކުރަންވާނެ.",
+      whoText: "35 އަހަރާއި އެއަށްވުރެ މަތީގެ ކުޅުންތެރިން. ކޮންމެ ޓީމަކުން 10 އާއި 12 އާ ދެމެދުގެ ކުޅުންތެރިންނާއި 4 އޮފިޝަލުން ރަޖިސްޓްރީ ކުރަންވާނެ.",
       whenTitle: "ކޮންއިރަކު",
       whenText: "ތާރީޚު އަދި ކަނޑައަޅާފައެއް ނުވޭ",
       whereTitle: "ކޮންތާކު",
@@ -1289,7 +1294,7 @@
       step3: "<b>ކަށަވަރުކޮށްދެވޭނެ</b><span>ރާވާ ފަރާތުން ގުޅުއްވާނެ</span>",
       deadlineLabel: "ރަޖިސްޓްރޭޝަން ނިމޭނީ",
       howtoTitle: "ރަޖިސްޓްރީ ކުރުމުގެ ކުރިން ތައްޔާރުކުރައްވާ",
-      howtoList: "<li>10 އާއި 12 އާ ދެމެދުގެ ކުޅުންތެރިން، ހުރިހާ ކުޅުންތެރިންގެ އުމުރު 35 ނުވަތަ މަތި</li><li>3 އޮފިޝަލުން: މެނޭޖަރު، ކޯޗު އަދި އެސިސްޓަންޓް</li><li>ކޮންމެ މީހެއްގެ ޕާސްޕޯޓް ސައިޒުގެ ފޮޓޯއަކާއި އައިޑީ ކާޑުގެ ފޮޓޯއެއް</li><li>މެނޭޖަރުގެ ފޯނު ނަންބަރު (ވަޓްސްއަޕް)</li>",
+      howtoList: "<li>10 އާއި 12 އާ ދެމެދުގެ ކުޅުންތެރިން، ހުރިހާ ކުޅުންތެރިންގެ އުމުރު 35 ނުވަތަ މަތި</li><li>4 އޮފިޝަލުން: މެނޭޖަރު، ކޯޗު، އޮފިޝަލް އަދި މެޑިކް</li><li>ކޮންމެ މީހެއްގެ ޕާސްޕޯޓް ސައިޒުގެ ފޮޓޯއަކާއި އައިޑީ ކާޑުގެ ފޮޓޯއެއް</li><li>މެނޭޖަރުގެ ފޯނު ނަންބަރު (ވަޓްސްއަޕް)</li>",
       lblTeam: "ޓީމުގެ ނަން *",
       errTeam: "ޓީމުގެ ނަން ލިޔުއްވާ",
       lblManager: "މެނޭޖަރުގެ ނަން *",
@@ -1331,10 +1336,11 @@
       secConfirmShort: "ފޮނުވުން",
       secOfficialsShort: "އޮފިޝަލުން",
       secOfficials: "ޓީމުގެ އޮފިޝަލުން",
-      secOfficialsSub: "މެނޭޖަރު، ކޯޗު އަދި އެސިސްޓަންޓް · ޓީމާ ގުޅޭނީ މެނޭޖަރާ",
+      secOfficialsSub: "މެނޭޖަރު، ކޯޗު، އޮފިޝަލް އަދި މެޑިކް · ޓީމާ ގުޅޭނީ މެނޭޖަރާ",
       errOfficials: "ކޮންމެ އޮފިޝަލެއްގެ ނަމާއި ފޯނު ނަންބަރާއި ދެ ފޮޓޯ ފުރުއްވާ",
       lblFullName: "ފުރިހަމަ ނަން",
       lblAge: "އުމުރު",
+      lblJersey: "ޖާޒީ ނަންބަރު",
       lblPhoneShort: "ފޯނު (ވަޓްސްއަޕް)",
       phPassport: "ޕާސްޕޯޓް ފޮޓޯ",
       phPassportShort: "ޕާސްޕޯޓް ފޮޓޯ",
@@ -1360,17 +1366,19 @@
       roleManager: "މެނޭޖަރު",
       roleManagerSub: "ޓީމާ ގުޅޭނެ ފަރާތް",
       roleCoach: "ކޯޗު",
-      roleAssistant: "އެސިސްޓަންޓް",
+      roleOfficial: "އޮފިޝަލް",
+      roleMedic: "މެޑިކް",
       cardDone: "ފުރިހަމަ",
       removePlayer: "ކުޅުންތެރިޔާ ނައްތާލާ",
       errMinPlayers: n => "މަދުވެގެން " + n + " ކުޅުންތެރިން އިތުރުކުރައްވާ",
-      errPlayerRows: "ކޮންމެ ކުޅުންތެރިއެއްގެ ނަމާއި އުމުރާއި ދެ ފޮޓޯ ފުރުއްވާ. ހުރިހާ ކުޅުންތެރިންގެ އުމުރު 35 ނުވަތަ މަތި ވާން ޖެހޭނެ.",
+      errPlayerRows: "ކޮންމެ ކުޅުންތެރިއެއްގެ ނަމާއި އުމުރާއި ޖާޒީ ނަންބަރާއި ދެ ފޮޓޯ ފުރުއްވާ. ހުރިހާ ކުޅުންތެރިންގެ އުމުރު 35 ނުވަތަ މަތި ވާން ޖެހޭނެ، އަދި ޖާޒީ ނަންބަރު ތަފާތު ވާން ޖެހޭނެ.",
+      errJerseyDup: "މި ނަންބަރު އެހެން ކުޅުންތެރިއަކު ބޭނުންކޮށްފި",
       popChampions: year => year + " ގެ ޗެމްޕިއަނުން",
       photoSoon: "ފޮޓޯ ދެން ލިބޭނެ",
       shareNote: "ވަޓްސްއަޕް އިޚްތިޔާރުކޮށް، ރާވާ ފަރާތުގެ ޗެޓް (+960 976-3551) އިޚްތިޔާރުކުރައްވާ.",
       attachNote: n => "+960 976-3551 އާއި އެކު ވަޓްސްއަޕް ޗެޓްގައި " + n + " ފޮޓޯ ފޮނުއްވާ.",
-      summary: s => "އޮފިޝަލުން " + s.o + "/3 · ކުޅުންތެރިން " + s.p + "/" + s.n + " ފުރިހަމަ",
-      summaryReady: n => "✓ ފޮނުވަން ތައްޔާރު: ޓީމު، 3 އޮފިޝަލުން އަދި " + n + " ކުޅުންތެރިން، ފޮޓޯތަކާއެކު",
+      summary: s => "އޮފިޝަލުން " + s.o + "/" + s.on + " · ކުޅުންތެރިން " + s.p + "/" + s.n + " ފުރިހަމަ",
+      summaryReady: n => "✓ ފޮނުވަން ތައްޔާރު: ޓީމު، 4 އޮފިޝަލުން އަދި " + n + " ކުޅުންތެރިން، ފޮޓޯތަކާއެކު",
       preparing: n => "ފޮޓޯ އަޕްލޯޑް ކުރަނީ… " + n,
       uploading: "ފޮނުވަނީ…",
       submitServerLabel: "ރަޖިސްޓްރޭޝަން ފޮނުއްވާ",
@@ -1383,17 +1391,19 @@
       roleManager: "Manager",
       roleManagerSub: "Team contact",
       roleCoach: "Coach",
-      roleAssistant: "Assistant",
+      roleOfficial: "Official",
+      roleMedic: "Medic",
       cardDone: "Done",
       removePlayer: "Remove player",
       errMinPlayers: n => "Add at least " + n + " players",
-      errPlayerRows: "Fill in every player's name, age and both photos. All players must be 35 or older.",
+      errPlayerRows: "Fill in every player's name, age, jersey number and both photos. All players must be 35 or older, and each needs a different jersey number.",
+      errJerseyDup: "Another player already has this number",
       popChampions: year => year + " Champions",
       photoSoon: "Photo coming soon",
       shareNote: "Choose WhatsApp, then the organiser's chat (+960 976-3551).",
       attachNote: n => "Attach the " + n + " photos in the WhatsApp chat with +960 976-3551.",
-      summary: s => "Officials " + s.o + "/3 · Players " + s.p + "/" + s.n + " complete",
-      summaryReady: n => "✓ Ready to send: team, 3 officials and " + n + " players with photos",
+      summary: s => "Officials " + s.o + "/" + s.on + " · Players " + s.p + "/" + s.n + " complete",
+      summaryReady: n => "✓ Ready to send: team, 4 officials and " + n + " players with photos",
       preparing: n => "Uploading photos… " + n,
       uploading: "Sending…",
       submitServerLabel: "Submit registration",
@@ -1584,7 +1594,8 @@
     const OFFICIALS = [
       { role: "manager", icon: "briefcase", title: "roleManager", sub: "roleManagerSub" },
       { role: "coach", icon: "clipboard", title: "roleCoach" },
-      { role: "assistant", icon: "user-plus", title: "roleAssistant" }
+      { role: "official", icon: "shield", title: "roleOfficial" },
+      { role: "medic", icon: "medic", title: "roleMedic" }
     ];
 
     const regForm = document.getElementById("reg-form");
@@ -1603,24 +1614,30 @@
     const val = (card, sel) => card.querySelector(sel).value.trim();
     const file = (card, sel) => card.querySelector(sel).files[0];
 
-    // Name, age or phone, passport photo and ID photo: how many are filled in
+    // How many of a card's fields are filled in correctly (name, age, jersey or phone, and both photos)
     function cardProgress(card) {
-      const second = card.querySelector(".p-age, .p-phone");
-      const parts = [
-        !!val(card, ".p-name"),
-        !!(second.value.trim() && second.checkValidity()),
-        !!file(card, ".f-passport"),
-        !!file(card, ".f-id")
-      ];
-      return parts.filter(Boolean).length;
+      const fields = [...card.querySelectorAll("[required]")];
+      const filled = fields.filter(el => el.type === "file" ? el.files.length : el.value.trim() && el.checkValidity()).length;
+      return { filled, total: fields.length };
+    }
+
+    // Two players can't wear the same number
+    function checkJerseys() {
+      const inputs = playerCards().map(card => card.querySelector(".p-jersey"));
+      inputs.forEach(el => el.setCustomValidity(""));
+      inputs.forEach(el => {
+        const n = el.value.trim();
+        if (n && inputs.some(other => other !== el && other.value.trim() !== "" && Number(other.value) === Number(n))) el.setCustomValidity(t("errJerseyDup"));
+      });
     }
 
     function updateCard(card) {
-      const done = cardProgress(card) === 4;
+      const { filled, total } = cardProgress(card);
+      const done = filled === total;
       card.classList.toggle("complete", done);
       const state = card.querySelector(".pc-state");
       if (done) state.innerHTML = '<svg class="ic" aria-hidden="true"><use href="#i-check"/></svg>' + t("cardDone");
-      else state.textContent = cardProgress(card) + " / 4";
+      else state.textContent = filled + " / " + total;
       return done;
     }
 
@@ -1649,6 +1666,7 @@
       const teamFilled = teamInputs.filter(el => el.value.trim() && el.checkValidity()).length;
       const teamOk = teamFilled === teamInputs.length;
 
+      checkJerseys();
       const officialsDone = officialCards().filter(updateCard).length;
       const officialsOk = officialsDone === OFFICIALS.length;
       const rows = playerCards();
@@ -1670,7 +1688,7 @@
         document.getElementById("sec-" + k).classList.toggle("done", ok));
 
       const summary = document.getElementById("reg-summary");
-      summary.textContent = ready ? t("summaryReady", rows.length) : t("summary", { o: officialsDone, p: complete, n: needed });
+      summary.textContent = ready ? t("summaryReady", rows.length) : t("summary", { o: officialsDone, on: OFFICIALS.length, p: complete, n: needed });
       summary.classList.toggle("ready", ready);
     }
     regForm.addEventListener("input", updateProgress);
@@ -1680,7 +1698,7 @@
     function makeCard(kind, official) {
       const card = tpl.content.firstElementChild.cloneNode(true);
       card.dataset.kind = kind;
-      card.querySelector(kind === "player" ? ".pc-phone" : ".pc-age").remove();
+      card.querySelector(kind === "player" ? ".pc-phone" : ".pc-pair").remove();
       if (kind === "official") {
         card.dataset.role = official.role;
         card.querySelector(".pc-badge").innerHTML = '<svg class="ic" aria-hidden="true"><use href="#i-' + official.icon + '"/></svg>';
@@ -1815,6 +1833,7 @@
         position: i + 1,
         name: val(card, ".p-name"),
         age: Number(val(card, ".p-age")),
+        jersey_number: Number(val(card, ".p-jersey")),
         passport_photo_path: pathOf(card, "photo"),
         id_photo_path: pathOf(card, "id")
       })));
@@ -1837,6 +1856,7 @@
       officialsField.classList.toggle("invalid", officialsBad);
 
       const rows = playerCards();
+      checkJerseys();
       const playersBad = !checkCards(rows) || rows.length < MIN_PLAYERS;
       playersErr.textContent = rows.length < MIN_PLAYERS ? t("errMinPlayers", MIN_PLAYERS) : t("errPlayerRows");
       playersField.classList.toggle("invalid", playersBad);
@@ -1854,7 +1874,7 @@
       const f = regForm.elements;
       const officialLines = officialCards().map((card, i) =>
         t(OFFICIALS[i].title) + ": " + val(card, ".p-name") + " (" + val(card, ".p-phone") + ")");
-      const playerLines = rows.map((card, i) => (i + 1) + ". " + val(card, ".p-name") + " (" + val(card, ".p-age") + ")");
+      const playerLines = rows.map((card, i) => (i + 1) + ". #" + val(card, ".p-jersey") + " " + val(card, ".p-name") + " (age " + val(card, ".p-age") + ")");
       shareFiles = collectPhotos().map(ph => {
         const src = file(ph.card, ph.input);
         const ext = (src.name.split(".").pop() || "jpg").toLowerCase();
