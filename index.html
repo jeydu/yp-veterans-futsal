@@ -401,13 +401,19 @@
     }
     .reg-steps b { display: block; }
     .reg-steps span { color: #f6d6db; font-size: .88rem; }
-    .reg-deadline { display: flex; align-items: center; gap: 12px; margin-top: 28px; padding: 14px 16px; border-radius: 12px; background: rgba(0,0,0,.22); border: 1px solid rgba(227, 178, 60, .35); }
+    .reg-deadline { margin-bottom: 28px; padding: 16px; border-radius: 14px; background: rgba(0,0,0,.25); border: 1px solid rgba(227, 178, 60, .45); }
     .reg-deadline[hidden] { display: none; }
-    .rd-icon { font-size: 1.7rem; color: var(--gold); }
+    .rd-head { display: flex; align-items: center; gap: 12px; }
+    .rd-icon { font-size: 1.6rem; color: var(--gold); }
     .rd-label { display: block; font-size: .75rem; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: #f6d6db; }
-    .rd-date { display: block; font-size: 1.05rem; }
-    .rd-left { display: inline-block; margin-top: 4px; padding: 2px 10px; border-radius: 99px; background: var(--gold); color: #2a0a0f; font-size: .75rem; font-weight: 700; }
-    .rd-left:empty { display: none; }
+    .rd-date { display: block; font-size: 1rem; }
+    /* Live countdown: days / hours / mins / secs */
+    .rd-clock { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-top: 14px; }
+    .rd-unit { text-align: center; padding: 10px 4px 8px; border-radius: 10px; background: rgba(255,255,255,.08); border: 1px solid rgba(255,255,255,.12); }
+    .rd-unit b { display: block; font-family: "Oswald", sans-serif; font-size: clamp(1.6rem, 5vw, 2.1rem); font-weight: 700; line-height: 1; color: var(--gold); font-variant-numeric: tabular-nums; }
+    .rd-unit span { display: block; margin-top: 4px; font-size: .68rem; font-weight: 600; letter-spacing: .1em; text-transform: uppercase; color: #f6d6db; }
+    .reg-deadline.soon .rd-unit b { color: #fff; }
+    .reg-deadline.soon { border-color: var(--gold); box-shadow: 0 0 0 3px rgba(227, 178, 60, .2); }
     /* Locked: the whole card follows the "closed" state */
     .reg.is-closed { grid-template-columns: 1fr; max-width: 760px; margin: 0 auto; }
     .reg.is-closed .reg-info { display: none; }
@@ -1034,6 +1040,22 @@
       <div class="reg">
         <div class="reg-info">
           <div class="reg-info-inner">
+            <!-- Closing date with a live countdown: organisers set the date on admin.html -->
+            <div class="reg-deadline" id="reg-deadline" hidden>
+              <div class="rd-head">
+                <span class="rd-icon"><svg class="ic" aria-hidden="true"><use href="#i-calendar"/></svg></span>
+                <div>
+                  <span class="rd-label" data-i18n="deadlineLabel">Registration closes</span>
+                  <b class="rd-date" id="rd-date"></b>
+                </div>
+              </div>
+              <div class="rd-clock" dir="ltr" role="timer" aria-live="off">
+                <div class="rd-unit"><b id="cd-d">0</b><span data-i18n="cdDays">Days</span></div>
+                <div class="rd-unit"><b id="cd-h">00</b><span data-i18n="cdHours">Hours</span></div>
+                <div class="rd-unit"><b id="cd-m">00</b><span data-i18n="cdMins">Mins</span></div>
+                <div class="rd-unit"><b id="cd-s">00</b><span data-i18n="cdSecs">Secs</span></div>
+              </div>
+            </div>
             <span data-i18n="regEyebrow" class="eyebrow">Next edition</span>
             <h2 data-i18n="regTitle">Register Your Team</h2>
             <p data-i18n="regIntro">Fill in your team and players, then send everything straight to the organisers on WhatsApp.</p>
@@ -1042,15 +1064,6 @@
               <li data-i18n="step2"><b>Send on WhatsApp</b><span>Your details and photos are ready to send</span></li>
               <li data-i18n="step3"><b>Get confirmed</b><span>The organisers will contact you</span></li>
             </ol>
-            <!-- Closing date and checklist: organisers set both on admin.html -->
-            <div class="reg-deadline" id="reg-deadline" hidden>
-              <span class="rd-icon"><svg class="ic" aria-hidden="true"><use href="#i-calendar"/></svg></span>
-              <div>
-                <span class="rd-label" data-i18n="deadlineLabel">Registration closes</span>
-                <b class="rd-date" id="rd-date"></b>
-                <span class="rd-left" id="rd-left"></span>
-              </div>
-            </div>
             <div class="reg-howto">
               <h3 data-i18n="howtoTitle">Before you register</h3>
               <ul id="howto-list" data-i18n="howtoList"><li>10 to 12 players, all aged 35 or older</li><li>4 officials: manager, coach, official and medic</li><li>A passport-size photo and an ID card photo for everyone</li><li>The manager's phone number (on WhatsApp)</li></ul>
@@ -1437,7 +1450,7 @@
       preparing: n => "ފޮޓޯ އަޕްލޯޑް ކުރަނީ… " + n,
       uploading: "ފޮނުވަނީ…",
       submitServerLabel: "ރަޖިސްޓްރޭޝަން ފޮނުއްވާ",
-      daysLeft: n => n === 0 ? "މިއަދު ނިމޭނެ" : n + " ދުވަސް ބާކީ",
+      cdDays: "ދުވަސް", cdHours: "ގަޑި", cdMins: "މިނެޓް", cdSecs: "ސިކުންތު",
       closedOn: d => d + " ގައި ނިމުނީ"
     };
     const EN = {
@@ -1462,7 +1475,6 @@
       preparing: n => "Uploading photos… " + n,
       uploading: "Sending…",
       submitServerLabel: "Submit registration",
-      daysLeft: n => n === 0 ? "Closes today" : n === 1 ? "1 day left" : n + " days left",
       closedOn: d => "Closed on " + d
     };
 
@@ -2033,9 +2045,27 @@
       document.getElementById("rd-date").textContent = new Intl.DateTimeFormat("en-GB", {
         timeZone: "Indian/Maldives", day: "numeric", month: "long", year: "numeric", hour: "numeric", minute: "2-digit", hour12: true
       }).format(closes);
-      const msLeft = closes - Date.now();
-      document.getElementById("rd-left").textContent = msLeft > 0 ? t("daysLeft", Math.floor(msLeft / 86400000)) : "";
       box.hidden = false;
+      tickCountdown();
+      if (!countdownTimer) countdownTimer = setInterval(tickCountdown, 1000);
+    }
+
+    // Ticks every second; when it reaches zero the form switches to "closed"
+    let countdownTimer = null;
+    function tickCountdown() {
+      const msLeft = Math.max(0, new Date(regSettings.closes_at) - Date.now());
+      const sec = Math.floor(msLeft / 1000);
+      const pad = n => String(n).padStart(2, "0");
+      document.getElementById("cd-d").textContent = Math.floor(sec / 86400);
+      document.getElementById("cd-h").textContent = pad(Math.floor(sec / 3600) % 24);
+      document.getElementById("cd-m").textContent = pad(Math.floor(sec / 60) % 60);
+      document.getElementById("cd-s").textContent = pad(sec % 60);
+      document.getElementById("reg-deadline").classList.toggle("soon", msLeft < 86400000);
+      if (msLeft === 0) {
+        clearInterval(countdownTimer);
+        countdownTimer = null;
+        checkRegistrationOpen();
+      }
     }
 
     // Organisers' own checklist (one item per line) replaces the standard one
