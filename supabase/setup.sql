@@ -106,13 +106,16 @@ create table if not exists public.officials (
   team_id              uuid not null references public.teams (id) on delete cascade,
   role                 text not null,
   name                 text not null check (char_length(name) between 1 and 100),
-  phone                text not null check (char_length(phone) between 7 and 20),
+  phone                text check (char_length(phone) between 7 and 20),
   passport_photo_path  text not null check (char_length(passport_photo_path) <= 200),
   id_photo_path        text not null check (char_length(id_photo_path) <= 200),
   unique (team_id, role)
 );
 
 create index if not exists officials_team_id_idx on public.officials (team_id);
+
+-- Only the manager gives a phone number
+alter table public.officials alter column phone drop not null;
 
 -- The four roles. 'assistant' was used before 2026-10-17 and is kept so older registrations stay valid
 alter table public.officials drop constraint if exists officials_role_check;

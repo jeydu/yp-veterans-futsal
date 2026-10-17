@@ -1045,7 +1045,7 @@
             </div>
             <div class="field people-field" id="officials-field">
               <div class="people" id="officials"></div>
-              <span data-i18n="errOfficials" class="err">Fill in each official's name, phone number and both photos</span>
+              <span data-i18n="errOfficials" class="err">Fill in each official's name and both photos, and the manager's phone number</span>
             </div>
           </div>
 
@@ -1337,7 +1337,7 @@
       secOfficialsShort: "އޮފިޝަލުން",
       secOfficials: "ޓީމުގެ އޮފިޝަލުން",
       secOfficialsSub: "މެނޭޖަރު، ކޯޗު، އޮފިޝަލް އަދި މެޑިކް · ޓީމާ ގުޅޭނީ މެނޭޖަރާ",
-      errOfficials: "ކޮންމެ އޮފިޝަލެއްގެ ނަމާއި ފޯނު ނަންބަރާއި ދެ ފޮޓޯ ފުރުއްވާ",
+      errOfficials: "ކޮންމެ އޮފިޝަލެއްގެ ނަމާއި ދެ ފޮޓޯ، އަދި މެނޭޖަރުގެ ފޯނު ނަންބަރު ފުރުއްވާ",
       lblFullName: "ފުރިހަމަ ނަން",
       lblAge: "އުމުރު",
       lblJersey: "ޖާޒީ ނަންބަރު",
@@ -1699,6 +1699,8 @@
       const card = tpl.content.firstElementChild.cloneNode(true);
       card.dataset.kind = kind;
       card.querySelector(kind === "player" ? ".pc-phone" : ".pc-pair").remove();
+      // Only the manager gives a phone number
+      if (kind === "official" && official.role !== "manager") card.querySelector(".pc-phone").remove();
       if (kind === "official") {
         card.dataset.role = official.role;
         card.querySelector(".pc-badge").innerHTML = '<svg class="ic" aria-hidden="true"><use href="#i-' + official.icon + '"/></svg>';
@@ -1823,7 +1825,7 @@
         team_id: teamId,
         role: card.dataset.role,
         name: val(card, ".p-name"),
-        phone: val(card, ".p-phone"),
+        phone: card.querySelector(".p-phone") ? val(card, ".p-phone") : null,
         passport_photo_path: pathOf(card, "photo"),
         id_photo_path: pathOf(card, "id")
       })));
@@ -1873,7 +1875,7 @@
 
       const f = regForm.elements;
       const officialLines = officialCards().map((card, i) =>
-        t(OFFICIALS[i].title) + ": " + val(card, ".p-name") + " (" + val(card, ".p-phone") + ")");
+        t(OFFICIALS[i].title) + ": " + val(card, ".p-name") + (card.querySelector(".p-phone") ? " (" + val(card, ".p-phone") + ")" : ""));
       const playerLines = rows.map((card, i) => (i + 1) + ". #" + val(card, ".p-jersey") + " " + val(card, ".p-name") + " (age " + val(card, ".p-age") + ")");
       shareFiles = collectPhotos().map(ph => {
         const src = file(ph.card, ph.input);

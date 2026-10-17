@@ -451,7 +451,7 @@
                     <div>
                       <small>${esc(o.role)}</small>
                       <b>${esc(o.name)}</b>
-                      <a href="tel:${esc(o.phone)}">${esc(o.phone)}</a>
+                      ${o.phone ? `<a href="tel:${esc(o.phone)}">${esc(o.phone)}</a>` : ""}
                     </div>
                     <span class="pics">
                       <img class="thumb" data-path="${esc(o.passport_photo_path)}" alt="Passport photo of ${esc(o.name)}">
@@ -559,11 +559,11 @@
 
     function exportCsv() {
       const cell = v => `"${String(v ?? "").replace(/"/g, '""')}"`;
-      const rows = [["Team", "Status", "Manager", "Phone", "Coach", "Coach phone", "Official", "Official phone", "Medic", "Medic phone", "Island", "Registered", "Player #", "Jersey", "Player", "Age", "Notes"]];
+      const rows = [["Team", "Status", "Manager", "Phone", "Coach", "Official", "Medic", "Island", "Registered", "Player #", "Jersey", "Player", "Age", "Notes"]];
       teams.forEach(t => {
         const off = role => t.officials.find(o => o.role === role) || {};
         t.players.forEach(p => rows.push([
-          t.team_name, t.status, t.manager, t.phone, off("coach").name, off("coach").phone, off("official").name, off("official").phone, off("medic").name, off("medic").phone,
+          t.team_name, t.status, t.manager, t.phone, off("coach").name, off("official").name, off("medic").name,
           t.island, fmtDate(t.created_at), p.position, p.jersey_number, p.name, p.age, t.notes
         ]));
       });
