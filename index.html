@@ -176,15 +176,19 @@
     /* Hero */
     header.hero {
       position: relative; overflow: hidden;
+      /* Green grass pitch: mown stripes, darker at the edges so the text stands out */
       background:
-        radial-gradient(ellipse at 50% 120%, rgba(227, 178, 60, .28), transparent 55%),
-        radial-gradient(ellipse at 50% -20%, rgba(255, 255, 255, .12), transparent 50%),
-        linear-gradient(160deg, #d4142f 0%, var(--brand-dark) 55%, #4a0612 100%);
+        radial-gradient(ellipse at 50% 45%, transparent 30%, rgba(0, 0, 0, .45) 100%),
+        linear-gradient(180deg, rgba(0, 0, 0, .25), transparent 30%, transparent 70%, rgba(0, 0, 0, .3)),
+        repeating-linear-gradient(90deg, #2f8a3a 0 8%, #287a32 8% 16%),
+        #2b8135;
       color: #fff;
       padding: 96px 0 80px;
       text-align: center;
     }
-    .hero-court { position: absolute; inset: 0; width: 100%; height: 100%; opacity: .09; pointer-events: none; }
+    .hero-court { position: absolute; inset: 0; width: 100%; height: 100%; opacity: .55; pointer-events: none; }
+    .hero-inner h1, .hero-sub { text-shadow: 0 2px 14px rgba(0, 0, 0, .45); }
+    .hero .tag { background: rgba(0, 0, 0, .3); }
     .hero-inner { position: relative; }
     .hero .tag {
       display: inline-block; padding: 6px 16px; border-radius: 99px;
@@ -193,7 +197,7 @@
       backdrop-filter: blur(4px);
     }
     .hero h1 { display: flex; flex-direction: column; align-items: center; margin: 22px 0 18px; line-height: .95; }
-    .h1-top { font-size: clamp(1.1rem, 3.2vw, 1.6rem); font-weight: 500; letter-spacing: .4em; padding-left: .4em; color: #f6d6db; }
+    .h1-top { font-size: clamp(1.1rem, 3.2vw, 1.6rem); font-weight: 500; letter-spacing: .4em; padding-left: .4em; color: #fff; }
     .h1-main {
       font-size: clamp(4rem, 17vw, 9rem); font-weight: 700; letter-spacing: .02em;
       background: linear-gradient(180deg, #fff 30%, #f3d58e 100%);
@@ -205,7 +209,7 @@
       font-size: clamp(1.3rem, 4.5vw, 2.4rem); font-weight: 500; letter-spacing: .3em; padding-left: .3em; color: var(--gold);
     }
     .h1-bottom::before, .h1-bottom::after { content: ""; width: clamp(24px, 6vw, 60px); height: 2px; background: var(--gold); opacity: .7; }
-    .hero-sub { color: #f6d6db; font-size: 1.1rem; }
+    .hero-sub { color: #fff; font-size: 1.1rem; }
     .hero-btns { display: flex; justify-content: center; flex-wrap: wrap; gap: 12px; margin-top: 32px; }
     .hero .btn {
       display: inline-block; padding: 14px 30px; border-radius: 12px; font-weight: 600; text-decoration: none;
@@ -747,7 +751,7 @@
     @keyframes court-draw { to { stroke-dashoffset: 0; } }
     header.hero::before {
       content: ""; position: absolute; inset: -20%; pointer-events: none;
-      background: radial-gradient(circle at 50% 75%, rgba(227, 178, 60, .22), transparent 45%);
+      background: radial-gradient(circle at 50% 75%, rgba(255, 240, 180, .12), transparent 45%);
       animation: hero-glow 7s ease-in-out infinite alternate;
     }
     @keyframes hero-glow { from { transform: translate(-6%, 2%) scale(1); opacity: .7; } to { transform: translate(6%, -3%) scale(1.15); opacity: 1; } }
@@ -841,6 +845,7 @@
         <rect x="10" y="10" width="380" height="180" rx="2" pathLength="1"/>
         <line x1="200" y1="10" x2="200" y2="190" pathLength="1"/>
         <circle cx="200" cy="100" r="30" pathLength="1"/>
+        <circle cx="200" cy="100" r="2" fill="#fff" stroke="none"/>
         <path d="M10 55 a45 45 0 0 1 0 90" pathLength="1"/>
         <path d="M390 55 a45 45 0 0 0 0 90" pathLength="1"/>
       </g>
