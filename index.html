@@ -395,6 +395,21 @@
     .rd-date { display: block; font-size: 1.05rem; }
     .rd-left { display: inline-block; margin-top: 4px; padding: 2px 10px; border-radius: 99px; background: var(--gold); color: #2a0a0f; font-size: .75rem; font-weight: 700; }
     .rd-left:empty { display: none; }
+    /* Locked: the whole card follows the "closed" state */
+    .reg-locked { display: none; align-items: center; gap: 12px; margin-top: 18px; padding: 14px 16px; border-radius: 12px; background: rgba(0,0,0,.28); border: 1px solid rgba(255,255,255,.12); }
+    .rl-icon { font-size: 1.6rem; }
+    .reg-locked b { display: block; font-size: 1.05rem; }
+    .rl-sub { display: block; font-size: .85rem; color: #e9c2c8; }
+    .rl-sub:empty { display: none; }
+    .reg.is-closed .reg-info { background: linear-gradient(160deg, #4a1820, #26090e); }
+    .reg.is-closed .reg-info-inner > p,
+    .reg.is-closed .reg-steps,
+    .reg.is-closed .reg-howto,
+    .reg.is-closed .reg-deadline { display: none; }
+    .reg.is-closed .reg-locked { display: flex; }
+    .reg.is-closed .reg-info h2 { opacity: .55; }
+    .reg.is-closed .reg-info .eyebrow { color: #c9a24a; }
+
     .reg-howto { margin-top: 18px; padding: 16px 18px; border-radius: 12px; background: rgba(0,0,0,.18); }
     .reg-howto h3 { font-size: 1rem; color: var(--gold); margin-bottom: 8px; }
     .reg-howto ul { list-style: none; display: grid; gap: 7px; }
@@ -883,6 +898,13 @@
           <div class="reg-info-inner">
             <span data-i18n="regEyebrow" class="eyebrow">Next edition</span>
             <h2 data-i18n="regTitle">Register Your Team</h2>
+            <div class="reg-locked" id="reg-locked">
+              <span class="rl-icon" aria-hidden="true">🔒</span>
+              <div>
+                <b data-i18n="lockedTitle">Registration closed</b>
+                <span class="rl-sub" id="rl-sub"></span>
+              </div>
+            </div>
             <p data-i18n="regIntro">Fill in your team and players, then send everything straight to the organisers on WhatsApp.</p>
             <ol class="reg-steps">
               <li data-i18n="step1"><b>Fill in the form</b><span>Team details, players and ID card photos</span></li>
@@ -1174,6 +1196,7 @@
       step2: "<b>ވަޓްސްއަޕްގައި ފޮނުއްވާ</b><span>މަޢުލޫމާތާއި އައިޑީ ފޮޓޯ ފޮނުވަން ތައްޔާރަށް</span>",
       step3: "<b>ކަށަވަރުކޮށްދެވޭނެ</b><span>ރާވާ ފަރާތުން ގުޅުއްވާނެ</span>",
       deadlineLabel: "ރަޖިސްޓްރޭޝަން ނިމޭނީ",
+      lockedTitle: "ރަޖިސްޓްރޭޝަން ބަންދު",
       howtoTitle: "ރަޖިސްޓްރީ ކުރުމުގެ ކުރިން ތައްޔާރުކުރައްވާ",
       howtoList: "<li>މަދުވެގެން 14 ކުޅުންތެރިން (އެންމެ ގިނަވެގެން 20)</li><li>ހުރިހާ ކުޅުންތެރިންގެ އުމުރު 35 ނުވަތަ މަތި</li><li>ކޮންމެ ކުޅުންތެރިއެއްގެ އައިޑީ ކާޑުގެ ސާފު ފޮޓޯއެއް</li><li>މެނޭޖަރުގެ ފޯނު ނަންބަރު (ވަޓްސްއަޕް)</li>",
       lblTeam: "ޓީމުގެ ނަން *",
@@ -1243,7 +1266,8 @@
       preparing: n => "އައިޑީ ފޮޓޯ އަޕްލޯޑް ކުރަނީ… " + n,
       uploading: "ފޮނުވަނީ…",
       submitServerLabel: "ރަޖިސްޓްރޭޝަން ފޮނުއްވާ",
-      daysLeft: n => n === 0 ? "މިއަދު ނިމޭނެ" : n + " ދުވަސް ބާކީ"
+      daysLeft: n => n === 0 ? "މިއަދު ނިމޭނެ" : n + " ދުވަސް ބާކީ",
+      closedOn: d => d + " ގައި ނިމުނީ"
     };
     const EN = {
       players: n => n + " players",
@@ -1260,7 +1284,8 @@
       preparing: n => "Uploading ID photos… " + n,
       uploading: "Sending…",
       submitServerLabel: "Submit registration",
-      daysLeft: n => n === 0 ? "Closes today" : n === 1 ? "1 day left" : n + " days left"
+      daysLeft: n => n === 0 ? "Closes today" : n === 1 ? "1 day left" : n + " days left",
+      closedOn: d => "Closed on " + d
     };
 
     let lang = "en";
@@ -1294,6 +1319,7 @@
       applyLang();
       if (typeof renumber === "function") renumber();
       if (typeof renderDeadline === "function") renderDeadline();
+      if (typeof renderLocked === "function") renderLocked();
       try { localStorage.setItem("lang", lang); } catch (e) {}
     }
 
@@ -1685,6 +1711,14 @@
 
     // Organisers can close registration from admin.html; if closed, show the closed panel instead of the form
     let regSettings = null;
+    let regClosedOn = null;
+
+    // "Closed on <date>" under the lock, when the closing date has passed
+    function renderLocked() {
+      document.getElementById("rl-sub").textContent = regClosedOn
+        ? t("closedOn", new Intl.DateTimeFormat("en-GB", { timeZone: "Indian/Maldives", day: "numeric", month: "long", year: "numeric" }).format(new Date(regClosedOn)))
+        : "";
+    }
 
     // Closing date in Maldives time, plus a "days left" badge
     function renderDeadline() {
@@ -1721,6 +1755,9 @@
         renderInstructions();
         const deadlinePassed = settings.closes_at && Date.now() >= new Date(settings.closes_at);
         if (settings.registration_open && !deadlinePassed) return;
+        document.querySelector(".reg").classList.add("is-closed");
+        regClosedOn = deadlinePassed ? settings.closes_at : null;
+        renderLocked();
         regForm.hidden = true;
         regDone.hidden = true;
         document.getElementById("reg-closed").hidden = false;
