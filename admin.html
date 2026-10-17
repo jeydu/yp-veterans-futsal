@@ -183,6 +183,27 @@
     .lbl { display: inline-flex; align-items: center; gap: 6px; }
     .rc-actions { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
     .rc-saved { color: var(--green); font-size: .85rem; font-weight: 600; }
+    .rc-row { grid-template-columns: 1fr 1fr; }
+    .dl-box { display: flex; flex-direction: column; gap: 10px; padding: 16px; border-radius: 14px; background: var(--surface-2); border: 1px solid var(--border); }
+    .dl-title { font-size: .9rem; font-weight: 700; color: var(--text); }
+    .dl-title small { font-weight: 400; color: var(--muted); }
+    .dl-step { font-size: .72rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); margin-top: 2px; }
+    .chips { display: flex; flex-wrap: wrap; gap: 6px; }
+    .chip { padding: 8px 14px; border-radius: 99px; border: 1.5px solid var(--border); background: var(--surface); font-size: .85rem; font-weight: 600; }
+    .chip:hover { border-color: var(--brand); color: var(--brand-text); }
+    .chip.on { background: var(--brand); border-color: var(--brand); color: #fff; }
+    .dl-inputs { display: grid; grid-template-columns: 1.4fr 1fr; gap: 8px; }
+    .dl-inputs input { font: inherit; font-size: 1rem; color: var(--text); background: var(--surface); border: 1.5px solid var(--border); border-radius: 12px; padding: 10px 12px; min-width: 0; }
+    .dl-inputs input:focus { outline: none; border-color: var(--brand); }
+    .dl-preview { display: flex; align-items: flex-start; gap: 10px; padding: 12px 14px; border-radius: 12px; font-size: .9rem; background: var(--surface); border: 1px dashed var(--border); color: var(--muted); }
+    .dl-preview .ic { font-size: 1.15rem; margin-top: 2px; }
+    .dl-preview b { color: var(--text); }
+    .dl-preview.ok { background: var(--green-bg); border: 1px solid transparent; color: var(--green); }
+    .dl-preview.bad { background: var(--red-bg); border: 1px solid transparent; color: var(--brand-text); }
+    .dl-preview.saved { background: var(--surface); border-style: solid; }
+    .save-btn { display: inline-flex; align-items: center; gap: 6px; padding: 10px 18px; border: 0; border-radius: 12px; background: var(--green); color: #fff; font-weight: 600; font-size: .9rem; }
+    .save-btn:hover { filter: brightness(1.1); }
+    .save-btn:disabled { background: var(--border); color: var(--muted); cursor: not-allowed; filter: none; }
     @media (max-width: 720px) { .rc-row { grid-template-columns: 1fr; } }
 
     /* Overview stats */
@@ -436,6 +457,25 @@
     const toMvInput = iso => iso ? new Date(new Date(iso).getTime() + 5 * 3600000).toISOString().slice(0, 16) : "";
     const fromMvInput = v => v ? new Date(v + ":00+05:00").toISOString() : null;
     const fmtMv = iso => new Intl.DateTimeFormat("en-GB", { timeZone: "Indian/Maldives", day: "numeric", month: "long", year: "numeric", hour: "numeric", minute: "2-digit", hour12: true }).format(new Date(iso));
+    // Closing date being chosen (kept until saved, so re-drawing the page doesn't lose it)
+    const mvToday = () => toMvInput(new Date().toISOString()).slice(0, 10);
+    let dl = null;
+    const dlFromSettings = () => {
+      const v = toMvInput(settings.closes_at);
+      dl = { date: v.slice(0, 10), time: v.slice(11, 16) || "23:59" };
+    };
+    const dlIso = () => dl.date && dl.time ? fromMvInput(dl.date + "T" + dl.time) : null;
+    function dlState() {
+      const iso = dlIso();
+      if (!iso) return { cls: "", canSave: false, html: `${icon("calendar")}<span>Pick a day above. ${settings.closes_at ? "" : "No closing date is set now, so registration stays open until you turn it off."}</span>` };
+      const when = fmtMv(iso);
+      if (new Date(iso) <= Date.now()) return { cls: "bad", canSave: false, html: `${icon("alert")}<span><b>${when}</b> has already passed. Pick a later day or time.</span>` };
+      const day = new Intl.DateTimeFormat("en-GB", { timeZone: "Indian/Maldives", weekday: "long" }).format(new Date(iso));
+      const same = !!settings.closes_at && Math.abs(new Date(iso) - new Date(settings.closes_at)) < 60000;
+      return { cls: same ? "ok saved" : "ok", canSave: !same,
+        html: `${icon(same ? "check-circle" : "clock")}<span>${same ? "Saved: registration" : "Registration will"} close${same ? "s" : ""} on <b>${day} ${when}</b> · in ${timeLeft(iso)}</span>` };
+    }
+
     const timeLeft = iso => {
       const ms = new Date(iso) - Date.now();
       const d = Math.floor(ms / 86400000), h = Math.floor(ms / 3600000) % 24, m = Math.floor(ms / 60000) % 60;
@@ -600,6 +640,7 @@
 
     // ---------- Render ----------
     function render() {
+      if (!dl) dlFromSettings();
       const counts = {
         all: teams.length,
         pending: teams.filter(t => t.status === "pending").length,
@@ -653,16 +694,35 @@
               <span class="rc-saved" id="msg-saved" hidden>✓ Saved</span>
             </div>
             <div class="rc-row">
-              <label><span class="lbl">${icon("calendar")} Closing date &amp; time</span><small>Maldives time · leave empty for no deadline</small>
-                <input type="datetime-local" id="closes-at" value="${toMvInput(settings.closes_at)}">
-              </label>
-              <label><span class="lbl">${icon("clipboard")} Checklist for teams</span><small>One item per line · leave empty for the standard list</small>
-                <textarea id="instructions" rows="4" maxlength="1000" placeholder="10 to 12 players, all aged 35 or older&#10;4 officials: manager, coach, official and medic&#10;A passport-size photo and an ID card photo for everyone&#10;The manager's phone number (on WhatsApp)">${esc(settings.instructions || "")}</textarea>
-              </label>
-            </div>
-            <div class="rc-actions">
-              <button class="tool-btn" id="save-extra">Save date &amp; checklist</button>
-              <span class="rc-saved" id="extra-saved" hidden>✓ Saved</span>
+              <div class="dl-box">
+                <span class="lbl dl-title">${icon("calendar")} Closing date &amp; time <small>Maldives time</small></span>
+                <div class="dl-step">Quick pick</div>
+                <div class="chips">
+                  ${[[3, "3 days"], [7, "1 week"], [14, "2 weeks"], [30, "1 month"]].map(([d, l]) => `<button type="button" class="chip" data-days="${d}">+ ${l}</button>`).join("")}
+                </div>
+                <div class="dl-step">Or choose a day</div>
+                <div class="dl-inputs">
+                  <input type="date" id="dl-date" value="${dl.date}" min="${mvToday()}" aria-label="Closing day">
+                  <input type="time" id="dl-time" value="${dl.time}" aria-label="Closing time">
+                </div>
+                <div class="chips">
+                  ${[["12:00", "12 noon"], ["18:00", "6 PM"], ["23:59", "11:59 PM"]].map(([v, l]) => `<button type="button" class="chip ${dl.time === v ? "on" : ""}" data-time="${v}">${l}</button>`).join("")}
+                </div>
+                <div class="dl-preview ${dlState().cls}" id="dl-preview">${dlState().html}</div>
+                <div class="rc-actions">
+                  <button class="save-btn" id="save-deadline" ${dlState().canSave ? "" : "disabled"}>${icon("check")} Save closing date</button>
+                  ${settings.closes_at ? `<button class="tool-btn" id="clear-deadline">${icon("x")} Remove deadline</button>` : ""}
+                </div>
+              </div>
+              <div class="dl-box">
+                <label><span class="lbl dl-title">${icon("clipboard")} Checklist for teams</span><small>One item per line · leave empty for the standard list</small>
+                  <textarea id="instructions" rows="7" maxlength="1000" placeholder="10 to 12 players, all aged 35 or older&#10;4 officials: manager, coach, official and medic&#10;A passport-size photo and an ID card photo for everyone&#10;The manager's phone number (on WhatsApp)">${esc(settings.instructions || "")}</textarea>
+                </label>
+                <div class="rc-actions">
+                  <button class="tool-btn" id="save-extra">Save checklist</button>
+                  <span class="rc-saved" id="extra-saved" hidden>✓ Saved</span>
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -711,7 +771,8 @@
       document.getElementById("refresh").onclick = () => load();
       document.getElementById("reg-switch").onclick = e => { e.preventDefault(); toggleRegistration(); };
       document.getElementById("save-msg").onclick = saveClosedMessage;
-      document.getElementById("save-extra").onclick = saveDeadlineAndChecklist;
+      document.getElementById("save-extra").onclick = saveChecklist;
+      wireDeadline();
       document.getElementById("export").onclick = exportCsv;
 
       app.querySelectorAll(".team").forEach(card => {
@@ -864,12 +925,45 @@
       render();
     }
 
-    async function saveDeadlineAndChecklist() {
-      const closes_at = fromMvInput(document.getElementById("closes-at").value);
-      const instructions = document.getElementById("instructions").value.trim() || null;
-      const { error } = await db.from("settings").update({ closes_at, instructions, updated_at: new Date().toISOString() }).eq("id", 1);
+    // Closing date picker: quick picks, day + time, live preview
+    function wireDeadline() {
+      const dateIn = document.getElementById("dl-date"), timeIn = document.getElementById("dl-time");
+      const refresh = () => {
+        dateIn.value = dl.date; timeIn.value = dl.time;
+        app.querySelectorAll(".chip[data-time]").forEach(c => c.classList.toggle("on", c.dataset.time === dl.time));
+        const st = dlState(), pv = document.getElementById("dl-preview");
+        pv.className = "dl-preview " + st.cls;
+        pv.innerHTML = st.html;
+        document.getElementById("save-deadline").disabled = !st.canSave;
+      };
+      app.querySelectorAll(".chip[data-days]").forEach(c => c.onclick = () => {
+        const d = new Date(mvToday() + "T00:00:00Z");
+        d.setUTCDate(d.getUTCDate() + Number(c.dataset.days));
+        dl.date = d.toISOString().slice(0, 10);
+        dl.time = "23:59";   // end of that day
+        refresh();
+      });
+      app.querySelectorAll(".chip[data-time]").forEach(c => c.onclick = () => { dl.time = c.dataset.time; refresh(); });
+      dateIn.oninput = () => { dl.date = dateIn.value; refresh(); };
+      timeIn.oninput = () => { dl.time = timeIn.value; refresh(); };
+      document.getElementById("save-deadline").onclick = () => saveDeadline(dlIso());
+      const clear = document.getElementById("clear-deadline");
+      if (clear) clear.onclick = () => { if (confirm("Remove the closing date? Registration will stay open until you turn it off.")) saveDeadline(null); };
+    }
+
+    async function saveDeadline(closes_at) {
+      const { error } = await db.from("settings").update({ closes_at, updated_at: new Date().toISOString() }).eq("id", 1);
       if (error) return alert("Couldn't save: " + error.message);
       settings.closes_at = closes_at;
+      dlFromSettings();
+      render();
+      toast(closes_at ? "✓ Closing date saved" : "Closing date removed");
+    }
+
+    async function saveChecklist() {
+      const instructions = document.getElementById("instructions").value.trim() || null;
+      const { error } = await db.from("settings").update({ instructions, updated_at: new Date().toISOString() }).eq("id", 1);
+      if (error) return alert("Couldn't save: " + error.message);
       settings.instructions = instructions;
       render();
       const saved = document.getElementById("extra-saved");
