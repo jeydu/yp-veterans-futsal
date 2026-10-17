@@ -27,6 +27,7 @@
       --tint: #fbeef0;
       --tint-strong: #fdf3f4;
       --off: #cdb9bc;
+      --ok-text: #16794a;
       color-scheme: light;
     }
     /* Dark mode: follows the device setting unless the visitor picks one with the button */
@@ -41,6 +42,7 @@
         --tint: #3a1a20;
         --tint-strong: #2c1418;
         --off: #5a4246;
+        --ok-text: #3fbf75;
         color-scheme: dark;
       }
     }
@@ -54,6 +56,7 @@
       --tint: #3a1a20;
       --tint-strong: #2c1418;
       --off: #5a4246;
+      --ok-text: #3fbf75;
       color-scheme: dark;
     }
     body { transition: background-color .3s ease, color .3s ease; }
@@ -133,6 +136,15 @@
     }
     @media (prefers-reduced-motion: reduce) { .ts-knob { transition: none; } }
     * { box-sizing: border-box; margin: 0; padding: 0; }
+    /* Line icons */
+    .ic { width: 1em; height: 1em; flex-shrink: 0; vertical-align: -.15em; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+    html { scroll-behavior: smooth; scroll-padding-top: 72px; }
+    a:focus-visible, button:focus-visible { outline: 3px solid var(--gold); outline-offset: 3px; }
+    /* Visitors who turn on "reduce motion" get no lifts, slides or pulses */
+    @media (prefers-reduced-motion: reduce) {
+      html { scroll-behavior: auto; }
+      *, *::before, *::after { transition-duration: .01ms !important; animation-duration: .01ms !important; animation-iteration-count: 1 !important; }
+    }
     body {
       font-family: "Inter", system-ui, sans-serif;
       background: var(--bg);
@@ -218,6 +230,7 @@
     }
     .champ-head { text-align: center; margin-bottom: 40px; }
     .champ-logo { width: 112px; height: 112px; border-radius: 50%; object-fit: cover; border: 3px solid var(--gold); box-shadow: 0 0 0 6px rgba(227, 178, 60, .15), 0 10px 30px rgba(0,0,0,.5); margin-bottom: 16px; }
+    .eyebrow .ic { font-size: 1.15em; margin-inline-end: 4px; }
     .eyebrow { display: block; color: var(--gold); font-weight: 600; font-size: .85rem; letter-spacing: .14em; text-transform: uppercase; margin-bottom: 6px; }
     .champ-head h2 { font-size: clamp(1.9rem, 5.5vw, 3rem); margin-bottom: 6px; }
     #champions .lead { color: #e9c2c8; margin-bottom: 0; }
@@ -230,11 +243,14 @@
       transition: transform .2s ease, box-shadow .2s ease, border-color .2s ease;
     }
     .poster:hover, .poster:focus-visible { transform: translateY(-6px); border-color: var(--gold); box-shadow: 0 18px 40px rgba(0,0,0,.5), 0 0 30px rgba(227, 178, 60, .25); outline: none; }
+    .poster:focus-visible { outline: 3px solid var(--gold); outline-offset: 3px; }
     .poster-tag {
       position: absolute; top: 22px; inset-inline-start: 22px; z-index: 2;
-      background: var(--gold); color: #2a0a0f; font-size: .72rem; font-weight: 600; letter-spacing: .06em; text-transform: uppercase;
+      background: var(--gold); color: #2a0a0f; font-size: .78rem; font-weight: 600; letter-spacing: .06em; text-transform: uppercase;
       padding: 4px 12px; border-radius: 99px; box-shadow: 0 4px 12px rgba(0,0,0,.35);
+      display: inline-flex; align-items: center; gap: 6px;
     }
+    .poster-tag .ic { font-size: 1rem; stroke-width: 2.4; }
     .poster-cap { display: block; padding: 14px 8px 6px; }
     .poster-name { display: block; font-family: "Oswald", sans-serif; font-size: 1.3rem; text-transform: uppercase; line-height: 1.2; }
     .poster-sub { display: block; color: #e9c2c8; font-size: .9rem; }
@@ -281,85 +297,78 @@
       transition: transform .2s ease, box-shadow .2s ease, border-color .2s ease;
     }
     .card:hover { transform: translateY(-4px); border-color: var(--brand-text); box-shadow: 0 12px 28px rgba(138, 11, 31, .12); }
-    .card-icon { display: flex; align-items: center; justify-content: center; width: 48px; height: 48px; border-radius: 12px; background: var(--tint); font-size: 1.4rem; margin-bottom: 14px; }
+    .card-icon { display: flex; align-items: center; justify-content: center; width: 48px; height: 48px; border-radius: 12px; background: var(--tint); color: var(--brand-text); font-size: 1.5rem; margin-bottom: 14px; }
     .card h3 { font-size: 1.1rem; margin-bottom: 4px; }
     .card p { color: var(--muted); font-size: .95rem; }
 
-    /* Past winners: round photo badges */
-    .winners { --ph: 168px; display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 36px 20px; padding-top: 18px; }
+    /* Past winners: square photo cards. The current champion gets a big card; the others sit beside it 2 x 2 */
+    .winners { display: grid; grid-template-columns: repeat(4, 1fr); gap: 18px; padding-top: 8px; }
     .champ-link {
-      position: relative; display: flex; flex-direction: column; align-items: center; text-align: center;
-      background: none; border: 0; padding: 0; font: inherit; color: var(--text); cursor: pointer;
+      position: relative; display: flex; flex-direction: column; text-align: start; min-width: 0;
+      background: var(--surface); border: 1px solid var(--border); border-radius: 18px; overflow: hidden;
+      padding: 0; font: inherit; color: var(--text); cursor: pointer;
+      box-shadow: 0 4px 14px rgba(34, 21, 22, .06);
+      transition: transform .25s ease, box-shadow .25s ease, border-color .25s ease;
     }
-    .champ-link:focus-visible { outline: none; }
+    .champ-link:hover { transform: translateY(-4px); border-color: var(--brand-text); box-shadow: 0 16px 36px rgba(138, 11, 31, .18); }
+    .champ-link:focus-visible { outline: 3px solid var(--brand-text); outline-offset: 3px; }
 
-    /* The round photo with a coloured ring */
+    /* Square photo with the year on it */
     .w-photo {
-      position: relative; display: block; width: var(--ph); height: var(--ph); border-radius: 50%; overflow: hidden;
+      position: relative; display: block; aspect-ratio: 1 / 1; overflow: hidden;
       background: linear-gradient(160deg, var(--brand), var(--brand-dark));
-      border: 5px solid var(--surface);
-      box-shadow: 0 0 0 3px var(--border), 0 12px 28px rgba(0,0,0,.18);
-      transition: transform .3s ease, box-shadow .3s ease;
     }
-    .w-photo img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform .4s ease; }
-    .w-photo::after { content: ""; position: absolute; inset: 0; background: linear-gradient(to top, rgba(0,0,0,.6), transparent 50%); }
-    .champ-link:hover .w-photo, .champ-link:focus-visible .w-photo { transform: translateY(-6px); box-shadow: 0 0 0 3px var(--brand), 0 18px 34px rgba(138, 11, 31, .28); }
-    .champ-link:hover .w-photo img { transform: scale(1.08); }
-
-    /* Year sits at the bottom of the circle */
+    .w-photo img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; display: block; transition: transform .5s ease; }
+    .w-photo::after { content: ""; position: absolute; inset: 0; background: linear-gradient(to top, rgba(20, 4, 8, .78), rgba(20, 4, 8, .1) 45%, transparent 70%); }
+    .champ-link:hover .w-photo img { transform: scale(1.06); }
     .w-year {
-      position: absolute; left: 50%; bottom: 14px; transform: translateX(-50%); z-index: 1;
-      color: #fff; font-family: "Oswald", sans-serif; font-weight: 700; font-size: 1.5rem; line-height: 1; letter-spacing: .04em;
+      position: absolute; inset-inline-start: 16px; bottom: 12px; z-index: 1;
+      color: #fff; font-family: "Oswald", sans-serif; font-weight: 700; font-size: 2rem; line-height: 1; letter-spacing: .03em;
+      text-shadow: 0 2px 10px rgba(0,0,0,.4);
     }
-    /* No photo yet: show a trophy on the red background */
+    /* No photo yet: a faint trophy on the red background */
     .no-photo .w-photo img { display: none; }
-    .no-photo .w-photo::before { content: "🏆"; position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-size: 3rem; opacity: .5; }
+    .no-photo .w-photo::before { content: ""; position: absolute; inset: 0; margin: auto; width: 30%; height: 30%; background: #fff; opacity: .45;
+      -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9H4.5a2.5 2.5 0 0 1 0-5H6M18 9h1.5a2.5 2.5 0 0 0 0-5H18M4 22h16M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22M18 2H6v7a6 6 0 0 0 12 0V2Z'/%3E%3C/svg%3E") center / contain no-repeat;
+              mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9H4.5a2.5 2.5 0 0 1 0-5H6M18 9h1.5a2.5 2.5 0 0 0 0-5H18M4 22h16M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22M18 2H6v7a6 6 0 0 0 12 0V2Z'/%3E%3C/svg%3E") center / contain no-repeat; }
 
-    .w-badge { margin-top: 14px; padding: 3px 12px; border-radius: 99px; background: var(--tint); color: var(--brand-text); font-size: .7rem; font-weight: 600; text-transform: uppercase; letter-spacing: .06em; }
-    .w-team { margin-top: 10px; padding: 0 6px; font-family: "Oswald", sans-serif; font-weight: 500; font-size: 1.15rem; line-height: 1.25; text-transform: uppercase; }
-    .w-view {
-      display: inline-flex; align-items: center; gap: 6px; margin-top: 6px;
-      color: var(--muted); font-size: .74rem; font-weight: 600; text-transform: uppercase; letter-spacing: .08em;
-      transition: color .2s ease;
-    }
-    .champ-link:hover .w-view, .champ-link:focus-visible .w-view { color: var(--brand-text); }
-    /* Small arrow for cards without a club logo */
-    .w-view::after { content: "→"; transition: transform .2s ease; }
-    :root[dir="rtl"] .w-view::after { content: "←"; }
-    .champ-link:hover .w-view::after { transform: translateX(3px); }
-    :root[dir="rtl"] .champ-link:hover .w-view::after { transform: translateX(-3px); }
-    .has-logo .w-view::after { content: none; }
-    .no-photo .w-view { color: var(--muted); }
-
-    /* Club logo: sticker on the edge of the photo circle */
+    /* Under the photo: club logo, team name and "View photo" */
+    .w-body { display: flex; align-items: center; gap: 12px; padding: 14px 16px 16px; }
     .w-logo {
-      position: absolute; z-index: 2;
-      top: calc(var(--ph) - 52px); left: calc(50% + var(--ph) / 2 - 50px);
-      width: 52px; height: 52px; border-radius: 50%;
-      background: #fff; border: 3px solid var(--surface);
-      box-shadow: 0 0 0 2px var(--border), 0 6px 14px rgba(0,0,0,.25);
-      transition: transform .35s cubic-bezier(.4, 1.4, .6, 1), box-shadow .3s ease;
+      flex-shrink: 0; width: 44px; height: 44px; border-radius: 50%; overflow: hidden;
+      background: #fff; box-shadow: 0 0 0 1.5px var(--border), 0 4px 10px rgba(0,0,0,.12);
     }
-    .w-logo img { width: 100%; height: 100%; border-radius: 50%; object-fit: cover; display: block; }
+    .w-logo img { width: 100%; height: 100%; object-fit: cover; display: block; }
     /* Logos that aren't round: show the whole shape inside the circle */
     .w-logo.fit img { object-fit: contain; padding: 3px; }
-    .champ-link:hover .w-logo, .champ-link:focus-visible .w-logo { transform: translateY(-6px) scale(1.12) rotate(-10deg); box-shadow: 0 0 0 2px var(--brand), 0 10px 20px rgba(0,0,0,.3); }
-
-    /* Current champion: gold ring, glow and crown */
-    .champ-link.current .w-photo { box-shadow: 0 0 0 3px var(--gold), 0 0 0 9px rgba(227, 178, 60, .18), 0 14px 32px rgba(227, 178, 60, .35); }
-    .champ-link.current:hover .w-photo { box-shadow: 0 0 0 3px var(--gold), 0 0 0 12px rgba(227, 178, 60, .22), 0 20px 40px rgba(227, 178, 60, .45); }
-    .champ-link.current .w-logo { box-shadow: 0 0 0 2px var(--gold), 0 6px 14px rgba(227, 178, 60, .45); }
-    .champ-link.current::before {
-      content: "👑"; position: absolute; top: -20px; left: 50%; z-index: 3;
-      transform: translateX(-50%) rotate(-12deg); font-size: 1.7rem;
-      filter: drop-shadow(0 3px 4px rgba(0,0,0,.3)); transition: transform .3s ease;
+    .w-text { display: flex; flex-direction: column; min-width: 0; }
+    .w-team { font-family: "Oswald", sans-serif; font-weight: 500; font-size: 1.1rem; line-height: 1.2; text-transform: uppercase; }
+    .w-view {
+      display: inline-flex; align-items: center; gap: 5px; margin-top: 3px;
+      color: var(--muted); font-size: .78rem; font-weight: 600; text-transform: uppercase; letter-spacing: .08em;
+      transition: color .2s ease;
     }
-    .champ-link.current:hover::before { transform: translateX(-50%) translateY(-6px) rotate(0deg); }
-    .champ-link.current .w-badge { background: var(--gold); color: #2a0a0f; }
+    .w-view .ic { font-size: 1rem; transition: transform .2s ease; }
+    :root[dir="rtl"] .w-view .ic { transform: scaleX(-1); }
+    .champ-link:hover .w-view, .champ-link:focus-visible .w-view { color: var(--brand-text); }
+    .champ-link:hover .w-view .ic { transform: translateX(3px); }
+    :root[dir="rtl"] .champ-link:hover .w-view .ic { transform: scaleX(-1) translateX(3px); }
 
-    @media (prefers-reduced-motion: reduce) {
-      .w-photo, .w-photo img, .w-logo, .champ-link.current::before { transition: none; }
+    /* Current champion: big card, gold frame and a crown badge */
+    .champ-link.current { grid-column: span 2; grid-row: span 2; border: 2px solid var(--gold); box-shadow: 0 10px 30px rgba(227, 178, 60, .22); }
+    .champ-link.current:hover { border-color: var(--gold); box-shadow: 0 20px 44px rgba(227, 178, 60, .32); }
+    .champ-link.current .w-photo { aspect-ratio: auto; flex: 1; min-height: 300px; }
+    .champ-link.current .w-year { font-size: 3.4rem; inset-inline-start: 22px; bottom: 18px; }
+    .champ-link.current .w-body { padding: 16px 22px 20px; background: linear-gradient(90deg, rgba(227, 178, 60, .14), transparent 70%); }
+    .champ-link.current .w-logo { width: 56px; height: 56px; box-shadow: 0 0 0 2px var(--gold), 0 6px 14px rgba(227, 178, 60, .35); }
+    .champ-link.current .w-team { font-size: 1.5rem; }
+    .w-badge {
+      position: absolute; top: 16px; inset-inline-start: 16px; z-index: 1;
+      display: inline-flex; align-items: center; gap: 6px; padding: 6px 12px; border-radius: 99px;
+      background: var(--gold); color: #2a0a0f; box-shadow: 0 4px 12px rgba(0,0,0,.3);
+      font-size: .78rem; font-weight: 700; text-transform: uppercase; letter-spacing: .06em;
     }
+    .w-badge .ic { font-size: 1.05rem; stroke-width: 2.4; }
 
     .field.check a { color: var(--brand-text); font-weight: 600; }
 
@@ -390,7 +399,7 @@
     .reg-steps span { color: #f6d6db; font-size: .88rem; }
     .reg-deadline { display: flex; align-items: center; gap: 12px; margin-top: 28px; padding: 14px 16px; border-radius: 12px; background: rgba(0,0,0,.22); border: 1px solid rgba(227, 178, 60, .35); }
     .reg-deadline[hidden] { display: none; }
-    .rd-icon { font-size: 1.6rem; }
+    .rd-icon { font-size: 1.7rem; color: var(--gold); }
     .rd-label { display: block; font-size: .75rem; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: #f6d6db; }
     .rd-date { display: block; font-size: 1.05rem; }
     .rd-left { display: inline-block; margin-top: 4px; padding: 2px 10px; border-radius: 99px; background: var(--gold); color: #2a0a0f; font-size: .75rem; font-weight: 700; }
@@ -457,7 +466,7 @@
       font: 700 .75rem "Oswald", sans-serif; transition: background .2s ease, border-color .2s ease;
     }
     .rp-count { font-weight: 400; font-size: .8rem; }
-    .rp-step.done { color: #1f9d55; }
+    .rp-step.done { color: var(--ok-text); }
     .rp-step.done .rp-dot { background: #1f9d55; border-color: #1f9d55; font-size: 0; }
     .rp-step.done .rp-dot::after { content: "✓"; color: #fff; font-size: .75rem; }
     .rp-bar { height: 6px; border-radius: 99px; background: var(--tint); overflow: hidden; }
@@ -483,7 +492,7 @@
 
     /* Registration: summary and WhatsApp button */
     .reg-summary { margin-top: 20px; padding: 12px 14px; border-radius: 10px; background: var(--tint); color: var(--muted); font-size: .9rem; text-align: center; }
-    .reg-summary.ready { background: rgba(31, 157, 85, .12); color: #1f9d55; font-weight: 600; }
+    .reg-summary.ready { background: rgba(31, 157, 85, .12); color: var(--ok-text); font-weight: 600; }
     .reg-submit { display: flex; align-items: center; justify-content: center; gap: 10px; margin-top: 14px; background: #25d366; color: #06371a; box-shadow: 0 8px 20px rgba(37, 211, 102, .35); }
     .reg-submit:hover { background: #1ebe5a; }
     .reg-submit svg { width: 22px; height: 22px; }
@@ -533,15 +542,15 @@
     .p-file { position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; }
     .p-thumb { display: none; flex-shrink: 0; width: 30px; height: 30px; border-radius: 7px; object-fit: cover; border: 2px solid #fff; box-shadow: 0 2px 6px rgba(0,0,0,.2); }
     /* Photo added: green, tick, and a preview of the photo */
-    .p-id.has-file { background: rgba(31, 157, 85, .12); border-color: rgba(31, 157, 85, .45); color: #1f9d55; }
+    .p-id.has-file { background: rgba(31, 157, 85, .12); border-color: rgba(31, 157, 85, .45); color: var(--ok-text); }
     .p-id.has-file .p-id-icon { background: #1f9d55; box-shadow: 0 3px 8px rgba(31, 157, 85, .35); }
     .p-id.has-file .ic-up { display: none; }
     .p-id.has-file .ic-check { display: block; }
     .p-id.has-file .p-thumb { display: block; }
     .player .bad { border-color: var(--brand) !important; background: var(--tint-strong); }
     .p-remove {
-      flex-shrink: 0; width: 30px; height: 30px; border-radius: 50%; border: 0; cursor: pointer;
-      background: transparent; color: var(--muted); font-size: 1.3rem; line-height: 1;
+      flex-shrink: 0; width: 40px; height: 40px; border-radius: 50%; border: 0; cursor: pointer;
+      background: transparent; color: var(--muted); font-size: 1.5rem; line-height: 1;
     }
     .p-remove:hover { background: var(--tint); color: var(--brand-text); }
     .add-player {
@@ -555,8 +564,9 @@
     .add-player:disabled { opacity: .4; cursor: not-allowed; }
     .done-steps { text-align: start; margin: 8px 0 4px; padding-inline-start: 20px; color: var(--muted); max-width: 360px; }
     .done-steps li { margin: 6px 0; }
-    .done-steps li.done { color: #1f9d55; }
-    .share-ids { max-width: 360px; }
+    .done-steps li.done { color: var(--ok-text); }
+    .share-ids { max-width: 360px; display: flex; align-items: center; justify-content: center; gap: 10px; }
+    .share-ids .ic { font-size: 1.25rem; }
 
     .done-part { display: flex; flex-direction: column; align-items: center; gap: 8px; width: 100%; }
     .done-part[hidden] { display: none; }
@@ -567,7 +577,7 @@
 
     .reg-closed { display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; gap: 10px; padding: 48px 32px; }
     .reg-closed[hidden] { display: none; }
-    .reg-closed-icon { display: flex; align-items: center; justify-content: center; width: 76px; height: 76px; border-radius: 50%; background: var(--tint); font-size: 2.2rem; margin-bottom: 4px; }
+    .reg-closed-icon { display: flex; align-items: center; justify-content: center; width: 76px; height: 76px; border-radius: 50%; background: var(--tint); color: var(--brand-text); font-size: 2.1rem; margin-bottom: 4px; }
     .reg-closed h3 { font-size: 1.8rem; }
     .reg-closed p { color: var(--muted); max-width: 380px; }
     .closed-msg { padding: 12px 16px; border-radius: 12px; background: var(--tint); border-inline-start: 4px solid var(--gold); color: var(--text) !important; white-space: pre-wrap; }
@@ -576,7 +586,7 @@
 
     .reg-done { display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; gap: 8px; }
     .reg-done[hidden] { display: none; }
-    .reg-done-icon { font-size: 3rem; }
+    .reg-done-icon { font-size: 3.4rem; color: var(--ok-text); }
     .reg-done h3 { font-size: 1.8rem; }
     .reg-done p { color: var(--muted); max-width: 340px; }
     .reg-again { margin-top: 12px; background: none; border: 1.5px solid var(--brand); color: var(--brand-text); border-radius: 10px; padding: 10px 18px; font: 600 .9rem "Inter", sans-serif; cursor: pointer; }
@@ -689,16 +699,35 @@
       .player { align-items: flex-start; }
       .player-fields { grid-template-columns: 1fr 70px; }
       .p-id { grid-column: 1 / -1; padding-block: 6px; }
-      .winners { --ph: 128px; grid-template-columns: 1fr 1fr; gap: 32px 12px; }
-      .winners .champ-link:last-child:nth-child(odd) { grid-column: 1 / -1; }
-      .w-year { font-size: 1.2rem; bottom: 10px; }
+      .winners { grid-template-columns: 1fr 1fr; gap: 12px; }
+      .champ-link.current { grid-row: auto; }
+      .champ-link.current .w-photo { flex: none; min-height: 0; aspect-ratio: 4 / 3; }
+      .champ-link.current .w-year { font-size: 2.6rem; }
+      .champ-link.current .w-team { font-size: 1.25rem; }
+      .w-year { font-size: 1.5rem; inset-inline-start: 12px; bottom: 10px; }
+      .w-body { gap: 9px; padding: 10px 10px 12px; }
+      .w-logo { width: 34px; height: 34px; }
       .w-team { font-size: .95rem; }
-      .w-logo { width: 42px; height: 42px; top: calc(var(--ph) - 42px); left: calc(50% + var(--ph) / 2 - 40px); }
+      .w-view { font-size: .72rem; letter-spacing: .05em; }
       section { padding: 48px 0; }
     }
   </style>
 </head>
 <body>
+
+  <!-- Line icons used around the page: <svg class="ic"><use href="#i-NAME"/></svg> -->
+  <svg width="0" height="0" style="position:absolute" aria-hidden="true">
+    <symbol id="i-users" viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></symbol>
+    <symbol id="i-calendar" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></symbol>
+    <symbol id="i-pin" viewBox="0 0 24 24"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></symbol>
+    <symbol id="i-ball" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 7l4.75 3.45-1.8 5.6h-5.9l-1.8-5.6L12 7zM12 7V2M16.75 10.45l4.75-1.5M14.95 16.05l2.95 4M9.05 16.05l-2.95 4M7.25 10.45L2.5 8.95"/></symbol>
+    <symbol id="i-trophy" viewBox="0 0 24 24"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6M18 9h1.5a2.5 2.5 0 0 0 0-5H18M4 22h16M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22M18 2H6v7a6 6 0 0 0 12 0V2Z"/></symbol>
+    <symbol id="i-crown" viewBox="0 0 24 24"><path d="M2 4l3 12h14l3-12-6 7-4-7-4 7-6-7zM5 20h14"/></symbol>
+    <symbol id="i-lock" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></symbol>
+    <symbol id="i-check-circle" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M8.5 12.5l2.5 2.5 4.5-5"/></symbol>
+    <symbol id="i-arrow" viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></symbol>
+    <symbol id="i-camera" viewBox="0 0 24 24"><path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z"/><circle cx="12" cy="13" r="3"/></symbol>
+  </svg>
 
   <nav>
     <div class="wrap">
@@ -747,17 +776,17 @@
   <section id="champions">
     <div class="wrap">
       <div class="champ-head">
-        <img class="champ-logo" src="images/royal-knights-logo.jpg" alt="">
-        <span data-i18n="champEyebrow" class="eyebrow">🏆 2026 Champions</span>
+        <img loading="lazy" decoding="async" class="champ-logo" src="images/royal-knights-logo.jpg" alt="">
+        <span class="eyebrow"><svg class="ic" aria-hidden="true"><use href="#i-trophy"/></svg><span data-i18n="champEyebrow">2026 Champions</span></span>
         <h2 data-i18n="rkName">Royal Knights Sports Club</h2>
         <p data-i18n="champLead" class="lead">Winners of the 2026 YP Veterans Futsal Tournament</p>
       </div>
 
       <div class="posters">
         <button class="poster" data-title="2026 Champions: Royal Knights Sports Club" data-photo="images/champions-2026.jpg">
-          <span data-i18n="posterChamps" class="poster-tag">🏆 Champions</span>
+          <span class="poster-tag"><svg class="ic" aria-hidden="true"><use href="#i-trophy"/></svg><span data-i18n="posterChamps">Champions</span></span>
           <span class="photo-main" data-file="images/champions-2026.jpg">
-            <img src="images/champions-2026.jpg" alt="Royal Knights Sports Club, 2026 champions" onerror="this.parentElement.classList.add('empty')">
+            <img loading="lazy" decoding="async" src="images/champions-2026.jpg" alt="Royal Knights Sports Club, 2026 champions" onerror="this.parentElement.classList.add('empty')">
           </span>
           <span class="poster-cap">
             <span class="poster-name" data-i18n="rkName">Royal Knights Sports Club</span>
@@ -765,9 +794,9 @@
           </span>
         </button>
         <button class="poster" data-title="King of the Tournament 2026: Adam Lareef" data-photo="images/king-of-tournament-2026.jpg">
-          <span data-i18n="posterKing" class="poster-tag">👑 King of the Tournament</span>
+          <span class="poster-tag"><svg class="ic" aria-hidden="true"><use href="#i-crown"/></svg><span data-i18n="posterKing">King of the Tournament</span></span>
           <span class="photo-main" data-file="images/king-of-tournament-2026.jpg">
-            <img src="images/king-of-tournament-2026.jpg" alt="Adam Lareef, King of the Tournament 2026" onerror="this.parentElement.classList.add('empty')">
+            <img loading="lazy" decoding="async" src="images/king-of-tournament-2026.jpg" alt="Adam Lareef, King of the Tournament 2026" onerror="this.parentElement.classList.add('empty')">
           </span>
           <span class="poster-cap">
             <span class="poster-name" data-i18n="adamName">Adam Lareef</span>
@@ -777,13 +806,13 @@
       </div>
       <div class="gallery">
         <div class="photo" data-file="images/champions-1.jpg">
-          <img src="images/champions-1.jpg" alt="Champions celebrating" onerror="this.parentElement.classList.add('empty')">
+          <img loading="lazy" decoding="async" src="images/champions-1.jpg" alt="Champions celebrating" onerror="this.parentElement.classList.add('empty')">
         </div>
         <div class="photo" data-file="images/champions-2.jpg">
-          <img src="images/champions-2.jpg" alt="Final match action" onerror="this.parentElement.classList.add('empty')">
+          <img loading="lazy" decoding="async" src="images/champions-2.jpg" alt="Final match action" onerror="this.parentElement.classList.add('empty')">
         </div>
         <div class="photo" data-file="images/champions-3.jpg">
-          <img src="images/champions-3.jpg" alt="Trophy presentation" onerror="this.parentElement.classList.add('empty')">
+          <img loading="lazy" decoding="async" src="images/champions-3.jpg" alt="Trophy presentation" onerror="this.parentElement.classList.add('empty')">
         </div>
       </div>
     </div>
@@ -806,22 +835,22 @@
 
       <div class="cards">
         <div class="card">
-          <span class="card-icon" aria-hidden="true">👥</span>
+          <span class="card-icon"><svg class="ic" aria-hidden="true"><use href="#i-users"/></svg></span>
           <h3 data-i18n="whoTitle">Who can play</h3>
           <p data-i18n="whoText">Players aged 35 and over. Each team needs at least 14 players.</p>
         </div>
         <div class="card">
-          <span class="card-icon" aria-hidden="true">📅</span>
+          <span class="card-icon"><svg class="ic" aria-hidden="true"><use href="#i-calendar"/></svg></span>
           <h3 data-i18n="whenTitle">When</h3>
           <p data-i18n="whenText">[Dates]</p>
         </div>
         <div class="card">
-          <span class="card-icon" aria-hidden="true">📍</span>
+          <span class="card-icon"><svg class="ic" aria-hidden="true"><use href="#i-pin"/></svg></span>
           <h3 data-i18n="whereTitle">Where</h3>
           <p data-i18n="whereText">[Venue]</p>
         </div>
         <div class="card">
-          <span class="card-icon" aria-hidden="true">⚽</span>
+          <span class="card-icon"><svg class="ic" aria-hidden="true"><use href="#i-ball"/></svg></span>
           <h3 data-i18n="formatTitle">Format</h3>
           <p data-i18n="formatText">[e.g. Group stage, then knockouts]</p>
         </div>
@@ -835,46 +864,71 @@
       <p data-i18n="pastLead" class="lead">Every champion in the tournament's history. Tap a team to see their photo.</p>
       <!-- Each card opens its photo. Add photos to images/ using the names in data-photo. -->
       <div class="winners">
-        <!-- A card with "has-logo" shows the club logo in place of the arrow button -->
-        <button class="champ-link current has-logo" data-year="2026" data-team="Royal Knights Sports Club" data-photo="images/champions-2026.jpg">
-          <span class="w-photo"><img src="images/champions-2026.jpg" alt="" onerror="this.closest('.champ-link').classList.add('no-photo')"><span class="w-year">2026</span></span>
-          <span data-i18n="badgeCurrent" class="w-badge">Current champion</span>
-          <span class="w-team" data-i18n="rkName">Royal Knights Sports Club</span>
-          <span class="w-view">
-            <span data-i18n="viewPhoto">View photo</span>
-            <span class="w-logo"><img src="images/royal-knights-logo.jpg" alt=""></span>
+        <!-- The first card ("current") is the big one. Add photos to images/ using the names in data-photo. -->
+        <button class="champ-link current" data-year="2026" data-team="Royal Knights Sports Club" data-photo="images/champions-2026.jpg">
+          <span class="w-photo">
+            <img loading="lazy" decoding="async" src="images/champions-2026.jpg" alt="" onerror="this.closest('.champ-link').classList.add('no-photo')">
+            <span class="w-badge"><svg class="ic" aria-hidden="true"><use href="#i-crown"/></svg><span data-i18n="badgeCurrent">Current champion</span></span>
+            <span class="w-year">2026</span>
+          </span>
+          <span class="w-body">
+            <span class="w-logo"><img loading="lazy" decoding="async" src="images/royal-knights-logo.jpg" alt=""></span>
+            <span class="w-text">
+              <span class="w-team" data-i18n="rkName">Royal Knights Sports Club</span>
+              <span class="w-view"><span data-i18n="viewPhoto">View photo</span><svg class="ic" aria-hidden="true"><use href="#i-arrow"/></svg></span>
+            </span>
           </span>
         </button>
-        <button class="champ-link has-logo" data-year="2025" data-team="Afiyns Sports Club" data-photo="images/champions-2025.webp">
-          <span class="w-photo"><img src="images/champions-2025.webp" alt="" onerror="this.closest('.champ-link').classList.add('no-photo')"><span class="w-year">2025</span></span>
-          <span class="w-team" data-i18n="afiynsName">Afiyns Sports Club</span>
-          <span class="w-view">
-            <span data-i18n="viewPhoto">View photo</span>
-            <span class="w-logo"><img src="images/afiyns-logo.jpg" alt=""></span>
+        <button class="champ-link" data-year="2025" data-team="Afiyns Sports Club" data-photo="images/champions-2025.webp">
+          <span class="w-photo">
+            <img loading="lazy" decoding="async" src="images/champions-2025.webp" alt="" onerror="this.closest('.champ-link').classList.add('no-photo')">
+            <span class="w-year">2025</span>
+          </span>
+          <span class="w-body">
+            <span class="w-logo"><img loading="lazy" decoding="async" src="images/afiyns-logo.jpg" alt=""></span>
+            <span class="w-text">
+              <span class="w-team" data-i18n="afiynsName">Afiyns Sports Club</span>
+              <span class="w-view"><span data-i18n="viewPhoto">View photo</span><svg class="ic" aria-hidden="true"><use href="#i-arrow"/></svg></span>
+            </span>
           </span>
         </button>
-        <button class="champ-link has-logo" data-year="2024" data-team="KK Kandumathi" data-photo="images/champions-2024.jpg">
-          <span class="w-photo"><img src="images/champions-2024.jpg" alt="" onerror="this.closest('.champ-link').classList.add('no-photo')"><span class="w-year">2024</span></span>
-          <span class="w-team" data-i18n="kkName">KK Kandumathi</span>
-          <span class="w-view">
-            <span data-i18n="viewPhoto">View photo</span>
-            <span class="w-logo fit"><img src="images/kk-kandumathi-logo.jpg" alt=""></span>
+        <button class="champ-link" data-year="2024" data-team="KK Kandumathi" data-photo="images/champions-2024.jpg">
+          <span class="w-photo">
+            <img loading="lazy" decoding="async" src="images/champions-2024.jpg" alt="" onerror="this.closest('.champ-link').classList.add('no-photo')">
+            <span class="w-year">2024</span>
+          </span>
+          <span class="w-body">
+            <span class="w-logo fit"><img loading="lazy" decoding="async" src="images/kk-kandumathi-logo.jpg" alt=""></span>
+            <span class="w-text">
+              <span class="w-team" data-i18n="kkName">KK Kandumathi</span>
+              <span class="w-view"><span data-i18n="viewPhoto">View photo</span><svg class="ic" aria-hidden="true"><use href="#i-arrow"/></svg></span>
+            </span>
           </span>
         </button>
-        <button class="champ-link has-logo" data-year="2023" data-team="FT Nakasole" data-photo="images/champions-2023.jpg">
-          <span class="w-photo"><img src="images/champions-2023.jpg" alt="" onerror="this.closest('.champ-link').classList.add('no-photo')"><span class="w-year">2023</span></span>
-          <span class="w-team" data-i18n="ftName">FT Nakasole</span>
-          <span class="w-view">
-            <span data-i18n="viewPhoto">View photo</span>
-            <span class="w-logo fit"><img src="images/ft-nakasole-logo.png" alt=""></span>
+        <button class="champ-link" data-year="2023" data-team="FT Nakasole" data-photo="images/champions-2023.jpg">
+          <span class="w-photo">
+            <img loading="lazy" decoding="async" src="images/champions-2023.jpg" alt="" onerror="this.closest('.champ-link').classList.add('no-photo')">
+            <span class="w-year">2023</span>
+          </span>
+          <span class="w-body">
+            <span class="w-logo fit"><img loading="lazy" decoding="async" src="images/ft-nakasole-logo.png" alt=""></span>
+            <span class="w-text">
+              <span class="w-team" data-i18n="ftName">FT Nakasole</span>
+              <span class="w-view"><span data-i18n="viewPhoto">View photo</span><svg class="ic" aria-hidden="true"><use href="#i-arrow"/></svg></span>
+            </span>
           </span>
         </button>
-        <button class="champ-link has-logo" data-year="2022" data-team="FT Nakasole" data-photo="images/champions-2022.jpg">
-          <span class="w-photo"><img src="images/champions-2022.jpg" alt="" onerror="this.closest('.champ-link').classList.add('no-photo')"><span class="w-year">2022</span></span>
-          <span class="w-team" data-i18n="ftName">FT Nakasole</span>
-          <span class="w-view">
-            <span data-i18n="viewPhoto">View photo</span>
-            <span class="w-logo fit"><img src="images/ft-nakasole-logo.png" alt=""></span>
+        <button class="champ-link" data-year="2022" data-team="FT Nakasole" data-photo="images/champions-2022.jpg">
+          <span class="w-photo">
+            <img loading="lazy" decoding="async" src="images/champions-2022.jpg" alt="" onerror="this.closest('.champ-link').classList.add('no-photo')">
+            <span class="w-year">2022</span>
+          </span>
+          <span class="w-body">
+            <span class="w-logo fit"><img loading="lazy" decoding="async" src="images/ft-nakasole-logo.png" alt=""></span>
+            <span class="w-text">
+              <span class="w-team" data-i18n="ftName">FT Nakasole</span>
+              <span class="w-view"><span data-i18n="viewPhoto">View photo</span><svg class="ic" aria-hidden="true"><use href="#i-arrow"/></svg></span>
+            </span>
           </span>
         </button>
       </div>
@@ -897,7 +951,7 @@
             </ol>
             <!-- Closing date and checklist: organisers set both on admin.html -->
             <div class="reg-deadline" id="reg-deadline" hidden>
-              <span class="rd-icon" aria-hidden="true">📅</span>
+              <span class="rd-icon"><svg class="ic" aria-hidden="true"><use href="#i-calendar"/></svg></span>
               <div>
                 <span class="rd-label" data-i18n="deadlineLabel">Registration closes</span>
                 <b class="rd-date" id="rd-date"></b>
@@ -1027,7 +1081,7 @@
         </template>
 
         <div class="reg-done" id="reg-done" hidden>
-          <span class="reg-done-icon" aria-hidden="true">✅</span>
+          <span class="reg-done-icon"><svg class="ic" aria-hidden="true"><use href="#i-check-circle"/></svg></span>
           <!-- Shown when registrations go to WhatsApp -->
           <div class="done-part" id="done-wa">
             <h3 data-i18n="doneTitle">Almost done!</h3>
@@ -1035,7 +1089,7 @@
               <li data-i18n="doneStep1" class="done">Team details opened in WhatsApp. Press <b>Send</b>.</li>
               <li data-i18n="doneStep2">Send the players' ID card photos to the same chat.</li>
             </ol>
-            <button data-i18n="shareIds" class="reg-btn share-ids" type="button" id="share-ids">📷 Send ID card photos</button>
+            <button class="reg-btn share-ids" type="button" id="share-ids"><svg class="ic" aria-hidden="true"><use href="#i-camera"/></svg><span data-i18n="shareIds">Send ID card photos</span></button>
             <p class="reg-note" id="share-note">Choose WhatsApp, then the organiser's chat (+960 976-3551).</p>
           </div>
           <!-- Shown when registrations are saved to the database -->
@@ -1048,7 +1102,7 @@
 
         <!-- Shown instead of the form when an organiser closes registration (admin.html) -->
         <div class="reg-closed" id="reg-closed" hidden>
-          <span class="reg-closed-icon" aria-hidden="true">🔒</span>
+          <span class="reg-closed-icon"><svg class="ic" aria-hidden="true"><use href="#i-lock"/></svg></span>
           <h3 data-i18n="closedTitle">Registration is closed</h3>
           <span class="closed-date" id="rl-sub"></span>
           <p data-i18n="closedText">Registration isn't open right now. Contact the organisers on WhatsApp for news about the next edition.</p>
@@ -1144,11 +1198,11 @@
       heroSub: "ދަނޑުގައި ތަޖުރިބާ. ދަނޑުން ބޭރުގައި ރައްޓެހިކަން.",
       btnChamps: "ޗެމްޕިއަނުން ދެކެލައްވާ",
       btnRegister: "ޓީމު ރަޖިސްޓްރީ ކުރައްވާ",
-      champEyebrow: "🏆 2026 ގެ ޗެމްޕިއަނުން",
+      champEyebrow: "2026 ގެ ޗެމްޕިއަނުން",
       champLead: "2026 ވައި.ޕީ ވެޓެރަންސް ފުޓްސަލް މުބާރާތުގެ ކާމިޔާބު ޓީމު",
-      posterChamps: "🏆 ޗެމްޕިއަނުން",
+      posterChamps: "ޗެމްޕިއަނުން",
       posterWinners: "މުބާރާތުގެ ކާމިޔާބު ޓީމު",
-      posterKing: "👑 މުބާރާތުގެ ރަސްގެފާނު",
+      posterKing: "މުބާރާތުގެ ރަސްގެފާނު",
       posterKingSub: "ނަންބަރު 39 · ރޯޔަލް ނައިޓްސް އެސް.ސީ",
       rkName: "ރޯޔަލް ނައިޓްސް ސްޕޯޓްސް ކްލަބް",
       adamName: "އާދަމް ލަރީފް",
@@ -1202,7 +1256,7 @@
       doneTitle: "ގާތްގަނޑަކަށް ނިމުނީ!",
       doneStep1: "ޓީމުގެ މަޢުލޫމާތު ވަޓްސްއަޕްގައި ހުޅުވިއްޖެ. <b>Send</b> އަށް ފިއްތަވާ.",
       doneStep2: "ކުޅުންތެރިންގެ އައިޑީ ކާޑުގެ ފޮޓޯ ހަމަ އެ ޗެޓަށް ފޮނުއްވާ.",
-      shareIds: "📷 އައިޑީ ކާޑުގެ ފޮޓޯ ފޮނުއްވާ",
+      shareIds: "އައިޑީ ކާޑުގެ ފޮޓޯ ފޮނުއްވާ",
       again: "އިތުރު ޓީމެއް ރަޖިސްޓްރީ ކުރައްވާ",
       contactTitle: "ގުޅުއްވާ",
       contactLead: "ދެން އޮތް މުބާރާތުގައި ޓީމެއް ވައްދަން ބޭނުންފުޅުތޯ؟",
