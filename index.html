@@ -538,15 +538,15 @@
     .pc-photos { display: flex; gap: 10px; }
     .ph-tile {
       position: relative; display: flex; align-items: center; justify-content: center; flex-shrink: 0;
-      width: 100px; height: 132px; border-radius: 12px; overflow: hidden; cursor: pointer;
+      width: 112px; height: 132px; border-radius: 12px; overflow: hidden; cursor: pointer;
       border: 1.5px dashed var(--off); background: var(--surface); color: var(--brand-text);
       transition: border-color .15s ease, background .15s ease;
     }
-    .ph-id { width: 156px; }
+    .ph-id { width: 150px; }
     .ph-tile:hover { border-color: var(--brand-text); background: var(--tint-strong); }
     .ph-tile:focus-within { outline: 3px solid var(--gold); outline-offset: 2px; }
     .ph-tile input { position: absolute; inset: 0; width: 100%; opacity: 0; cursor: pointer; z-index: 2; }
-    .ph-empty { display: flex; flex-direction: column; align-items: center; gap: 5px; padding: 8px; text-align: center; font-size: .78rem; font-weight: 600; line-height: 1.2; }
+    .ph-empty { display: flex; flex-direction: column; align-items: center; gap: 5px; padding: 6px; text-align: center; font-size: .78rem; font-weight: 600; line-height: 1.2; }
     .ph-empty .ic { font-size: 1.7rem; stroke-width: 1.7; }
     .ph-empty small { color: var(--muted); font-weight: 400; font-size: .72rem; }
     .ph-prev, .ph-done, .ph-cap { display: none; }
@@ -1078,10 +1078,6 @@
               </div>
             </div>
             <div class="fields">
-              <div class="field full">
-                <label data-i18n="lblNotes" for="r-notes">Notes <small>(optional)</small></label>
-                <textarea id="r-notes" name="notes" rows="3" placeholder="Jersey colour, questions, anything else" data-i18n-ph="phNotes"></textarea>
-              </div>
               <div class="field full check">
                 <label><input type="checkbox" name="agree" required> <span data-i18n="agree">All our players meet the age rule and we agree to the tournament rules.</span></label>
                 <span data-i18n="errAgree" class="err">Please confirm to continue</span>
@@ -1122,9 +1118,9 @@
                 <label class="ph-tile ph-passport">
                   <input class="f-passport" type="file" accept="image/*" required>
                   <img class="ph-prev" alt="">
-                  <span class="ph-empty"><svg class="ic" aria-hidden="true"><use href="#i-portrait"/></svg><span data-i18n="phPassport">Passport photo</span><small data-i18n="phTap">Tap to add</small></span>
+                  <span class="ph-empty"><svg class="ic" aria-hidden="true"><use href="#i-portrait"/></svg><span data-i18n="phPassport">Passport‑size photo</span><small data-i18n="phTap">Tap to add</small></span>
                   <span class="ph-done"><svg class="ic" aria-hidden="true"><use href="#i-check"/></svg></span>
-                  <span class="ph-cap" data-i18n="phPassportShort">Passport photo</span>
+                  <span class="ph-cap" data-i18n="phPassportShort">Passport‑size photo</span>
                 </label>
                 <label class="ph-tile ph-id">
                   <input class="f-id" type="file" accept="image/*" required>
@@ -1145,7 +1141,7 @@
             <h3 data-i18n="doneTitle">Almost done!</h3>
             <ol class="done-steps">
               <li data-i18n="doneStep1" class="done">Team details opened in WhatsApp. Press <b>Send</b>.</li>
-              <li data-i18n="doneStep2">Send everyone's passport and ID card photos to the same chat.</li>
+              <li data-i18n="doneStep2">Send everyone's passport-size and ID card photos to the same chat.</li>
             </ol>
             <button class="reg-btn share-ids" type="button" id="share-ids"><svg class="ic" aria-hidden="true"><use href="#i-camera"/></svg><span data-i18n="shareIds">Send the photos</span></button>
             <p class="reg-note" id="share-note">Choose WhatsApp, then the organiser's chat (+960 976-3551).</p>
@@ -1313,7 +1309,7 @@
       submitNote: "ތިޔަ މަޢުލޫމާތު ފުރިފައި ވަޓްސްއަޕް ހުޅުވޭނެ.",
       doneTitle: "ގާތްގަނޑަކަށް ނިމުނީ!",
       doneStep1: "ޓީމުގެ މަޢުލޫމާތު ވަޓްސްއަޕްގައި ހުޅުވިއްޖެ. <b>Send</b> އަށް ފިއްތަވާ.",
-      doneStep2: "ހުރިހާ މީހުންގެ ޕާސްޕޯޓް ފޮޓޯއާއި އައިޑީ ކާޑުގެ ފޮޓޯ ހަމަ އެ ޗެޓަށް ފޮނުއްވާ.",
+      doneStep2: "ހުރިހާ މީހުންގެ ޕާސްޕޯޓް ސައިޒުގެ ފޮޓޯއާއި އައިޑީ ކާޑުގެ ފޮޓޯ ހަމަ އެ ޗެޓަށް ފޮނުއްވާ.",
       shareIds: "ފޮޓޯތައް ފޮނުއްވާ",
       again: "އިތުރު ޓީމެއް ރަޖިސްޓްރީ ކުރައްވާ",
       contactTitle: "ގުޅުއްވާ",
@@ -1342,8 +1338,8 @@
       lblAge: "އުމުރު",
       lblJersey: "ޖާޒީ ނަންބަރު",
       lblPhoneShort: "ފޯނު (ވަޓްސްއަޕް)",
-      phPassport: "ޕާސްޕޯޓް ފޮޓޯ",
-      phPassportShort: "ޕާސްޕޯޓް ފޮޓޯ",
+      phPassport: "ޕާސްޕޯޓް ސައިޒުގެ ފޮޓޯ",
+      phPassportShort: "ޕާސްޕޯޓް ސައިޒުގެ ފޮޓޯ",
       phIdCard: "އައިޑީ ކާޑުގެ ފޮޓޯ",
       phIdShort: "އައިޑީ ކާޑު",
       phTap: "އިތުރުކުރައްވާ",
@@ -1817,8 +1813,7 @@
         team_name: f.team.value.trim(),
         manager: val(manager, ".p-name"),
         phone: val(manager, ".p-phone"),
-        island: f.island.value.trim(),
-        notes: f.notes.value.trim() || null
+        island: f.island.value.trim()
       });
       if (team.error) throw team.error;
       const officials = await db.from("officials").insert(officialCards().map(card => ({
@@ -1895,10 +1890,8 @@
         "*Players (" + rows.length + ")*",
         ...playerLines,
         "",
-        f.notes.value.trim() ? "Notes: " + f.notes.value.trim() : "",
-        "",
         "We confirm all players meet the age rule and agree to the tournament rules.",
-        "Passport and ID card photos to follow in this chat."
+        "Passport-size and ID card photos to follow in this chat."
       ].filter((line, i, all) => line !== "" || all[i - 1] !== "").join("\n");
       const waLink = "https://wa.me/" + REG_WHATSAPP + "?text=" + encodeURIComponent(msg);
 

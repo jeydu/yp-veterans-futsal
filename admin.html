@@ -454,14 +454,14 @@
                       ${o.phone ? `<a href="tel:${esc(o.phone)}">${esc(o.phone)}</a>` : ""}
                     </div>
                     <span class="pics">
-                      <img class="thumb" data-path="${esc(o.passport_photo_path)}" alt="Passport photo of ${esc(o.name)}">
+                      <img class="thumb" data-path="${esc(o.passport_photo_path)}" alt="Passport-size photo of ${esc(o.name)}">
                       <img class="thumb wide" data-path="${esc(o.id_photo_path)}" alt="ID card of ${esc(o.name)}">
                     </span>
                   </div>`).join("")}
               </div>` : ""}
             <h4 class="sub-h">Players</h4>
             <table>
-              <thead><tr><th>#</th><th>Jersey</th><th>Player</th><th>Age</th><th>Photo</th><th>ID card</th></tr></thead>
+              <thead><tr><th>#</th><th>Jersey</th><th>Player</th><th>Age</th><th>Passport-size photo</th><th>ID card</th></tr></thead>
               <tbody>
                 ${t.players.map(p => `
                   <tr>
@@ -469,7 +469,7 @@
                     <td><b>${p.jersey_number ?? "—"}</b></td>
                     <td>${esc(p.name)}</td>
                     <td class="${p.age < 35 ? "age-bad" : ""}">${p.age}</td>
-                    <td>${p.passport_photo_path ? `<img class="thumb portrait" data-path="${esc(p.passport_photo_path)}" alt="Passport photo of ${esc(p.name)}">` : `<span class="no-photo">—</span>`}</td>
+                    <td>${p.passport_photo_path ? `<img class="thumb portrait" data-path="${esc(p.passport_photo_path)}" alt="Passport-size photo of ${esc(p.name)}">` : `<span class="no-photo">—</span>`}</td>
                     <td><img class="thumb" data-path="${esc(p.id_photo_path)}" alt="ID card of ${esc(p.name)}"></td>
                   </tr>`).join("")}
               </tbody>
