@@ -1638,7 +1638,8 @@
     }
 
     // Squad size limits
-    const MIN_PLAYERS = 10;   // needed to register (also the number of cards shown at first)
+    const MIN_PLAYERS = 10;   // needed to register
+    const START_PLAYERS = 3;  // cards shown at first, so the form isn't a long scroll; "Add player" adds more
     const MAX_PLAYERS = 12;
     // The three team officials; the manager is the team's contact
     const OFFICIALS = [
@@ -1702,8 +1703,8 @@
       rows.forEach((card, i) => {
         card.querySelector(".pc-badge").textContent = i + 1;
         card.querySelector(".pc-name").textContent = t("playerN", i + 1);
-        // Players above the minimum can be removed
-        card.querySelector(".p-remove").hidden = rows.length <= MIN_PLAYERS;
+        // Players beyond the first few can be removed
+        card.querySelector(".p-remove").hidden = rows.length <= START_PLAYERS;
       });
       document.getElementById("players-count").textContent = t("players", rows.length + " / " + MAX_PLAYERS);
       addBtn.hidden = rows.length >= MAX_PLAYERS;
@@ -1785,7 +1786,7 @@
       officialsBox.innerHTML = "";
       OFFICIALS.forEach(o => officialsBox.appendChild(makeCard("official", o)));
       playersBox.innerHTML = "";
-      for (let i = 0; i < MIN_PLAYERS; i++) playersBox.appendChild(makeCard("player"));
+      for (let i = 0; i < START_PLAYERS; i++) playersBox.appendChild(makeCard("player"));
       refreshPeople();
     }
     resetPeople();
