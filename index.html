@@ -1964,37 +1964,25 @@
         const up = await db.storage.from("id-cards").upload(teamId + "/" + ph.path, blob, { contentType: "image/jpeg", upsert: false });
         if (up.error) throw up.error;
       }
-      const pathOf = (card, kind) => teamId + "/" + photos.find(ph => ph.card === card && ph.kind === kind).path;
-
+      // One step on the server saves the team, officials and players together (or nothing),
+      // after checking the squad rules and that every photo above was uploaded
       onProgress(t("uploading"));
-      const manager = officialCards()[0];
-      const team = await db.from("teams").insert({
+      const { error } = await db.rpc("register_team", { p: {
         id: teamId,
         team_name: f.team.value.trim(),
-        manager: val(manager, ".p-name"),
-        phone: val(manager, ".p-phone"),
-        island: f.island.value.trim()
-      });
-      if (team.error) throw team.error;
-      const officials = await db.from("officials").insert(officialCards().map(card => ({
-        team_id: teamId,
-        role: card.dataset.role,
-        name: val(card, ".p-name"),
-        phone: card.querySelector(".p-phone") ? val(card, ".p-phone") : null,
-        passport_photo_path: pathOf(card, "photo"),
-        id_photo_path: pathOf(card, "id")
-      })));
-      if (officials.error) throw officials.error;
-      const squad = await db.from("players").insert(playerCards().map((card, i) => ({
-        team_id: teamId,
-        position: i + 1,
-        name: val(card, ".p-name"),
-        age: Number(val(card, ".p-age")),
-        jersey_number: Number(val(card, ".p-jersey")),
-        passport_photo_path: pathOf(card, "photo"),
-        id_photo_path: pathOf(card, "id")
-      })));
-      if (squad.error) throw squad.error;
+        island: f.island.value.trim(),
+        officials: officialCards().map(card => ({
+          role: card.dataset.role,
+          name: val(card, ".p-name"),
+          phone: card.querySelector(".p-phone") ? val(card, ".p-phone") : null
+        })),
+        players: playerCards().map(card => ({
+          name: val(card, ".p-name"),
+          age: Number(val(card, ".p-age")),
+          jersey_number: Number(val(card, ".p-jersey"))
+        }))
+      } });
+      if (error) throw error;
     }
 
     regForm.addEventListener("submit", async e => {
