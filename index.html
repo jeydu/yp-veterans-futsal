@@ -1677,6 +1677,7 @@
       stageSemis: "ސެމީ ފައިނަލްތައް",
       stagePlayoff: "ޕްލޭއޮފް",
       resPens: s => "ޕެނަލްޓީ " + s,
+      resNoScore: "ނަތީޖާ ނޭނގެ",
       resPartial: "މި އަހަރުގެ ބައެއް ނަތީޖާ އަދި ނުލިބޭ. ލިބުމުން އިތުރުކުރެވޭނެ.",
       stageFinal: "ފައިނަލް"
     };
@@ -1706,6 +1707,7 @@
       stageSemis: "Semi-finals",
       stagePlayoff: "Playoff",
       resPens: s => s + " on penalties",
+      resNoScore: "Score not known",
       resPartial: "Some results from this year are still missing. More will be added when we find them.",
       stageFinal: "Final",
       photoSoon: "Photo coming soon",
@@ -2397,6 +2399,8 @@
           { day: 3,     no: 6,  home: "Mathiveri Veterans", away: "Aaru FT",       score: [2, 1] },
           { day: 4,     no: 7,  home: "Afiyns SC",          away: "Aaru FT",       score: [9, 3] },
           { day: 4,     no: 8,  home: "FT Nakasole",        away: "KK Kandumathi", score: [1, 2] },
+          // Score not found; KK Kandumathi went through to the final, so they won it
+          { day: 6,             home: "Mathiveri Veterans", away: "KK Kandumathi", score: null, won: "away", stage: "playoff" },
           { day: 7,             home: "Afiyns SC",          away: "KK Kandumathi", score: [2, 2], pens: [4, 5], stage: "final" }
         ]
       }
@@ -2423,7 +2427,7 @@
 
     // Year, champion and totals: the face of a year card, and the top of the popup
     function resSummary(r) {
-      const goals = r.matches.reduce((sum, m) => sum + m.score[0] + m.score[1], 0);
+      const goals = r.matches.reduce((sum, m) => sum + (m.score ? m.score[0] + m.score[1] : 0), 0);
       return `<span class="res-big">${r.year}</span>
           <span class="res-champ">
             <small><svg class="ic" aria-hidden="true"><use href="#i-trophy"/></svg>${t("resChampion")}</small>
@@ -2511,15 +2515,16 @@
       // Each match slides in a moment after the one before it
       const delay = m => `style="--d:${(.25 + r.matches.indexOf(m) * .06).toFixed(2)}s"`;
       const matchHtml = m => {
-        // Level after full time: the shootout decides the winner
-        const [a, b] = m.score[0] === m.score[1] && m.pens ? m.pens : m.score;
+        // Level after full time: the shootout decides the winner. No score known: just mark who won.
+        const [a, b] = !m.score ? (m.won === "home" ? [1, 0] : [0, 1])
+          : m.score[0] === m.score[1] && m.pens ? m.pens : m.score;
         const stage = m.stage && !dayStage(m.day) ? `<span class="m-stage">${t(STAGE_KEYS[m.stage])}</span>` : "";
         const pens = m.pens ? `<small class="m-pens">${t("resPens", m.pens.join("–"))}</small>` : "";
         return `<div class="match${m.stage === "final" ? " final" : ""}" ${delay(m)}>
             <span class="m-meta">${m.no ? t("resMatch", m.no) : ""}${stage}</span>
             <div class="m-line" dir="ltr">
               ${teamHtml(m.home, a, b)}
-              <span class="m-scorebox"><span class="m-score">${m.score[0]} – ${m.score[1]}</span>${pens}</span>
+              <span class="m-scorebox"><span class="m-score">${m.score ? `${m.score[0]} – ${m.score[1]}` : "?"}</span>${m.score ? pens : `<small class="m-pens">${t("resNoScore")}</small>`}</span>
               ${teamHtml(m.away, b, a)}
             </div>
           </div>`;
