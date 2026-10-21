@@ -417,6 +417,144 @@
     }
     .w-badge .ic { font-size: 1.05rem; stroke-width: 2.4; }
 
+    /* Match results: one card per year; tapping it opens a popup with the matches grouped by day */
+    .duo { padding-bottom: 72px; }
+    .duo-row { display: grid; grid-template-columns: 1fr 1fr; gap: 32px; }
+    .duo h2 { margin-bottom: 16px; }
+    .duo-row > div { min-width: 0; }
+    .duo .res-year { height: 116px; }
+    @media (max-width: 720px) {
+      .duo-row { gap: 12px; }
+      .duo h2 { font-size: 1.25rem; margin-bottom: 10px; }
+      .duo .res-list { grid-template-columns: 1fr; }
+      .duo .res-year { height: 104px; padding: 12px 10px; }
+      .duo .res-year .res-big { font-size: 2.1rem; }
+      .pw-icon { font-size: 1.8rem; }
+      .pw-years { font-size: 1rem; }
+    }
+    .res-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 180px)); gap: 14px; }
+    .res-year {
+      position: relative; display: flex; flex-direction: column; gap: 14px; text-align: start; min-width: 0;
+      padding: 22px; border-radius: 18px; cursor: pointer; font: inherit; color: #fff;
+      background:
+        radial-gradient(ellipse at 0% 0%, rgba(227, 178, 60, .25), transparent 55%),
+        linear-gradient(135deg, #3d0610, #1c0509);
+      border: 1px solid rgba(227, 178, 60, .35);
+      box-shadow: 0 10px 26px rgba(138, 11, 31, .18);
+      transition: transform .25s ease, box-shadow .25s ease, border-color .25s ease;
+    }
+    .res-year:hover { transform: translateY(-4px); border-color: var(--gold); box-shadow: 0 18px 40px rgba(138, 11, 31, .3); }
+    /* The card face is just the year, with a gold shine sweeping across on hover */
+    .res-year { align-items: center; justify-content: center; padding: 22px 16px; overflow: hidden; }
+    .res-year .res-big { font-size: 2.6rem; }
+    .res-year::after {
+      content: ""; position: absolute; inset: 0; pointer-events: none; transform: translateX(-120%);
+      background: linear-gradient(110deg, transparent 30%, rgba(255, 234, 176, .28) 50%, transparent 70%);
+    }
+    .res-year:hover::after { transform: translateX(120%); transition: transform .7s ease; }
+    .res-year:active { transform: scale(.97); }
+    /* Past Winners button: a trophy and the years it covers */
+    .pw-open { gap: 8px; }
+    .pw-icon { font-size: 2.2rem; color: var(--gold); stroke-width: 1.6; filter: drop-shadow(0 4px 10px rgba(227, 178, 60, .35)); transition: transform .3s cubic-bezier(.34,1.56,.64,1); }
+    .pw-open:hover .pw-icon { transform: scale(1.12) rotate(-6deg); }
+    .pw-years { font: 700 1.15rem "Oswald", sans-serif; letter-spacing: .04em; color: #fff; }
+    /* Past winners inside their popup: each card rises in after the one before */
+    .res-pop .winners { padding: 20px; }
+    .res-pop[open] .champ-link { animation: res-rise .5s cubic-bezier(.2,.8,.2,1) backwards; }
+    .res-pop[open] .champ-link:nth-child(1) { animation-delay: .2s; }
+    .res-pop[open] .champ-link:nth-child(2) { animation-delay: .28s; }
+    .res-pop[open] .champ-link:nth-child(3) { animation-delay: .36s; }
+    .res-pop[open] .champ-link:nth-child(4) { animation-delay: .44s; }
+    .res-pop[open] .champ-link:nth-child(n+5) { animation-delay: .52s; }
+
+    /* The popup: the full results card, scrolling inside the screen */
+    .res-pop {
+      width: min(980px, calc(100% - 24px)); max-width: none; max-height: calc(100dvh - 24px); margin: auto;
+      padding: 0; border: 0; border-radius: 20px; background: transparent; color: var(--text); overflow: auto;
+    }
+    /* Opening: the card grows out of the year that was tapped (transform-origin is set by the script),
+       then each match slides in one after another. Closing shrinks it back. */
+    .res-pop[open] { animation: res-grow .45s cubic-bezier(.2,.9,.25,1.05); }
+    .res-pop.closing { animation: res-shrink .25s ease-in forwards; }
+    .res-pop::backdrop { background: rgba(10, 2, 4, .78); backdrop-filter: blur(4px); animation: res-fade .3s ease; }
+    .res-pop.closing::backdrop { animation: res-fade .25s ease reverse forwards; }
+    @keyframes res-grow { from { opacity: 0; transform: scale(.25); } }
+    @keyframes res-shrink { to { opacity: 0; transform: scale(.25); } }
+    @keyframes res-fade { from { opacity: 0; } }
+    .res-pop[open] .res-top-row, .res-pop[open] .res-pop-title { animation: res-rise .5s cubic-bezier(.2,.8,.2,1) .15s backwards; }
+    .res-pop[open] .res-day h3 { animation: res-rise .45s ease var(--d) backwards; }
+    .res-pop[open] .match { animation: res-rise .5s cubic-bezier(.2,.8,.2,1) var(--d) backwards; }
+    .res-pop[open] .m-score { animation: res-pop-score .45s cubic-bezier(.34,1.56,.64,1) calc(var(--d) + .2s) backwards; }
+    .res-pop[open] .match.final { animation: res-rise .5s cubic-bezier(.2,.8,.2,1) var(--d) backwards, res-glow 2.4s ease-in-out calc(var(--d) + .6s) 2; }
+    @keyframes res-rise { from { opacity: 0; transform: translateY(16px); } }
+    @keyframes res-pop-score { from { opacity: 0; transform: scale(.4); } }
+    @keyframes res-glow { 50% { box-shadow: 0 0 0 4px rgba(227, 178, 60, .25), 0 0 28px rgba(227, 178, 60, .35); } }
+    .res-close {
+      flex-shrink: 0; width: 40px; height: 40px; border-radius: 50%; border: 0; cursor: pointer;
+      display: flex; align-items: center; justify-content: center; font-size: 1.2rem;
+      background: rgba(255,255,255,.12); color: #fff; transition: background .15s ease;
+    }
+    .res-close:hover { background: rgba(255,255,255,.24); }
+    .res-card {
+      background: var(--surface); border: 1px solid var(--border); border-radius: 20px; overflow: clip;
+      box-shadow: 0 14px 34px rgba(138, 11, 31, .1);
+    }
+    /* Card top: the year, the champion and a few totals (stays in view, with the close button, while scrolling) */
+    .res-top {
+      position: sticky; top: 0; z-index: 1;
+      display: flex; align-items: center; flex-wrap: wrap; gap: 14px 22px; padding: 22px 24px; color: #fff;
+      background:
+        radial-gradient(ellipse at 0% 0%, rgba(227, 178, 60, .25), transparent 55%),
+        linear-gradient(135deg, #3d0610, #1c0509);
+    }
+    .res-top-row { display: flex; align-items: center; flex-wrap: wrap; gap: 14px 22px; width: 100%; }
+    .res-pop-title { flex: 1; min-width: 0; font-size: .85rem; letter-spacing: .12em; color: var(--gold); }
+    .res-big { font-family: "Oswald", sans-serif; font-weight: 700; font-size: 3rem; line-height: 1; color: var(--gold); }
+    .res-champ { display: flex; flex-direction: column; min-width: 0; flex: 1; }
+    .res-champ small { display: inline-flex; align-items: center; gap: 6px; color: var(--gold); font-size: .75rem; font-weight: 600; letter-spacing: .1em; text-transform: uppercase; }
+    .res-champ b { font-family: "Oswald", sans-serif; font-weight: 500; font-size: 1.35rem; text-transform: uppercase; line-height: 1.2; }
+    .res-totals { display: flex; gap: 10px; }
+    .res-total { text-align: center; padding: 8px 14px; border-radius: 12px; background: rgba(255,255,255,.07); border: 1px solid rgba(255,255,255,.12); }
+    .res-total b { display: block; font-family: "Oswald", sans-serif; font-size: 1.5rem; line-height: 1; color: #fff; }
+    .res-total span { display: block; margin-top: 3px; font-size: .68rem; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: #f6d6db; }
+
+    /* Hairlines between days (the card clips the outer ones), so a half-empty last row stays clean */
+    .res-days { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); }
+    .res-day { padding: 18px 20px 20px; box-shadow: 1px 1px 0 var(--border); }
+    .res-day h3 { font-size: .85rem; letter-spacing: .12em; color: var(--brand-text); margin-bottom: 10px; }
+    .match + .match { margin-top: 10px; }
+    .match { padding: 10px 12px 12px; border-radius: 12px; background: var(--tint-strong); border: 1px solid transparent; }
+    .m-meta { display: flex; align-items: center; gap: 8px; font-size: .72rem; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); margin-bottom: 6px; }
+    .m-stage { padding: 2px 9px; border-radius: 99px; background: var(--tint); color: var(--brand-text); letter-spacing: .06em; }
+    /* Teams either side of the score, like the posters: club logo with the short name under it */
+    .m-line { display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 10px; }
+    .m-team {
+      display: flex; flex-direction: column; align-items: center; gap: 5px; min-width: 0; text-align: center;
+      font-family: "Oswald", sans-serif; font-weight: 500; font-size: .78rem; line-height: 1.2; text-transform: uppercase; color: var(--muted); overflow-wrap: anywhere;
+    }
+    .m-logo {
+      width: 48px; height: 48px; border-radius: 50%; overflow: hidden; background: #fff;
+      box-shadow: 0 0 0 1.5px var(--border), 0 4px 10px rgba(0,0,0,.15);
+      transition: opacity .2s ease;
+    }
+    .m-logo img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .m-logo.fit img { object-fit: contain; padding: 3px; }
+    .m-initials {
+      display: flex; align-items: center; justify-content: center;
+      background: linear-gradient(160deg, #4a3236, #24171a); color: #fff; font-size: 1rem; font-weight: 700; letter-spacing: .04em;
+    }
+    .m-team.win { color: var(--text); font-weight: 700; }
+    .m-team.win .m-logo { box-shadow: 0 0 0 2px var(--gold), 0 4px 12px rgba(227, 178, 60, .35); }
+    .m-team.lose .m-logo { opacity: .6; }
+    .m-score {
+      min-width: 74px; padding: 4px 10px; border-radius: 8px; text-align: center;
+      background: linear-gradient(160deg, var(--brand), var(--brand-dark)); color: #fff;
+      font: 700 1.3rem "Oswald", sans-serif; font-variant-numeric: tabular-nums; white-space: nowrap;
+    }
+    .match.final { border-color: var(--gold); background: linear-gradient(90deg, rgba(227, 178, 60, .16), var(--tint-strong)); }
+    .match.final .m-stage { background: var(--gold); color: #2a0a0f; }
+    .match.final .m-score { background: linear-gradient(160deg, #f3d58e, var(--gold)); color: #2a0a0f; }
+
     .field.check a { color: var(--brand-text); font-weight: 600; }
 
     /* Team registration */
@@ -829,6 +967,15 @@
       .w-logo { width: 34px; height: 34px; }
       .w-team { font-size: .95rem; }
       .w-view { font-size: .72rem; letter-spacing: .05em; }
+      .res-top { padding: 18px 16px; }
+      .res-big { font-size: 2.4rem; }
+      .res-totals { width: 100%; }
+      .res-total { flex: 1; }
+      .res-days { grid-template-columns: 1fr; }
+      .res-day { padding: 16px 12px; }
+      .m-logo { width: 42px; height: 42px; }
+      .res-pop .winners { padding: 12px; }
+      .m-score { min-width: 64px; font-size: 1.15rem; }
       section { padding: 48px 0; }
     }
 
@@ -1043,11 +1190,35 @@
     </div>
   </section>
 
-  <section id="history" style="padding-top:0">
-    <div class="wrap">
+  <!-- PAST WINNERS and MATCH RESULTS side by side: each is a small card that opens a popup -->
+  <section class="duo" style="padding-top:0">
+    <div class="wrap duo-row">
+    <div id="history">
       <h2 data-i18n="pastTitle">Past Winners</h2>
-      <p data-i18n="pastLead" class="lead">Every champion in the tournament's history. Tap a team to see their photo.</p>
-      <!-- Each card opens its photo. Add photos to images/ using the names in data-photo. -->
+      <!-- Opens the popup below with every winner -->
+      <div class="res-list">
+        <button type="button" class="res-year pw-open" data-i18n-label="pastTitle" aria-label="Past Winners">
+          <svg class="ic pw-icon" aria-hidden="true"><use href="#i-trophy"/></svg>
+          <span class="pw-years">2022 – 2026</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Match results: one card per year. Scores live in RESULTS in the script at the bottom. -->
+    <div id="results">
+      <h2 data-i18n="resTitle">Match Results</h2>
+      <div class="res-list" id="res-list"></div>
+    </div>
+    </div>
+  </section>
+
+  <!-- Popup with every past winner. Each card opens its photo. Add photos to images/ using the names in data-photo. -->
+  <dialog id="winners-pop" class="res-pop" aria-labelledby="winners-pop-title">
+    <div class="res-card">
+      <div class="res-top">
+        <h2 class="res-pop-title" id="winners-pop-title" data-i18n="pastTitle">Past Winners</h2>
+        <button type="button" class="res-close" data-i18n-label="close" aria-label="Close"><svg class="ic" aria-hidden="true"><use href="#i-x"/></svg></button>
+      </div>
       <div class="winners">
         <!-- The first card ("current") is the big one. Add photos to images/ using the names in data-photo. -->
         <button class="champ-link current" data-year="2026" data-team="Royal Knights Sports Club" data-photo="images/champions-2026.jpg">
@@ -1118,7 +1289,12 @@
         </button>
       </div>
     </div>
-  </section>
+  </dialog>
+
+  <!-- Popup with all the results of one year -->
+  <dialog id="res-pop" class="res-pop" aria-labelledby="res-pop-title">
+    <div class="res-card" id="res-card"></div>
+  </dialog>
 
   <!-- TEAM REGISTRATION — sends the details to the organiser on WhatsApp (number set in the script at the bottom) -->
   <section id="register">
@@ -1437,9 +1613,9 @@
       formatTitle: "ބާއްވާ ގޮތް",
       formatText: "[މިސާލު: ގްރޫޕް ބުރު، ދެން ނޮކްއައުޓް]",
       pastTitle: "ކުރީގެ ޗެމްޕިއަނުން",
-      pastLead: "މުބާރާތުގެ ތާރީޚުގައި ހުރިހާ ޗެމްޕިއަނުން. ފޮޓޯ ބެއްލެވުމަށް ޓީމަކަށް ފިއްތަވާ.",
       badgeCurrent: "މިހާރުގެ ޗެމްޕިއަން",
       viewPhoto: "ފޮޓޯ ބައްލަވާ",
+      resTitle: "މެޗުތަކުގެ ނަތީޖާ",
       regEyebrow: "ދެން އޮތް މުބާރާތް",
       regTitle: "ޓީމު ރަޖިސްޓްރީ ކުރައްވާ",
       regIntro: "ޓީމާއި ކުޅުންތެރިންގެ މަޢުލޫމާތު ފުރުއްވާފައި، ވަޓްސްއަޕް މެދުވެރިކޮށް ރާވާ ފަރާތަށް ފޮނުއްވާ.",
@@ -1537,7 +1713,18 @@
       uploading: "ފޮނުވަނީ…",
       submitServerLabel: "ރަޖިސްޓްރޭޝަން ފޮނުއްވާ",
       cdDays: "ދުވަސް", cdHours: "ގަޑި", cdMins: "މިނެޓް", cdSecs: "ސިކުންތު",
-      closedOn: d => d + " ގައި ނިމުނީ"
+      closedOn: d => d + " ގައި ނިމުނީ",
+      resPopTitle: y => y + " ގެ މެޗުތަކުގެ ނަތީޖާ",
+      close: "ބަންދުކުރޭ",
+      resChampion: "ޗެމްޕިއަން",
+      resMatches: "މެޗު",
+      resGoals: "ގޯލު",
+      resDay: n => n + " ވަނަ މެޗު ދުވަސް",
+      resMatch: n => "މެޗު " + n,
+      stageSemi: "ސެމީ ފައިނަލް",
+      stageSemis: "ސެމީ ފައިނަލްތައް",
+      stagePlayoff: "ޕްލޭއޮފް",
+      stageFinal: "ފައިނަލް"
     };
     const EN = {
       players: n => n + " players",
@@ -1553,6 +1740,18 @@
       errPlayerRows: "Fill in every player's name, age, jersey number and both photos. All players must be 35 or older, and each needs a different jersey number.",
       errJerseyDup: "Another player already has this number",
       popChampions: year => year + " Champions",
+      resPopTitle: y => y + " Match Results",
+      pastTitle: "Past Winners",
+      close: "Close",
+      resChampion: "Champion",
+      resMatches: "Matches",
+      resGoals: "Goals",
+      resDay: n => "Match Day " + n,
+      resMatch: n => "Match " + n,
+      stageSemi: "Semi-final",
+      stageSemis: "Semi-finals",
+      stagePlayoff: "Playoff",
+      stageFinal: "Final",
       photoSoon: "Photo coming soon",
       shareNote: "Choose WhatsApp, then the organiser's chat (+960 976-3551).",
       attachNote: n => "Attach the " + n + " photos in the WhatsApp chat with +960 976-3551.",
@@ -1594,6 +1793,7 @@
       if (typeof refreshPeople === "function") refreshPeople();
       if (typeof renderDeadline === "function") renderDeadline();
       if (typeof renderLocked === "function") renderLocked();
+      if (typeof renderResults === "function") renderResults();
       try { localStorage.setItem("lang", lang); } catch (e) {}
     }
 
@@ -1676,7 +1876,7 @@
     pop.querySelector(".v-close").addEventListener("click", () => pop.close());
     pop.querySelector(".v-prev").addEventListener("click", () => showPhoto(vIndex - 1));
     pop.querySelector(".v-next").addEventListener("click", () => showPhoto(vIndex + 1));
-    pop.addEventListener("close", () => document.body.style.overflow = "");
+    pop.addEventListener("close", () => { if (!document.querySelector("dialog[open]")) document.body.style.overflow = ""; });
     // Tap the dark area around the photo to close
     document.getElementById("v-stage").addEventListener("click", e => { if (e.target.id === "v-stage") pop.close(); });
     // Arrow keys move between photos (Esc closes)
@@ -2191,10 +2391,181 @@
       card.style.setProperty("--my", (e.clientY - r.top) + "px");
     }));
 
+    // ---------- Match results ----------
+    // One entry per year, newest first. Use short team names (RBG SC, RK SC, BHC, Stelco SC).
+    // stage: "semi" or "final" (leave it out for other matches)
+    const RESULTS = [
+      {
+        year: 2026,
+        champion: { en: "Royal Knights Sports Club", dv: DV.rkName },
+        matches: [
+          { day: 1, no: 1,  home: "Stelco SC",   away: "FT Nakasole",          score: [4, 1] },
+          { day: 1, no: 2,  home: "RK SC",       away: "BHC",                  score: [1, 1] },
+          { day: 2, no: 3,  home: "RBG SC",      away: "FT Nakasole",          score: [9, 0] },
+          { day: 2, no: 4,  home: "RK SC",       away: "Stelco SC",            score: [3, 0] },
+          { day: 3, no: 5,  home: "BHC",         away: "RBG SC",               score: [3, 4] },
+          { day: 3, no: 6,  home: "FT Nakasole", away: "RK SC",                score: [3, 12] },
+          { day: 4, no: 7,  home: "Stelco SC",   away: "BHC",                  score: [6, 3] },
+          { day: 4, no: 8,  home: "RBG SC",      away: "RK SC",                score: [4, 0] },
+          { day: 5, no: 9,  home: "RBG SC",      away: "BHC",                  score: [4, 2], stage: "semi" },
+          { day: 5, no: 10, home: "Stelco SC",   away: "RK SC",                score: [1, 2], stage: "semi" },
+          { day: 6, no: 11, home: "RBG SC",      away: "RK SC",                score: [1, 3], stage: "final" }
+        ]
+      },
+      {
+        year: 2025,
+        champion: { en: "Afiyns Sports Club", dv: DV.afiynsName },
+        matches: [
+          { day: 1, no: 1,  home: "KK Kandumathi", away: "RK SC",         score: [7, 2] },
+          { day: 1, no: 2,  home: "Afiyns SC",     away: "FC Mathiveri",  score: [9, 0] },
+          { day: 2, no: 3,  home: "Old Stars",     away: "KK Kandumathi", score: [3, 0] },
+          { day: 2, no: 4,  home: "RK SC",         away: "Afiyns SC",     score: [5, 5] },
+          { day: 3, no: 5,  home: "Old Stars",     away: "FC Mathiveri",  score: [6, 0] },
+          { day: 3, no: 6,  home: "Afiyns SC",     away: "KK Kandumathi", score: [7, 2] },
+          { day: 4, no: 7,  home: "RK SC",         away: "Old Stars",     score: [10, 3] },
+          { day: 4, no: 8,  home: "FC Mathiveri",  away: "KK Kandumathi", score: [2, 10] },
+          { day: 5, no: 9,  home: "Afiyns SC",     away: "Old Stars",     score: [4, 2] },
+          { day: 5, no: 10, home: "RK SC",         away: "FC Mathiveri",  score: [12, 3] },
+          { day: 6, no: 11, home: "KK Kandumathi", away: "RK SC",         score: [4, 2], stage: "playoff" },
+          { day: 7, no: 12, home: "Afiyns SC",     away: "KK Kandumathi", score: [4, 3], stage: "final" }
+        ]
+      }
+    ];
+    // Club logos shown in the results. "fit" shows the whole logo for ones that aren't round.
+    // Teams missing here get a badge with their initials.
+    const TEAM_LOGOS = {
+      "RK SC":       { src: "images/royal-knights-logo.jpg" },
+      "RBG SC":      { src: "images/rbg-logo.jpg", fit: true },
+      "Stelco SC":   { src: "images/stelco-logo.jpg" },
+      "BHC":         { src: "images/bhc-logo.jpg" },
+      "FT Nakasole": { src: "images/ft-nakasole-logo.png", fit: true },
+      "Afiyns SC":     { src: "images/afiyns-logo.jpg" },
+      "KK Kandumathi": { src: "images/kk-kandumathi-logo.jpg", fit: true }
+    };
+    const STAGE_KEYS = { semi: "stageSemi", playoff: "stagePlayoff", final: "stageFinal" };
+    const STAGE_DAY_KEYS = { semi: "stageSemis", playoff: "stagePlayoff", final: "stageFinal" };
+    const resPop = document.getElementById("res-pop");
+    let resOpen = null;   // the year shown in the popup
+
+    // Year, champion and totals: the face of a year card, and the top of the popup
+    function resSummary(r) {
+      const goals = r.matches.reduce((sum, m) => sum + m.score[0] + m.score[1], 0);
+      return `<span class="res-big">${r.year}</span>
+          <span class="res-champ">
+            <small><svg class="ic" aria-hidden="true"><use href="#i-trophy"/></svg>${t("resChampion")}</small>
+            <b>${lang === "dv" ? r.champion.dv : r.champion.en}</b>
+          </span>
+          <span class="res-totals">
+            <span class="res-total"><b>${r.matches.length}</b><span>${t("resMatches")}</span></span>
+            <span class="res-total"><b>${goals}</b><span>${t("resGoals")}</span></span>
+          </span>`;
+    }
+
+    function renderResults() {
+      const list = document.getElementById("res-list");
+      list.innerHTML = RESULTS.map(r =>
+        `<button type="button" class="res-year" aria-label="${t("resPopTitle", r.year)}"><span class="res-big">${r.year}</span></button>`).join("");
+      list.querySelectorAll(".res-year").forEach((b, i) => b.addEventListener("click", () => openResults(RESULTS[i].year, b)));
+      if (resOpen) fillResults();
+    }
+
+    function openResults(year, card) {
+      resOpen = year;
+      fillResults();
+      openPop(resPop, card);
+    }
+
+    // ---------- Card popups (match results, past winners) ----------
+    // Open a popup so it grows out of the card that was tapped
+    function openPop(dlg, card) {
+      dlg.classList.remove("closing");
+      dlg.showModal();
+      dlg.scrollTop = 0;
+      document.body.style.overflow = "hidden";
+      // The popup is centred, so work out where the card sits relative to it
+      const c = card.getBoundingClientRect();
+      const left = (innerWidth - dlg.offsetWidth) / 2, top = (innerHeight - dlg.offsetHeight) / 2;
+      dlg.style.transformOrigin = `${c.left + c.width / 2 - left}px ${c.top + c.height / 2 - top}px`;
+    }
+
+    // Shrink back, then really close
+    function closePop(dlg) {
+      if (!dlg.open || dlg.classList.contains("closing")) return;
+      dlg.classList.add("closing");
+      const timer = setTimeout(done, 300);
+      function done() { clearTimeout(timer); dlg.removeEventListener("animationend", onEnd); dlg.classList.remove("closing"); dlg.close(); }
+      function onEnd(e) { if (e.target === dlg) done(); }
+      dlg.addEventListener("animationend", onEnd);
+    }
+
+    // ✕, Esc and tapping the dark area all close with the animation.
+    // The page only scrolls again once no popup is left open (the photo viewer can sit on top of past winners).
+    function wirePop(dlg, onClose) {
+      dlg.addEventListener("click", e => {
+        if (e.target === dlg) closePop(dlg);
+        if (e.target.closest(".res-close")) closePop(dlg);
+      });
+      dlg.addEventListener("cancel", e => { e.preventDefault(); closePop(dlg); });
+      dlg.addEventListener("close", () => {
+        if (onClose) onClose();
+        if (!document.querySelector("dialog[open]")) document.body.style.overflow = "";
+      });
+    }
+
+    const winnersPop = document.getElementById("winners-pop");
+    wirePop(winnersPop);
+    document.querySelector(".pw-open").addEventListener("click", e => openPop(winnersPop, e.currentTarget));
+
+    function fillResults() {
+      const r = RESULTS.find(x => x.year === resOpen);
+      const days = [...new Set(r.matches.map(m => m.day))];
+      // A day where every match is the same stage is headed by the stage alone ("Semi-finals", "Final") instead of tagging each match
+      const dayStage = d => {
+        const stages = new Set(r.matches.filter(m => m.day === d).map(m => m.stage));
+        return stages.size === 1 ? [...stages][0] : undefined;
+      };
+      const dayTitle = d => dayStage(d) ? t(STAGE_DAY_KEYS[dayStage(d)]) : t("resDay", d);
+      const teamHtml = (name, own, other) => {
+        const logo = TEAM_LOGOS[name];
+        const result = own > other ? " win" : own < other ? " lose" : "";
+        const initials = name.split(" ").map(w => w[0]).join("").slice(0, 2);
+        const badge = logo
+          ? `<span class="m-logo${logo.fit ? " fit" : ""}"><img loading="lazy" decoding="async" src="${logo.src}" alt=""></span>`
+          : `<span class="m-logo m-initials" aria-hidden="true">${initials}</span>`;
+        return `<span class="m-team${result}">${badge}${name}</span>`;
+      };
+      // Each match slides in a moment after the one before it
+      const delay = m => `style="--d:${(.25 + r.matches.indexOf(m) * .06).toFixed(2)}s"`;
+      const matchHtml = m => {
+        const [a, b] = m.score;
+        const stage = m.stage && !dayStage(m.day) ? `<span class="m-stage">${t(STAGE_KEYS[m.stage])}</span>` : "";
+        return `<div class="match${m.stage === "final" ? " final" : ""}" ${delay(m)}>
+            <span class="m-meta">${t("resMatch", m.no)}${stage}</span>
+            <div class="m-line" dir="ltr">
+              ${teamHtml(m.home, a, b)}
+              <span class="m-score">${a} – ${b}</span>
+              ${teamHtml(m.away, b, a)}
+            </div>
+          </div>`;
+      };
+      document.getElementById("res-card").innerHTML = `
+        <div class="res-top">
+          <h2 class="res-pop-title" id="res-pop-title">${t("resPopTitle", r.year)}</h2>
+          <button type="button" class="res-close" aria-label="${t("close")}"><svg class="ic" aria-hidden="true"><use href="#i-x"/></svg></button>
+          <span class="res-top-row">${resSummary(r)}</span>
+        </div>
+        <div class="res-days">
+          ${days.map(d => `<div class="res-day${dayStage(d) ? " " + dayStage(d) : ""}"><h3 ${delay(r.matches.find(m => m.day === d))}>${dayTitle(d)}</h3>${r.matches.filter(m => m.day === d).map(matchHtml).join("")}</div>`).join("")}
+        </div>`;
+    }
+
+    wirePop(resPop, () => resOpen = null);
+    renderResults();
+
     // ---------- Scroll animations ----------
     if ("IntersectionObserver" in window && !matchMedia("(prefers-reduced-motion: reduce)").matches) {
       document.documentElement.classList.add("js-reveal");
-      const groups = [".champ-head", ".poster", ".gallery .photo", ".sec-head", ".stat", ".card", "#history h2", "#history .lead", ".champ-link", ".reg-info", "#contact h2", "#contact .lead", ".contact-num", ".contact-btn"];
+      const groups = [".champ-head", ".poster", ".gallery .photo", ".sec-head", ".stat", ".card", "#history h2", "#results h2", ".res-year", ".reg-info", "#contact h2", "#contact .lead", ".contact-num", ".contact-btn"];
       groups.forEach(sel => document.querySelectorAll(sel).forEach((el, i) => {
         el.classList.add("reveal");
         el.style.setProperty("--d", (i % 4) * 0.1 + "s");
