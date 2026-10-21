@@ -16,10 +16,10 @@ create table if not exists public.organisers (
   email text primary key
 );
 
--- Phone-number logins are stored as <960 + number>@phone.ypveterans.com (admin.html converts the number)
-insert into public.organisers (email)
-values ('jadhullo7@gmail.com'), ('9609751808@phone.ypveterans.com')
-on conflict do nothing;
+-- The organiser logins are not kept in this file, because the website (and this file) are public.
+-- Add each one yourself in the SQL Editor (it only needs doing once per organiser):
+--   insert into public.organisers (email) values ('organiser@example.com') on conflict do nothing;
+-- Phone-number logins are stored as <960 + number>@phone.ypveterans.com (admin.html converts the number).
 
 create or replace function public.is_organiser()
 returns boolean
