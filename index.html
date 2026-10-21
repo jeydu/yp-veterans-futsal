@@ -299,7 +299,7 @@
     .stats {
       display: grid; grid-template-columns: repeat(4, 1fr);
       background: linear-gradient(135deg, var(--brand), var(--brand-dark));
-      border-radius: 16px; margin-bottom: 24px; overflow: hidden;
+      border-radius: 16px; overflow: hidden;
       box-shadow: 0 14px 34px rgba(138, 11, 31, .25);
     }
     .stat { padding: 26px 16px; text-align: center; color: #fff; }
@@ -307,46 +307,6 @@
     .stat-num { display: block; font-family: "Oswald", sans-serif; font-weight: 700; font-size: 2.6rem; line-height: 1; color: var(--gold); }
     .stat-label { display: block; margin-top: 8px; font-size: .85rem; color: #f6d6db; }
 
-    /* Info cards: "liquid glass" over soft red, gold and green glows */
-    .cards { position: relative; isolation: isolate; display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
-    .cards::before {
-      content: ""; position: absolute; inset: -40px -20px; z-index: -1; pointer-events: none; filter: blur(40px); opacity: .9;
-      background:
-        radial-gradient(closest-side, rgba(200, 16, 46, .55), transparent) 8% 30% / 34% 90% no-repeat,
-        radial-gradient(closest-side, rgba(227, 178, 60, .5), transparent) 52% 75% / 34% 90% no-repeat,
-        radial-gradient(closest-side, rgba(47, 138, 58, .42), transparent) 95% 25% / 32% 90% no-repeat;
-      animation: glow-drift 14s ease-in-out infinite alternate;
-    }
-    @keyframes glow-drift { to { transform: translate(3%, -4%) scale(1.06); } }
-    .card {
-      position: relative; overflow: hidden; border-radius: 22px; padding: 26px 22px;
-      background: var(--glass);
-      -webkit-backdrop-filter: blur(22px) saturate(170%); backdrop-filter: blur(22px) saturate(170%);
-      border: 1px solid var(--glass-line);
-      box-shadow: inset 0 1px 0 var(--glass-edge), inset 0 0 0 1px rgba(255,255,255,.04), var(--glass-shadow);
-      transition: transform .3s cubic-bezier(.2,.8,.2,1), box-shadow .3s ease, border-color .3s ease;
-    }
-    /* Light that follows the pointer, and a glint along the top edge */
-    .card::before { content: ""; position: absolute; inset: 0; z-index: -1; pointer-events: none; opacity: 0; transition: opacity .3s ease;
-      background: radial-gradient(260px circle at var(--mx, 50%) var(--my, 0%), rgba(255,255,255,.22), transparent 60%); }
-    .card:hover::before { opacity: 1; }
-    .card::after { content: ""; position: absolute; left: 14%; right: 14%; top: 0; height: 1px; pointer-events: none;
-      background: linear-gradient(90deg, transparent, var(--glass-edge), transparent); }
-    .card:hover { transform: translateY(-6px); border-color: rgba(200, 16, 46, .35); box-shadow: inset 0 1px 0 var(--glass-edge), 0 20px 44px rgba(138, 11, 31, .22); }
-    .card-icon {
-      position: relative; overflow: hidden; display: flex; align-items: center; justify-content: center; width: 52px; height: 52px; border-radius: 16px; margin-bottom: 16px;
-      color: #fff; font-size: 1.5rem;
-      background: linear-gradient(180deg, #ff5c74, #d61634 50%, #8a0b1f);
-      border: 1px solid rgba(255,255,255,.35);
-      box-shadow: inset 0 1px 0 rgba(255,255,255,.6), inset 0 -2px 5px rgba(90, 0, 18, .45), 0 8px 18px rgba(200, 16, 46, .35);
-      transition: transform .3s cubic-bezier(.34,1.56,.64,1);
-    }
-    .card-icon::before { content: ""; position: absolute; left: 4px; right: 4px; top: 2px; height: 46%; border-radius: 12px 12px 50% 50% / 12px 12px 8px 8px;
-      background: linear-gradient(180deg, rgba(255,255,255,.5), rgba(255,255,255,.05)); }
-    .card-icon .ic { position: relative; filter: drop-shadow(0 1px 1px rgba(80, 0, 15, .4)); }
-    .card:hover .card-icon { transform: scale(1.08) rotate(-4deg); }
-    .card h3 { font-size: 1.15rem; margin-bottom: 6px; }
-    .card p { color: var(--muted); font-size: .95rem; }
 
     /* Past winners: square photo cards. The current champion gets a big card; the others sit beside it 2 x 2 */
     .winners { display: grid; grid-template-columns: repeat(4, 1fr); gap: 18px; padding-top: 8px; }
@@ -937,8 +897,6 @@
       .gallery { grid-template-columns: 1fr 1fr; }
       .posters { grid-template-columns: 1fr; max-width: 440px; }
       #champions { padding: 56px 0; }
-      .cards { grid-template-columns: 1fr 1fr; gap: 12px; }
-      .card { padding: 18px 16px; }
       .stats { grid-template-columns: 1fr 1fr; }
       .stat:nth-child(3) { border-inline-start: 0; }
       .stat:nth-child(n+3) { border-top: 1px solid rgba(255,255,255,.15); }
@@ -1163,29 +1121,6 @@
         <div class="stat"><span class="stat-num">2022</span><span data-i18n="statFirst" class="stat-label">First season</span></div>
         <div class="stat"><span class="stat-num">4</span><span data-i18n="statDifferent" class="stat-label">Different champions</span></div>
         <div class="stat"><span class="stat-num">2×</span><span data-i18n="statMost" class="stat-label">Most titles · FT Nakasole</span></div>
-      </div>
-
-      <div class="cards">
-        <div class="card">
-          <span class="card-icon"><svg class="ic" aria-hidden="true"><use href="#i-users"/></svg></span>
-          <h3 data-i18n="whoTitle">Who can play</h3>
-          <p data-i18n="whoText">Players aged 35 and over. Each team registers 10 to 12 players and 4 officials.</p>
-        </div>
-        <div class="card">
-          <span class="card-icon"><svg class="ic" aria-hidden="true"><use href="#i-calendar"/></svg></span>
-          <h3 data-i18n="whenTitle">When</h3>
-          <p data-i18n="whenText">Dates not confirmed yet</p>
-        </div>
-        <div class="card">
-          <span class="card-icon"><svg class="ic" aria-hidden="true"><use href="#i-pin"/></svg></span>
-          <h3 data-i18n="whereTitle">Where</h3>
-          <p data-i18n="whereText">A.A Bodufolhudhoo Football Ground</p>
-        </div>
-        <div class="card">
-          <span class="card-icon"><svg class="ic" aria-hidden="true"><use href="#i-ball"/></svg></span>
-          <h3 data-i18n="formatTitle">Format</h3>
-          <p data-i18n="formatText">[e.g. Group stage, then knockouts]</p>
-        </div>
       </div>
     </div>
   </section>
@@ -1604,14 +1539,6 @@
       afiynsName: "އަފީންސް ސްޕޯޓްސް ކްލަބް",
       kkName: "ކޭ.ކޭ ކަނޑުމަތި",
       ftName: "އެފް.ޓީ ނަކަސޯލް",
-      whoTitle: "ކުޅެވޭނީ ކާކަށް",
-      whoText: "35 އަހަރާއި އެއަށްވުރެ މަތީގެ ކުޅުންތެރިން. ކޮންމެ ޓީމަކުން 10 އާއި 12 އާ ދެމެދުގެ ކުޅުންތެރިންނާއި 4 އޮފިޝަލުން ރަޖިސްޓްރީ ކުރަންވާނެ.",
-      whenTitle: "ކޮންއިރަކު",
-      whenText: "ތާރީޚު އަދި ކަނޑައަޅާފައެއް ނުވޭ",
-      whereTitle: "ކޮންތާކު",
-      whereText: "އއ. ބޮޑުފޮޅުދޫ ފުޓްބޯޅަ ދަނޑު",
-      formatTitle: "ބާއްވާ ގޮތް",
-      formatText: "[މިސާލު: ގްރޫޕް ބުރު، ދެން ނޮކްއައުޓް]",
       pastTitle: "ކުރީގެ ޗެމްޕިއަނުން",
       badgeCurrent: "މިހާރުގެ ޗެމްޕިއަން",
       viewPhoto: "ފޮޓޯ ބައްލަވާ",
@@ -2384,13 +2311,6 @@
     }
     checkRegistrationOpen();
 
-    // Glass cards catch the light where the pointer is
-    document.querySelectorAll(".card").forEach(card => card.addEventListener("pointermove", e => {
-      const r = card.getBoundingClientRect();
-      card.style.setProperty("--mx", (e.clientX - r.left) + "px");
-      card.style.setProperty("--my", (e.clientY - r.top) + "px");
-    }));
-
     // ---------- Match results ----------
     // One entry per year, newest first. Use short team names (RBG SC, RK SC, BHC, Stelco SC).
     // stage: "semi" or "final" (leave it out for other matches)
@@ -2567,7 +2487,7 @@
     // ---------- Scroll animations ----------
     if ("IntersectionObserver" in window && !matchMedia("(prefers-reduced-motion: reduce)").matches) {
       document.documentElement.classList.add("js-reveal");
-      const groups = [".champ-head", ".poster", ".gallery .photo", ".sec-head", ".stat", ".card", "#history h2", "#results h2", ".res-year", ".reg-info", "#contact h2", "#contact .lead", ".contact-num", ".contact-btn"];
+      const groups = [".champ-head", ".poster", ".gallery .photo", ".sec-head", ".stat", "#history h2", "#results h2", ".res-year", ".reg-info", "#contact h2", "#contact .lead", ".contact-num", ".contact-btn"];
       groups.forEach(sel => document.querySelectorAll(sel).forEach((el, i) => {
         el.classList.add("reveal");
         el.style.setProperty("--d", (i % 4) * 0.1 + "s");
