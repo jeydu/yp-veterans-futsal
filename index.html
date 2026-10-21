@@ -447,6 +447,30 @@
     /* Score plus, under it, a penalty shootout when there was one */
     .m-scorebox { display: flex; flex-direction: column; align-items: center; gap: 4px; }
     .m-pens { font-size: .66rem; font-weight: 600; letter-spacing: .04em; color: #c8102e; white-space: nowrap; }
+    /* Highlights / Watch buttons, the player, and a chip per goal */
+    .m-actions { display: flex; justify-content: center; gap: 8px; margin-top: 10px; }
+    .m-play {
+      display: flex; align-items: center; gap: 6px; padding: 6px 14px;
+      border: 2px solid #c8102e; border-radius: 2px; cursor: pointer; background: #fff; color: #c8102e;
+      font: 600 .78rem "Oswald", sans-serif; text-transform: uppercase; letter-spacing: .08em;
+    }
+    .m-play svg { width: 14px; height: 14px; }
+    .m-hl { background: #c8102e; color: #fff; }
+    .m-play:hover, .m-play.on { background: #8a0b1f; border-color: #8a0b1f; color: #fff; }
+    .m-play:focus-visible, .m-goals button:focus-visible { outline: 2px solid #c8102e; outline-offset: 2px; }
+    .m-video { margin-top: 10px; }
+    .m-video[hidden] { display: none; }
+    .m-player { aspect-ratio: 16 / 9; background: #000; }
+    .m-player iframe { width: 100%; height: 100%; border: 0; display: block; }
+    .m-goals { list-style: none; display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+    .m-goals button {
+      padding: 4px 9px; border: 1px solid #e4d9d7; border-radius: 2px; cursor: pointer; background: #fff; color: #221516;
+      font: 600 .74rem "Oswald", sans-serif; text-transform: uppercase; letter-spacing: .04em;
+    }
+    .m-goals b { color: #c8102e; margin-inline-end: 3px; }
+    .m-goals button:hover { border-color: #c8102e; }
+    .m-goals button.now { background: #c8102e; border-color: #c8102e; color: #fff; }
+    .m-goals button.now b { color: #fff; }
     /* The final: white tile with red ink, inside a red-ruled row */
     .match.final { padding-inline: 12px; border: 2px solid #c8102e; background: #fff5f6; }
     .match.final .m-score { background: #fff; color: #c8102e; box-shadow: inset 0 0 0 2px #c8102e; }
@@ -1543,6 +1567,8 @@
       stagePlayoff: "ޕްލޭއޮފް",
       resPens: s => "ޕެނަލްޓީ " + s,
       resNoScore: "ނަތީޖާ ނޭނގެ",
+      resWatch: "މުޅި މެޗު",
+      resHighlights: "ހައިލައިޓްސް",
       stageFinal: "ފައިނަލް"
     };
     const EN = {
@@ -1572,6 +1598,8 @@
       stagePlayoff: "Playoff",
       resPens: s => s + " on penalties",
       resNoScore: "Score not known",
+      resWatch: "Full match",
+      resHighlights: "Highlights",
       stageFinal: "Final",
       photoSoon: "Photo coming soon",
       shareNote: "Choose WhatsApp, then the organiser's chat (+960 976-3551).",
@@ -2215,21 +2243,102 @@
       {
         year: 2026,
         champion: { en: "Royal Knights Sports Club", dv: DV.rkName },
+        // video: the match's YouTube id (Ahoo Live stream). Match 1 wasn't streamed.
+        // goals: highlight clips. t = when the on-screen score changed, s = where the clip starts
+        // (seconds into the video); score = the score after the goal (home–away).
         matches: [
-          { day: 1, no: 1,  home: "Stelco SC",   away: "FT Nakasole",          score: [4, 1] },
-          { day: 1, no: 2,  home: "RK SC",       away: "BHC",                  score: [1, 1] },
-          { day: 2, no: 3,  home: "RBG SC",      away: "FT Nakasole",          score: [9, 0] },
-          { day: 2, no: 4,  home: "RK SC",       away: "Stelco SC",            score: [3, 0] },
-          { day: 3, no: 5,  home: "BHC",         away: "RBG SC",               score: [3, 4] },
-          { day: 3, no: 6,  home: "FT Nakasole", away: "RK SC",                score: [3, 12] },
-          { day: 4, no: 7,  home: "Stelco SC",   away: "BHC",                  score: [6, 3] },
-          { day: 4, no: 8,  home: "RBG SC",      away: "RK SC",                score: [4, 0] },
-          // Match day 5 (4 Oct): scores read off the Ahoo Live full-time graphics
-          { day: 5, no: 9,  home: "FT Nakasole", away: "BHC",                  score: [1, 13] },
-          { day: 5, no: 10, home: "RBG SC",      away: "Stelco SC",            score: [1, 1] },
-          { day: 6, no: 11, home: "RBG SC",      away: "BHC",                  score: [4, 2], stage: "semi" },
-          { day: 6, no: 12, home: "Stelco SC",   away: "RK SC",                score: [1, 2], stage: "semi" },
-          { day: 7, no: 13, home: "RBG SC",      away: "RK SC",                score: [1, 3], stage: "final" }
+          { day: 1, no: 1,  home: "Stelco SC", away: "FT Nakasole", score: [4, 1] },
+          { day: 1, no: 2,  home: "RK SC", away: "BHC", score: [1, 1], video: "8jg50urgM_s",
+            goals: [{ s: 393, t: 418, team: "RK SC", score: "1–0" },
+                    { s: 2346, t: 2371, team: "BHC", score: "1–1" }] },
+          { day: 2, no: 3,  home: "RBG SC", away: "FT Nakasole", score: [9, 0], video: "6VxFF4_yx0I",
+            goals: [{ s: 1489, t: 1514, team: "RBG SC", score: "1–0" },
+                    { s: 1798, t: 1823, team: "RBG SC", score: "2–0" },
+                    { s: 1897, t: 1922, team: "RBG SC", score: "3–0" },
+                    { s: 2077, t: 2102, team: "RBG SC", score: "4–0" },
+                    { s: 2156, t: 2181, team: "RBG SC", score: "5–0" },
+                    { s: 2376, t: 2401, team: "RBG SC", score: "6–0" },
+                    { s: 3511, t: 3536, team: "RBG SC", score: "7–0" },
+                    { s: 3641, t: 3666, team: "RBG SC", score: "8–0" },
+                    { s: 3770, t: 3795, team: "RBG SC", score: "9–0" }] },
+          { day: 2, no: 4,  home: "RK SC", away: "Stelco SC", score: [3, 0], video: "V770mPlY_D0",
+            goals: [{ s: 781, t: 806, team: "RK SC", score: "1–0" },
+                    { s: 1706, t: 1731, team: "RK SC", score: "2–0" },
+                    { s: 3070, t: 3095, team: "RK SC", score: "3–0" }] },
+          { day: 3, no: 5,  home: "BHC", away: "RBG SC", score: [3, 4], video: "AReZVN3RM7Q",
+            goals: [{ s: 1261, t: 1286, team: "RBG SC", score: "0–1" },
+                    { s: 1330, t: 1365, team: "BHC", score: "1–1" },
+                    { s: 1729, t: 1754, team: "RBG SC", score: "1–2" },
+                    { s: 1958, t: 1993, team: "RBG SC", score: "1–3" },
+                    { s: 2566, t: 2591, team: "RBG SC", score: "1–4" },
+                    { s: 2935, t: 2960, team: "BHC", score: "2–4" },
+                    { s: 3413, t: 3438, team: "BHC", score: "3–4" }] },
+          { day: 3, no: 6,  home: "FT Nakasole", away: "RK SC", score: [3, 12], video: "aGY2Vw9ycEM",
+            goals: [{ s: 572, t: 597, team: "RK SC", score: "0–1" },
+                    { s: 771, t: 796, team: "RK SC", score: "0–2" },
+                    { s: 930, t: 955, team: "RK SC", score: "0–3" },
+                    { s: 1408, t: 1433, team: "RK SC", score: "0–4" },
+                    { s: 1527, t: 1552, team: "RK SC", score: "0–5" },
+                    { s: 1627, t: 1652, team: "RK SC", score: "0–6" },
+                    { s: 2144, t: 2169, team: "RK SC", score: "0–7" },
+                    { s: 2204, t: 2229, team: "RK SC", score: "0–8" },
+                    { s: 2234, t: 2259, team: "FT Nakasole", score: "1–8" },
+                    { s: 2413, t: 2438, team: "FT Nakasole", score: "2–8" },
+                    { s: 2523, t: 2547, team: "RK SC", score: "2–9" },
+                    { s: 2652, t: 2677, team: "RK SC", score: "2–10" },
+                    { s: 2851, t: 2876, team: "FT Nakasole", score: "3–10" },
+                    { s: 3130, t: 3154, team: "RK SC", score: "3–11" },
+                    { s: 3169, t: 3194, team: "RK SC", score: "3–12" }] },
+          { day: 4, no: 7,  home: "Stelco SC", away: "BHC", score: [7, 3], video: "ekxGhUoblAI",
+            goals: [{ s: 1339, t: 1364, team: "Stelco SC", score: "1–0" },
+                    { s: 1449, t: 1494, team: "Stelco SC", score: "2–0" },
+                    { s: 1489, t: 1514, team: "Stelco SC", score: "3–0" },
+                    { s: 1708, t: 1743, team: "BHC", score: "3–1" },
+                    { s: 1937, t: 1962, team: "Stelco SC", score: "4–1" },
+                    { s: 2216, t: 2241, team: "Stelco SC", score: "5–1" },
+                    { s: 2246, t: 2280, team: "Stelco SC", score: "6–1" },
+                    { s: 3062, t: 3107, team: "BHC", score: "6–2" },
+                    { s: 3988, t: 4013, team: "BHC", score: "6–3" },
+                    { s: 4367, t: 4392, team: "Stelco SC", score: "7–3" }] },
+          { day: 4, no: 8,  home: "RBG SC", away: "RK SC", score: [4, 0], video: "7FJ3AcWjcm8",
+            goals: [{ s: 961, t: 986, team: "RBG SC", score: "1–0" },
+                    { s: 2175, t: 2200, team: "RBG SC", score: "2–0" },
+                    { s: 2683, t: 2708, team: "RBG SC", score: "3–0" },
+                    { s: 2793, t: 2818, team: "RBG SC", score: "4–0" }] },
+          { day: 5, no: 9,  home: "FT Nakasole", away: "BHC", score: [1, 13], video: "s5p9ymG6mqg",
+            goals: [{ s: 1448, t: 1472, team: "BHC", score: "0–1" },
+                    { s: 1587, t: 1612, team: "BHC", score: "0–2" },
+                    { s: 2204, t: 2229, team: "BHC", score: "0–3" },
+                    { s: 2701, t: 2726, team: "BHC", score: "0–4" },
+                    { s: 2731, t: 2756, team: "BHC", score: "0–5" },
+                    { s: 2791, t: 2816, team: "BHC", score: "0–6" },
+                    { s: 3000, t: 3025, team: "BHC", score: "0–7" },
+                    { s: 3099, t: 3124, team: "BHC", score: "0–8" },
+                    { s: 3209, t: 3233, team: "BHC", score: "0–9" },
+                    { s: 3437, t: 3462, team: "BHC", score: "0–10" },
+                    { s: 3477, t: 3502, team: "BHC", score: "0–11" },
+                    { s: 3557, t: 3582, team: "BHC", score: "0–12" },
+                    { s: 3606, t: 3631, team: "FT Nakasole", score: "1–12" },
+                    { s: 3776, t: 3801, team: "BHC", score: "1–13" }] },
+          { day: 5, no: 10, home: "RBG SC", away: "Stelco SC", score: [1, 1], video: "Z5juxVWGrcw",
+            goals: [{ s: 652, t: 677, team: "Stelco SC", score: "0–1" },
+                    { s: 2981, t: 3006, team: "RBG SC", score: "1–1" }] },
+          { day: 6, no: 11, home: "RBG SC", away: "BHC", score: [4, 2], stage: "semi", video: "o85FGjK_z5c",
+            goals: [{ s: 1429, t: 1474, team: "RBG SC", score: "1–0" },
+                    { s: 1529, t: 1563, team: "RBG SC", score: "2–0" },
+                    { s: 1907, t: 1942, team: "RBG SC", score: "3–0" },
+                    { s: 2883, t: 2908, team: "BHC", score: "3–1" },
+                    { s: 3251, t: 3276, team: "RBG SC", score: "4–1" },
+                    { s: 3371, t: 3396, team: "BHC", score: "4–2" }] },
+          { day: 6, no: 12, home: "Stelco SC", away: "RK SC", score: [1, 2], stage: "semi", video: "ReUamnQOm2g",
+            goals: [{ s: 552, t: 597, team: "RK SC", score: "0–1" },
+                    { s: 3188, t: 3213, team: "Stelco SC", score: "1–1" },
+                    { s: 3238, t: 3263, team: "RK SC", score: "1–2" }] },
+          { day: 7, no: 13, home: "RBG SC", away: "RK SC", score: [1, 3], stage: "final", video: "bq5I3BMnh-E",
+            goals: [{ s: 2017, t: 2042, team: "RK SC", score: "0–1" },
+                    { s: 3412, t: 3436, team: "RK SC", score: "0–2" },
+                    { s: 3750, t: 3775, team: "RK SC", score: "0–3" },
+                    { s: 4258, t: 4293, team: "RBG SC", score: "1–3" }] }
         ]
       },
       {
@@ -2341,6 +2450,7 @@
     document.querySelector(".pw-open").addEventListener("click", e => openPop(winnersPop, e.currentTarget));
 
     function fillResults() {
+      if (typeof stopVideo === "function") stopVideo();
       const r = RESULTS.find(x => x.year === resOpen);
       const days = [...new Set(r.matches.map(m => m.day))];
       // A day where every match is the same stage is headed by the stage alone ("Semi-finals", "Final") instead of tagging each match
@@ -2366,13 +2476,20 @@
           : m.score[0] === m.score[1] && m.pens ? m.pens : m.score;
         const stage = m.stage && !dayStage(m.day) ? `<span class="m-stage">${t(STAGE_KEYS[m.stage])}</span>` : "";
         const pens = m.pens ? `<small class="m-pens">${t("resPens", m.pens.join("–"))}</small>` : "";
-        return `<div class="match${m.stage === "final" ? " final" : ""}" ${delay(m)}>
+        return `<div class="match${m.stage === "final" ? " final" : ""}" data-m="${r.matches.indexOf(m)}" ${delay(m)}>
             <span class="m-meta">${m.no ? t("resMatch", m.no) : ""}${stage}</span>
             <div class="m-line" dir="ltr">
               ${teamHtml(m.home, a, b)}
               <span class="m-scorebox"><span class="m-score">${m.score ? `${m.score[0]} – ${m.score[1]}` : "?"}</span>${m.score ? pens : `<small class="m-pens">${t("resNoScore")}</small>`}</span>
               ${teamHtml(m.away, b, a)}
             </div>
+            ${m.video ? `<div class="m-actions">
+              ${m.goals ? `<button type="button" class="m-play m-hl"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2l2.9 6.6 7.1.6-5.4 4.7 1.6 7L12 17.3 5.8 21l1.6-7L2 9.2l7.1-.6z"/></svg>${t("resHighlights")}</button>` : ""}
+              <button type="button" class="m-play m-watch"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5.5v13l11-6.5z"/></svg>${t("resWatch")}</button>
+            </div>
+            <div class="m-video" hidden><div class="m-player"></div>
+              ${m.goals ? `<ol class="m-goals">${m.goals.map((g, i) => `<li><button type="button" data-goal="${i}"><b dir="ltr">${g.score}</b> ${g.team}</button></li>`).join("")}</ol>` : ""}
+            </div>` : ""}
           </div>`;
       };
       document.getElementById("res-card").innerHTML = `
@@ -2386,7 +2503,79 @@
         </div>`;
     }
 
-    wirePop(resPop, () => resOpen = null);
+    // ---------- Match videos and highlights ----------
+    // Videos play from Ahoo Live's YouTube streams inside the popup (nothing is copied or re-uploaded).
+    // Highlights play each goal back to back: from its clip start (or 35 s before the on-screen score changed) to 5 s after.
+    const CLIP_BEFORE = 35, CLIP_AFTER = 5;
+    let ytApi = null;
+    function loadYouTube() {
+      ytApi = ytApi || new Promise(resolve => {
+        window.onYouTubeIframeAPIReady = resolve;
+        const s = document.createElement("script");
+        s.src = "https://www.youtube.com/iframe_api";
+        document.head.appendChild(s);
+      });
+      return ytApi;
+    }
+    let watching = null;   // { player, box, clips, i }
+    function stopVideo() {
+      if (!watching) return;
+      try { watching.player.destroy(); } catch (e) {}
+      watching.box.hidden = true;
+      watching.box.closest(".match").querySelectorAll(".m-play").forEach(b => b.classList.remove("on"));
+      watching = null;
+    }
+    function showClip() {
+      const w = watching, c = w.clips[w.i];
+      w.box.querySelectorAll("[data-goal]").forEach((b, n) => b.classList.toggle("now", !!c && n === w.i));
+      return c ? { videoId: w.video, startSeconds: c.start, endSeconds: c.end } : { videoId: w.video };
+    }
+    async function playMatch(el, highlights, from) {
+      stopVideo();
+      const m = RESULTS.find(x => x.year === resOpen).matches[+el.dataset.m];
+      const box = el.querySelector(".m-video");
+      el.querySelector(highlights ? ".m-hl" : ".m-watch").classList.add("on");
+      box.hidden = false;
+      const slot = document.createElement("div");
+      box.querySelector(".m-player").replaceChildren(slot);
+      const clips = highlights ? m.goals.map(g => ({ start: Math.max(0, g.s ?? g.t - CLIP_BEFORE), end: g.t + CLIP_AFTER })) : [null];
+      const w = watching = { video: m.video, box, clips, i: from || 0 };
+      await loadYouTube();
+      if (watching !== w) return;
+      const first = showClip();
+      w.player = new YT.Player(slot, {
+        host: "https://www.youtube-nocookie.com",
+        videoId: m.video,
+        playerVars: { autoplay: 1, rel: 0, playsinline: 1, start: first.startSeconds, end: first.endSeconds },
+        events: {
+          onReady: ev => ev.target.playVideo(),
+          // A clip ended: go on to the next goal
+          onStateChange: ev => {
+            if (ev.data === YT.PlayerState.ENDED && w.clips[w.i] && w.i < w.clips.length - 1) {
+              w.i++;
+              ev.target.loadVideoById(showClip());
+            }
+          }
+        }
+      });
+    }
+    resPop.addEventListener("click", e => {
+      const goal = e.target.closest("[data-goal]");
+      const btn = e.target.closest(".m-play");
+      if (goal) {
+        const el = goal.closest(".match");
+        // Jump within the highlights already playing, or start them at this goal
+        if (watching && watching.player && watching.clips[0] && watching.box === el.querySelector(".m-video")) {
+          watching.i = +goal.dataset.goal;
+          watching.player.loadVideoById(showClip());
+        } else playMatch(el, true, +goal.dataset.goal);
+      } else if (btn) {
+        if (btn.classList.contains("on")) stopVideo();
+        else playMatch(btn.closest(".match"), btn.classList.contains("m-hl"));
+      }
+    });
+
+    wirePop(resPop, () => { stopVideo(); resOpen = null; });
     renderResults();
 
     // ---------- Scroll animations ----------
