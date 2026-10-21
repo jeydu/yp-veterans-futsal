@@ -11,6 +11,8 @@
   <script>
     // Apply a saved light/dark choice before the page draws, so it doesn't flash
     try { const t = localStorage.getItem("theme"); if (t) document.documentElement.dataset.theme = t; } catch (e) {}
+    // Lets the CSS hide parts that the script fills in (e.g. registration, until we know it is open)
+    document.documentElement.classList.add("js");
   </script>
   <script src="config.js"></script>
   <style>
@@ -563,6 +565,9 @@
     .reg-deadline.soon { border-color: var(--gold); box-shadow: 0 0 0 3px rgba(227, 178, 60, .2); }
     /* Locked: the whole card follows the "closed" state */
     .reg.is-closed { grid-template-columns: 1fr; max-width: 760px; margin: 0 auto; }
+    /* Hidden until we know whether registration is open, so the form doesn't flash before "closed" */
+    .reg { transition: opacity .3s ease; }
+    .js .reg.checking { opacity: 0; pointer-events: none; }
     .reg.is-closed .reg-info { display: none; }
     .closed-date { padding: 4px 14px; border-radius: 99px; background: var(--tint); color: var(--brand-text); font-size: .85rem; font-weight: 600; }
     .closed-date:empty { display: none; }
@@ -1242,7 +1247,7 @@
   <!-- TEAM REGISTRATION — sends the details to the organiser on WhatsApp (number set in the script at the bottom) -->
   <section id="register">
     <div class="wrap">
-      <div class="reg">
+      <div class="reg checking">
         <div class="reg-info">
           <div class="reg-info-inner">
             <!-- Closing date with a live countdown: organisers set the date on admin.html -->
@@ -2297,10 +2302,11 @@
     }
 
     async function checkRegistrationOpen() {
-      if (!USE_SERVER) return;
+      const reg = document.querySelector(".reg");
+      if (!USE_SERVER) { reg.classList.remove("checking"); return; }
       try {
         const res = await fetch(CONFIG.supabaseUrl + "/rest/v1/settings?id=eq.1&select=registration_open,closed_message,closes_at,instructions",
-          { headers: { apikey: CONFIG.supabaseKey } });
+          { headers: { apikey: CONFIG.supabaseKey }, signal: AbortSignal.timeout(5000) });
         const [settings] = await res.json();
         if (!settings) return;
         regSettings = settings;
@@ -2308,7 +2314,7 @@
         renderInstructions();
         const deadlinePassed = settings.closes_at && Date.now() >= new Date(settings.closes_at);
         if (settings.registration_open && !deadlinePassed) return;
-        document.querySelector(".reg").classList.add("is-closed");
+        reg.classList.add("is-closed");
         regClosedOn = deadlinePassed ? settings.closes_at : null;
         renderLocked();
         regForm.hidden = true;
@@ -2322,6 +2328,8 @@
         }
       } catch (e) {
         // Can't reach the server: leave the form showing (WhatsApp backup still works)
+      } finally {
+        reg.classList.remove("checking");
       }
     }
     checkRegistrationOpen();
