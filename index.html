@@ -519,6 +519,11 @@
       background: #c8102e; color: #fff;
       font: 700 1.3rem "Oswald", sans-serif; font-variant-numeric: tabular-nums; white-space: nowrap;
     }
+    /* Score plus, under it, a penalty shootout when there was one */
+    .m-scorebox { display: flex; flex-direction: column; align-items: center; gap: 4px; }
+    .m-pens { font-size: .66rem; font-weight: 600; letter-spacing: .04em; color: #c8102e; white-space: nowrap; }
+    /* Shown under a year whose results are not all in yet */
+    .res-note { padding: 12px 18px 16px; font-size: .82rem; color: var(--muted); border-top: 1px solid var(--border); }
     /* The final: white tile with red ink, inside a red-ruled row */
     .match.final { padding-inline: 12px; border: 2px solid #c8102e; background: #fff5f6; }
     .match.final .m-score { background: #fff; color: #c8102e; box-shadow: inset 0 0 0 2px #c8102e; }
@@ -1671,6 +1676,8 @@
       stageSemi: "ސެމީ ފައިނަލް",
       stageSemis: "ސެމީ ފައިނަލްތައް",
       stagePlayoff: "ޕްލޭއޮފް",
+      resPens: s => "ޕެނަލްޓީ " + s,
+      resPartial: "މި އަހަރުގެ ބައެއް ނަތީޖާ އަދި ނުލިބޭ. ލިބުމުން އިތުރުކުރެވޭނެ.",
       stageFinal: "ފައިނަލް"
     };
     const EN = {
@@ -1698,6 +1705,8 @@
       stageSemi: "Semi-final",
       stageSemis: "Semi-finals",
       stagePlayoff: "Playoff",
+      resPens: s => s + " on penalties",
+      resPartial: "Some results from this year are still missing. More will be added when we find them.",
       stageFinal: "Final",
       photoSoon: "Photo coming soon",
       shareNote: "Choose WhatsApp, then the organiser's chat (+960 976-3551).",
@@ -2372,6 +2381,22 @@
           { day: 6, no: 11, home: "KK Kandumathi", away: "RK SC",         score: [4, 2], stage: "playoff" },
           { day: 7, no: 12, home: "Afiyns SC",     away: "KK Kandumathi", score: [4, 3], stage: "final" }
         ]
+      },
+      {
+        // Only the results we have posters for; partial hides the totals and shows a "some results missing" note.
+        // The two Mathiveri wins came on 11 or 12 August (match numbers unknown). pens = penalty shootout.
+        year: 2024,
+        partial: true,
+        champion: { en: "KK Kandumathi", dv: DV.kkName },
+        matches: [
+          { day: 1,     no: 1,  home: "Mathiveri Veterans", away: "Afiyns SC",     score: [2, 3] },
+          { day: 1,     no: 2,  home: "Aaru FT",            away: "FT Nakasole",   score: [3, 3] },
+          { day: "2–3",         home: "Mathiveri Veterans", away: "KK Kandumathi", score: [4, 0] },
+          { day: "2–3",         home: "Mathiveri Veterans", away: "Aaru FT",       score: [2, 1] },
+          { day: 4,     no: 7,  home: "Afiyns SC",          away: "Aaru FT",       score: [9, 3] },
+          { day: 4,     no: 8,  home: "FT Nakasole",        away: "KK Kandumathi", score: [1, 2] },
+          { day: 7,             home: "Afiyns SC",          away: "KK Kandumathi", score: [2, 2], pens: [4, 5], stage: "final" }
+        ]
       }
     ];
     // Club logos shown in the results. "fit" shows the whole logo for ones that aren't round.
@@ -2385,7 +2410,9 @@
       "Afiyns SC":     { src: "images/afiyns-logo.jpg" },
       "KK Kandumathi": { src: "images/kk-kandumathi-logo.jpg", fit: true },
       "Old Stars":     { src: "images/old-stars-logo.jpg", fit: true },
-      "FC Mathiveri":  { src: "images/fc-mathiveri-logo.jpg", fit: true }
+      "FC Mathiveri":  { src: "images/fc-mathiveri-logo.jpg", fit: true },
+      "Mathiveri Veterans": { src: "images/mathiveri-veterans-logo.jpg", fit: true },
+      "Aaru FT":       { src: "images/aaru-ft-logo.jpg" }
     };
     const STAGE_KEYS = { semi: "stageSemi", playoff: "stagePlayoff", final: "stageFinal" };
     const STAGE_DAY_KEYS = { semi: "stageSemis", playoff: "stagePlayoff", final: "stageFinal" };
@@ -2400,10 +2427,10 @@
             <small><svg class="ic" aria-hidden="true"><use href="#i-trophy"/></svg>${t("resChampion")}</small>
             <b>${lang === "dv" ? r.champion.dv : r.champion.en}</b>
           </span>
-          <span class="res-totals">
+          ${r.partial ? "" : `<span class="res-totals">
             <span class="res-total"><b>${r.matches.length}</b><span>${t("resMatches")}</span></span>
             <span class="res-total"><b>${goals}</b><span>${t("resGoals")}</span></span>
-          </span>`;
+          </span>`}`;
     }
 
     function renderResults() {
@@ -2482,13 +2509,15 @@
       // Each match slides in a moment after the one before it
       const delay = m => `style="--d:${(.25 + r.matches.indexOf(m) * .06).toFixed(2)}s"`;
       const matchHtml = m => {
-        const [a, b] = m.score;
+        // Level after full time: the shootout decides the winner
+        const [a, b] = m.score[0] === m.score[1] && m.pens ? m.pens : m.score;
         const stage = m.stage && !dayStage(m.day) ? `<span class="m-stage">${t(STAGE_KEYS[m.stage])}</span>` : "";
+        const pens = m.pens ? `<small class="m-pens">${t("resPens", m.pens.join("–"))}</small>` : "";
         return `<div class="match${m.stage === "final" ? " final" : ""}" ${delay(m)}>
-            <span class="m-meta">${t("resMatch", m.no)}${stage}</span>
+            <span class="m-meta">${m.no ? t("resMatch", m.no) : ""}${stage}</span>
             <div class="m-line" dir="ltr">
               ${teamHtml(m.home, a, b)}
-              <span class="m-score">${a} – ${b}</span>
+              <span class="m-scorebox"><span class="m-score">${m.score[0]} – ${m.score[1]}</span>${pens}</span>
               ${teamHtml(m.away, b, a)}
             </div>
           </div>`;
@@ -2501,7 +2530,8 @@
         </div>
         <div class="res-days">
           ${days.map(d => `<div class="res-day${dayStage(d) ? " " + dayStage(d) : ""}"><h3 ${delay(r.matches.find(m => m.day === d))}>${dayTitle(d)}</h3>${r.matches.filter(m => m.day === d).map(matchHtml).join("")}</div>`).join("")}
-        </div>`;
+        </div>
+        ${r.partial ? `<p class="res-note">${t("resPartial")}</p>` : ""}`;
     }
 
     wirePop(resPop, () => resOpen = null);
