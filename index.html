@@ -693,7 +693,7 @@
     .reg-again { margin-top: 12px; background: none; border: 1.5px solid var(--brand); color: var(--brand-text); border-radius: 2px; padding: 10px 18px; font: 600 .9rem "Inter", sans-serif; cursor: pointer; }
     .reg-again:hover { background: var(--tint); }
 
-    /* Contact: a red band with kit stripes along the top; number big, then three plain buttons */
+    /* Contact: a red band with kit stripes along the top; number big, then three icon buttons */
     #contact { position: relative; background: var(--brand); color: #fff; padding-top: 88px; }
     #contact::before {
       content: ""; position: absolute; left: 0; right: 0; top: 0; height: 16px;
@@ -701,16 +701,17 @@
     }
     #contact .lead { color: #ffe1e6; margin-bottom: 18px; }
     .contact-num { font-family: "Oswald", sans-serif; font-weight: 700; font-size: clamp(2.4rem, 7vw, 3.6rem); line-height: 1; letter-spacing: .02em; margin-bottom: 28px; }
-    .contact-btns { display: flex; flex-wrap: wrap; gap: 10px; }
+    .contact-btns { display: flex; flex-wrap: wrap; gap: 12px; }
     #contact .contact-btn {
-      display: inline-flex; align-items: center; gap: 10px; padding: 13px 22px; border-radius: 2px; text-decoration: none;
-      font: 600 1rem "Oswald", sans-serif; text-transform: uppercase; letter-spacing: .08em;
-      transition: background .15s ease, color .15s ease;
+      display: inline-flex; align-items: center; justify-content: center; width: 64px; height: 64px; border-radius: 2px;
+      transition: background .15s ease, color .15s ease, transform .15s ease;
     }
+    #contact .contact-btn:hover { transform: translateY(-3px); }
+    /* The name stays for screen readers, hidden on screen */
+    .contact-label { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
     #contact .contact-btn:focus-visible { outline: 3px solid #fff; outline-offset: 3px; }
     .contact-circle { display: flex; }
-    .contact-circle svg { width: 24px; height: 24px; }
-    #contact .contact-btn { font-weight: 700; }
+    .contact-circle svg { width: 30px; height: 30px; }
     .wa { background: #25d366; color: #06371a; }
     .wa:hover { background: #1ebe5a; }
     .call { background: #fff; color: var(--brand); }
@@ -801,7 +802,7 @@
       .stat:nth-child(n+3) { border-top: 1px solid rgba(255,255,255,.12); }
       .stat-num { font-size: 2.4rem; }
       #contact { padding-top: 64px; }
-      #contact .contact-btn { flex: 1 1 auto; justify-content: center; padding: 13px 14px; }
+
       .reg { grid-template-columns: 1fr; }
       .reg-info-inner { position: static; }
       .reg-progress { margin: -28px -20px 8px; padding: 12px 20px; }
