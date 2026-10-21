@@ -128,10 +128,10 @@
       background: var(--ink);
       padding: 96px 0 120px;
     }
-    .hero-photo { position: absolute; inset: 0; z-index: -2; background: url("images/champions-team.webp") 70% 30% / cover no-repeat; }
+    .hero-photo { position: absolute; inset: 0; z-index: -2; background: url("images/hero-trophy.jpg") 50% 40% / auto 115% no-repeat; background-color: #123a1c; left: 30%; }
     header.hero::before {
       content: ""; position: absolute; inset: 0; z-index: -1;
-      background: linear-gradient(100deg, rgba(150, 8, 30, .97) 0%, rgba(200, 16, 46, .92) 40%, rgba(200, 16, 46, .55) 68%, rgba(21, 12, 13, .2) 100%);
+      background: linear-gradient(100deg, rgba(150, 8, 30, .98) 0%, rgba(200, 16, 46, .95) 42%, rgba(200, 16, 46, .35) 64%, rgba(21, 12, 13, .1) 100%);
     }
     :root[dir="rtl"] header.hero::before { transform: scaleX(-1); }
     /* Kit stripes along the bottom edge */
@@ -790,7 +790,7 @@
       .reg-progress { top: 104px; }
       .logo-name { font-size: 1rem; }
       header.hero { padding: 64px 0 88px; }
-      .hero-photo { background-position: 75% 30%; }
+      .hero-photo { left: 0; background-size: cover; background-position: 50% 30%; }
       header.hero::before { background: linear-gradient(180deg, rgba(150, 8, 30, .9) 0%, rgba(200, 16, 46, .78) 55%, rgba(200, 16, 46, .6) 100%); }
       .gallery { grid-template-columns: 1fr 1fr; }
       .posters { grid-template-columns: 1fr; }
