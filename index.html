@@ -522,8 +522,6 @@
     /* Score plus, under it, a penalty shootout when there was one */
     .m-scorebox { display: flex; flex-direction: column; align-items: center; gap: 4px; }
     .m-pens { font-size: .66rem; font-weight: 600; letter-spacing: .04em; color: #c8102e; white-space: nowrap; }
-    /* Shown under a year whose results are not all in yet */
-    .res-note { padding: 12px 18px 16px; font-size: .82rem; color: var(--muted); border-top: 1px solid var(--border); }
     /* The final: white tile with red ink, inside a red-ruled row */
     .match.final { padding-inline: 12px; border: 2px solid #c8102e; background: #fff5f6; }
     .match.final .m-score { background: #fff; color: #c8102e; box-shadow: inset 0 0 0 2px #c8102e; }
@@ -1678,7 +1676,6 @@
       stagePlayoff: "ޕްލޭއޮފް",
       resPens: s => "ޕެނަލްޓީ " + s,
       resNoScore: "ނަތީޖާ ނޭނގެ",
-      resPartial: "މި އަހަރުގެ ބައެއް ނަތީޖާ އަދި ނުލިބޭ. ލިބުމުން އިތުރުކުރެވޭނެ.",
       stageFinal: "ފައިނަލް"
     };
     const EN = {
@@ -1708,7 +1705,6 @@
       stagePlayoff: "Playoff",
       resPens: s => s + " on penalties",
       resNoScore: "Score not known",
-      resPartial: "Some results from this year are still missing. More will be added when we find them.",
       stageFinal: "Final",
       photoSoon: "Photo coming soon",
       shareNote: "Choose WhatsApp, then the organiser's chat (+960 976-3551).",
@@ -2385,7 +2381,7 @@
         ]
       },
       {
-        // Only the results we have posters for; partial hides the totals and shows a "some results missing" note.
+        // Only the results we have posters for; partial hides the match and goal totals.
         // Matches 3–6 follow the order the result posters were published in. pens = penalty shootout.
         year: 2024,
         partial: true,
@@ -2537,8 +2533,7 @@
         </div>
         <div class="res-days">
           ${days.map(d => `<div class="res-day${dayStage(d) ? " " + dayStage(d) : ""}"><h3 ${delay(r.matches.find(m => m.day === d))}>${dayTitle(d)}</h3>${r.matches.filter(m => m.day === d).map(matchHtml).join("")}</div>`).join("")}
-        </div>
-        ${r.partial ? `<p class="res-note">${t("resPartial")}</p>` : ""}`;
+        </div>`;
     }
 
     wirePop(resPop, () => resOpen = null);
