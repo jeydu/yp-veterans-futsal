@@ -2950,6 +2950,18 @@
     }
 
     function renderMedia() { renderNews(); renderGallery(); renderSponsors(); }
+
+    // Logos chosen in the organiser portal (Site Settings)
+    function applyLogos(l) {
+      if (l.site_logo) document.querySelector("nav .logo img").src = l.site_logo;
+      if (l.club_logo) document.querySelector("footer img").src = l.club_logo;
+    }
+    try { applyLogos(JSON.parse(localStorage.getItem("yp-logos") || "{}")); } catch (e) {}
+    if (USE_SERVER) api("settings?select=site_logo,club_logo&id=eq.1").then(([l]) => {
+      if (!l) return;
+      applyLogos({ site_logo: l.site_logo || "images/veterans-logo.jpg", club_logo: l.club_logo || "images/yp-logo.jpg" });
+      try { localStorage.setItem("yp-logos", JSON.stringify(l)); } catch (e) {}
+    }).catch(() => {});
     async function loadMedia() {
       if (!USE_SERVER) return;
       const [p, g, s] = await Promise.all([

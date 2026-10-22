@@ -592,6 +592,12 @@
     .tm-hd { border-top: 0; font-size: .72rem; font-weight: 700; text-transform: uppercase; letter-spacing: .07em; color: var(--muted); background: var(--surface-2); }
     .tm-name { display: flex; align-items: center; gap: 12px; min-width: 0; }
     .tm-name .tl { width: 36px; height: 36px; }
+    /* The logo in the list is a button: tap to replace it */
+    .tm-logo { position: relative; flex-shrink: 0; cursor: pointer; border-radius: 50%; }
+    .tm-cam { position: absolute; inset: 0; display: grid; place-items: center; border-radius: 50%; background: rgba(21, 12, 13, .6); color: #fff; font-size: .95rem; opacity: 0; transition: opacity .15s ease; }
+    .tm-logo:hover .tm-cam, .tm-logo:focus-within .tm-cam { opacity: 1; }
+    .tm-logo.busy .tm-cam { opacity: 1; animation: pulse-o 1s ease-in-out infinite alternate; }
+    @keyframes pulse-o { to { background: rgba(200, 16, 46, .7); } }
     .tm-name b { font: 700 1rem "Oswald", sans-serif; text-transform: uppercase; letter-spacing: .02em; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
     .tm-short, .tm-mgr { color: var(--muted); font-size: .88rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
     .tm-pl b { font: 700 1.05rem "Oswald", sans-serif; }
@@ -816,6 +822,7 @@
       <a class="nav-item" href="#gallery" data-page="gallery" data-group="manage"><svg class="ic" aria-hidden="true"><use href="#i-image"/></svg><span>Gallery</span></a>
       <a class="nav-item" href="#sponsors" data-page="sponsors" data-group="manage"><svg class="ic" aria-hidden="true"><use href="#i-star"/></svg><span>Sponsors</span></a>
       <span class="side-h" data-group="admin">Super admin</span>
+      <a class="nav-item" href="#site" data-page="site" data-group="admin"><svg class="ic" aria-hidden="true"><use href="#i-image"/></svg><span>Site Settings</span></a>
       <a class="nav-item" href="#users" data-page="users" data-group="admin"><svg class="ic" aria-hidden="true"><use href="#i-user"/></svg><span>Users</span></a>
       <a class="nav-item" href="#roles" data-page="roles" data-group="admin"><svg class="ic" aria-hidden="true"><use href="#i-shield"/></svg><span>User Roles</span></a>
       <span class="side-h">Website</span>
@@ -1040,9 +1047,9 @@
       dashboard: ["dashboard", () => loadDashboard()], registrations: ["registrations", () => load()],
       fixtures: ["fixtures", () => loadFixtures()], teams: ["teams", () => loadTeamsPage()],
       news: ["news", () => loadNews()], gallery: ["gallery", () => loadGallery()], sponsors: ["sponsors", () => loadSponsors()],
-      users: ["users", () => loadUsers()], roles: ["users", () => loadRoles()]
+      users: ["users", () => loadUsers()], roles: ["users", () => loadRoles()], site: ["settings", () => loadSiteSettings()]
     };
-    const ALL_PERMS = ["dashboard", "registrations", "fixtures", "teams", "news", "gallery", "sponsors", "users"];
+    const ALL_PERMS = ["dashboard", "registrations", "fixtures", "teams", "news", "gallery", "sponsors", "users", "settings"];
     let me = { email: "", name: "", role: "" }, perms = new Set();
     const can = p => perms.has(p);
     let page = "dashboard";
@@ -1885,7 +1892,7 @@
       if (!error) { clubs = data; mergeClubs(); }
     }
 
-    const teamsHead = `<div class="ph"><div><h1>Teams &amp; Players</h1><p>Add teams, upload logos and keep squad lists up to date.</p></div>
+    const teamsHead = `<div class="ph"><div><h1>Teams &amp; Players</h1><p>Add teams, upload logos and keep squad lists up to date. Tap a logo to change it.</p></div>
       <div class="ph-act"><button class="btn primary" id="tm-add">${icon("plus")} Add team</button></div></div>`;
 
     async function loadTeamsPage() {
@@ -1907,7 +1914,8 @@
           <div class="tm-row tm-hd"><span>Team</span><span>Short</span><span>Manager</span><span>Players</span><span></span></div>
           ${clubs.length ? clubs.map(c => `
             <div class="tm-row">
-              <span class="tm-name">${teamLogo(c.name)}<b>${esc(c.name)}</b></span>
+              <span class="tm-name"><label class="tm-logo" title="Change ${esc(c.name)}'s logo">${teamLogo(c.name)}<span class="tm-cam">${icon("camera")}</span>
+                <input type="file" accept="image/png,image/jpeg,image/webp" data-logo="${c.id}" hidden></label><b>${esc(c.name)}</b></span>
               <span class="tm-short">${esc(c.short || "—")}</span>
               <span class="tm-mgr">${esc(c.manager || "—")}</span>
               <span class="tm-pl"><b>${(c.players || []).length}</b><small> players</small></span>
@@ -1916,6 +1924,23 @@
           : `<div class="fx-empty">${icon("team")}<b>No teams yet</b><span>Add the first team.</span></div>`}
         </div>`;
       document.getElementById("tm-add").onclick = () => editClub(null);
+      app.querySelectorAll("[data-logo]").forEach(inp => inp.onchange = async () => {
+        const c = clubs.find(x => x.id === inp.dataset.logo), file = inp.files[0];
+        if (!file) return;
+        const cell = inp.closest(".tm-logo");
+        cell.classList.add("busy");
+        try {
+          const blob = await shrinkLogo(file);
+          const path = crypto.randomUUID() + ".png";
+          const up = await db.storage.from("club-logos").upload(path, blob, { contentType: "image/png" });
+          if (up.error) throw up.error;
+          const logo = db.storage.from("club-logos").getPublicUrl(path).data.publicUrl;
+          const { error } = await db.from("clubs").update({ logo }).eq("id", c.id);
+          if (error) throw error;
+          toast("✓ " + c.name + " logo updated");
+          loadTeamsPage();
+        } catch (x) { cell.classList.remove("busy"); alert("Couldn't change the logo: " + x.message); }
+      });
       app.querySelectorAll("[data-club]").forEach(b => b.onclick = () => editClub(clubs.find(c => c.id === b.dataset.club)));
     }
 
@@ -2393,7 +2418,8 @@
       ["news", "News: write stories and choose the slider"],
       ["gallery", "Gallery: photos and videos"],
       ["sponsors", "Sponsors: sponsor logos"],
-      ["users", "Users & roles: add organisers and choose what they can do"]
+      ["users", "Users & roles: add organisers and choose what they can do"],
+      ["settings", "Site settings: the website's logos"]
     ];
     let people = [], roleList = [];
     async function loadPeople() {
@@ -2512,6 +2538,54 @@
           if (error) return alert("Couldn't save: " + error.message);
           toast("✓ Role saved"); loadRoles();
         };
+      });
+    }
+
+    // ---------- Site Settings: the website's logos ----------
+    const LOGOS = [
+      ["site_logo", "Tournament logo", "In the menu bar at the top of every page.", "images/veterans-logo.jpg"],
+      ["club_logo", "Club crest", "Young Players SC, in the footer at the bottom.", "images/yp-logo.jpg"]
+    ];
+    async function loadSiteSettings() {
+      const head = pageHead("Site Settings", "The logos the website shows. Changes appear as soon as you save.",
+        `<a class="btn" href="./" target="_blank" rel="noopener">${icon("external")} View website</a>`);
+      app.innerHTML = head + `<p class="notice">Loading…</p>`;
+      const { data, error } = await db.from("settings").select("site_logo, club_logo").eq("id", 1).single();
+      if (page !== "site") return;
+      if (error) return setupNeeded(head, error);
+      app.innerHTML = head + `<div class="sp-grid">${LOGOS.map(([k, title, where, def]) => `
+        <form class="card sp-card" data-k="${k}">
+          <div class="d-h"><div><h2>${title}</h2><span>${where}</span></div>${data[k] ? "" : `<span class="d-pill">Default</span>`}</div>
+          <div class="sp-top"><span class="logo-prev"><img src="${esc(data[k] || def)}" alt=""></span>
+            <div class="logo-btns"><label class="btn file-btn">${icon("plus")} Choose new logo<input type="file" accept="image/png,image/jpeg,image/webp" hidden></label>
+              <small class="hint">Square images work best. PNG keeps a transparent background.</small></div></div>
+          <div class="sp-act">${data[k] ? `<button type="button" class="btn danger" data-reset>${icon("undo")} Back to default</button>` : ""}<span class="sp"></span>
+            <button class="btn primary" type="submit" disabled>${icon("check")} Save logo</button></div>
+        </form>`).join("")}</div>`;
+      app.querySelectorAll("[data-k]").forEach(f => {
+        const k = f.dataset.k;
+        let file = null;
+        f.querySelector("input[type=file]").onchange = e => {
+          file = e.target.files[0];
+          if (!file) return;
+          f.querySelector(".logo-prev").innerHTML = `<img src="${URL.createObjectURL(file)}" alt="">`;
+          f.querySelector("[type=submit]").disabled = false;
+        };
+        const save = async value => {
+          const { error } = await db.from("settings").update({ [k]: value, updated_at: new Date().toISOString() }).eq("id", 1);
+          if (error) return alert("Couldn't save: " + error.message);
+          if (data[k] && data[k] !== value) removeMedia(data[k]);
+          toast(value ? "✓ Logo saved" : "Logo back to default");
+          loadSiteSettings();
+        };
+        f.onsubmit = async e => {
+          e.preventDefault();
+          const btn = f.querySelector("[type=submit]"); btn.disabled = true;
+          try { save(await uploadMedia(file, "site", { max: 512, png: true })); }
+          catch (x) { btn.disabled = false; alert("Couldn't upload: " + x.message); }
+        };
+        const reset = f.querySelector("[data-reset]");
+        if (reset) reset.onclick = () => { if (confirm("Go back to the original logo?")) save(null); };
       });
     }
 

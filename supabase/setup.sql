@@ -612,3 +612,18 @@ create policy "editors add media" on storage.objects for insert to authenticated
 drop policy if exists "editors remove media" on storage.objects;
 create policy "editors remove media" on storage.objects for delete to authenticated
   using (bucket_id = 'media' and (public.has_perm('news') or public.has_perm('gallery') or public.has_perm('sponsors')));
+
+
+-- 12. Site settings: the website's logos (organiser portal → Site Settings) ---------------------
+alter table public.settings add column if not exists site_logo text check (char_length(site_logo) <= 500);
+alter table public.settings add column if not exists club_logo text check (char_length(club_logo) <= 500);
+drop policy if exists "site editors update settings" on public.settings;
+create policy "site editors update settings" on public.settings for update to authenticated
+  using (public.has_perm('settings')) with check (public.has_perm('settings'));
+update public.roles set perms = array_append(perms, 'settings') where name = 'Super Admin' and not ('settings' = any (perms));
+drop policy if exists "editors add media" on storage.objects;
+create policy "editors add media" on storage.objects for insert to authenticated
+  with check (bucket_id = 'media' and (public.has_perm('news') or public.has_perm('gallery') or public.has_perm('sponsors') or public.has_perm('settings')));
+drop policy if exists "editors remove media" on storage.objects;
+create policy "editors remove media" on storage.objects for delete to authenticated
+  using (bucket_id = 'media' and (public.has_perm('news') or public.has_perm('gallery') or public.has_perm('sponsors') or public.has_perm('settings')));
