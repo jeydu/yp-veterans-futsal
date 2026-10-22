@@ -739,24 +739,39 @@
       .rl-grid, .sp-grid { grid-template-columns: 1fr; }
     }
 
-    /* Add many matches: a wide panel with one row per match */
-    .sheet.wide { width: min(1100px, 100%); }
-    .bk-head, .bk-row { display: grid; grid-template-columns: 58px 58px 150px 105px minmax(0, 1fr) minmax(0, 1fr) 120px 36px; gap: 6px; align-items: center; }
-    .bk-head { padding: 14px 0 6px; font-size: .7rem; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); }
-    .bk-rows { display: grid; gap: 6px; margin-bottom: 12px; }
-    .bk-row input, .bk-row select { width: 100%; padding: 8px 9px !important; font-size: .88rem !important; }
-    .bk-row label { gap: 0 !important; }
-    .bk-row label > span { display: none; }
-    .bk-row.bad { outline: 2px solid var(--brand); outline-offset: 2px; border-radius: 8px; }
-    /* Phones: each match is a small card with labelled boxes */
+    /* Add many matches: set the day, tap two teams per match, check the list */
+    .ez-step { display: flex; align-items: center; gap: 10px; margin: 18px 0 10px; font-weight: 700; font-size: .95rem; }
+    .ez-step b { display: grid; place-items: center; width: 26px; height: 26px; border-radius: 50%; background: var(--brand); color: #fff; font-size: .8rem; }
+    .ez-day { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; }
+    .ez-teams { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 8px; }
+    .ez-team { display: flex; align-items: center; gap: 9px; min-width: 0; padding: 9px 10px; border: 2px solid var(--border); border-radius: 12px; background: var(--surface); text-align: start; transition: border-color .15s ease, background .15s ease; }
+    .ez-team span { font: 600 .85rem "Oswald", sans-serif; text-transform: uppercase; letter-spacing: .02em; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .ez-team .tl { width: 30px; height: 30px; }
+    .ez-team:hover { border-color: var(--brand); }
+    .ez-team.on { border-color: var(--brand); background: var(--brand); color: #fff; }
+    .ez-team.used:not(.on) { opacity: .5; }
+    .ez-other { border-style: dashed; color: var(--muted); justify-content: center; }
+    .ez-list { display: grid; gap: 6px; }
+    .ez-none { padding: 14px; border: 1px dashed var(--border); border-radius: 12px; text-align: center; }
+    .ez-m { display: grid; grid-template-columns: 56px minmax(0, 1fr) auto; align-items: center; gap: 10px; padding: 8px 10px; border-radius: 12px; background: var(--surface-2); border: 1px solid var(--border); }
+    .ez-time { font: 700 1.05rem "Oswald", sans-serif; color: var(--brand-text); }
+    .ez-vs { display: grid; grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr); align-items: center; gap: 8px; font: 600 .85rem "Oswald", sans-serif; text-transform: uppercase; }
+    .ez-vs > span { display: flex; align-items: center; gap: 6px; min-width: 0; overflow: hidden; white-space: nowrap; }
+    .ez-vs > span:last-child { justify-content: flex-end; }
+    .ez-vs .tl { width: 24px; height: 24px; }
+    .ez-vs em { font-style: normal; color: var(--muted); }
+    .ez-tools { display: flex; gap: 4px; }
+    .ez-tools .icon-btn { width: 32px; height: 32px; font-size: .9rem; }
+    .ez-tools [data-up] .ic { transform: rotate(180deg); }
     @media (max-width: 860px) {
-      .bk-head { display: none; }
-      .bk-row { grid-template-columns: 1fr 1fr 40px; grid-template-areas: "d n x" "dt t t" "h h h" "a a a" "s s s";
-        gap: 8px; padding: 12px; border: 1px solid var(--border); border-radius: 12px; background: var(--surface-2); }
-      .bk-row label { gap: 4px !important; }
-      .bk-row label > span { display: block; font-size: .72rem; }
-      .c-d { grid-area: d; } .c-n { grid-area: n; } .c-dt { grid-area: dt; } .c-t { grid-area: t; }
-      .c-h { grid-area: h; } .c-a { grid-area: a; } .c-s { grid-area: s; } .c-x { grid-area: x; align-self: end; }
+      .ez-day { grid-template-columns: 1fr 1fr; }
+      .ez-day label:first-child { grid-column: 1 / -1; }
+      .ez-teams { grid-template-columns: 1fr 1fr; }
+      .ez-m { grid-template-columns: 48px minmax(0, 1fr); }
+      .ez-tools { grid-column: 1 / -1; justify-content: flex-end; }
+      /* Phones: the ✕ at the top closes; the two save buttons share the bottom bar */
+      .ez-cancel, .ez-cancel + .sp { display: none; }
+      #bk-next, #bk-save { flex: 1; padding-left: 8px; padding-right: 8px; }
     }
     @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important; } }
     /* Phones */
@@ -1679,7 +1694,7 @@
 
       document.getElementById("fx-add").disabled = document.getElementById("fx-bulk").disabled = !season;
       document.getElementById("fx-add").onclick = () => editMatch(null);
-      document.getElementById("fx-bulk").onclick = bulkFixtures;
+      document.getElementById("fx-bulk").onclick = () => bulkFixtures();
       document.getElementById("fx-new-season").onclick = newSeason;
       const yearSel = document.getElementById("fx-year");
       if (yearSel) yearSel.onchange = () => { fx.year = Number(yearSel.value); renderFixtures(); };
@@ -1734,93 +1749,126 @@
 
 
     // ---------- Add many matches at once ----------
-    // One row per match. A new row copies the date of the row above and kicks off an hour later.
-    function bulkFixtures() {
+    // Set the day once (date, first kick-off, gap, match day, stage), then tap two teams to make each match.
+    // Kick-off times follow the order of the list. "Save & next day" carries on with the day after.
+    function bulkFixtures(start) {
       const all = fx.matches.filter(x => x.year === fx.year);
-      let nextNo = all.length ? Math.max(0, ...all.map(x => x.no || 0)) + 1 : 1;
-      const lastDay = all.length ? Math.max(...all.map(x => x.day)) : 0;
+      const st = start || {
+        day: all.length ? Math.max(...all.map(x => x.day)) + 1 : 1,
+        no: all.length ? Math.max(0, ...all.map(x => x.no || 0)) + 1 : 1,
+        date: "", first: "20:45", gap: 60, stage: ""
+      };
+      const list = [];      // matches made so far: [home, away]
+      let pick = null;      // the team tapped first (home)
+      const teams = teamNames();
+
       fxDlg.innerHTML = `
         <form class="sheet-in" id="bk-form" novalidate>
-          <div class="sheet-h"><div><h2>Add many matches</h2><p>Season ${fx.year} · fill in the schedule, then save all at once</p></div>
+          <div class="sheet-h"><div><h2>Add many matches</h2><p>Season ${fx.year}</p></div>
             <button type="button" class="icon-btn" id="bk-close" aria-label="Close">${icon("x")}</button></div>
           <div class="sheet-b">
-            <div class="bk-head"><span>Day</span><span>No.</span><span>Date</span><span>Kick-off</span><span>Home</span><span>Away</span><span>Stage</span><span></span></div>
-            <div id="bk-rows" class="bk-rows"></div>
-            <datalist id="bk-teams">${teamNames().map(n => `<option value="${esc(n)}">`).join("")}</datalist>
-            <button type="button" class="btn" id="bk-add">${icon("plus")} Add row</button>
-            <small class="hint">Times are Maldives time. Pick team names from the list so their logos show. Empty rows are skipped.</small>
+            <div class="ez-step"><b>1</b> Set the day</div>
+            <div class="ez-day">
+              <label>Date<input name="date" type="date" value="${st.date}"></label>
+              <label>First kick-off<input name="first" type="time" value="${st.first}"></label>
+              <label>Minutes between<input name="gap" type="number" min="0" max="240" step="5" inputmode="numeric" value="${st.gap}"></label>
+              <label>Match day<input name="day" type="number" min="1" max="60" inputmode="numeric" value="${st.day}"></label>
+              <label>Stage<select name="stage">${STAGES.map(([k, l]) => `<option value="${k}" ${k === st.stage ? "selected" : ""}>${l}</option>`).join("")}</select></label>
+            </div>
+            <div class="ez-step"><b>2</b> <span id="ez-say">Tap the home team</span></div>
+            <div class="ez-teams" id="ez-teams">
+              ${teams.map(n => `<button type="button" class="ez-team" data-team="${esc(n)}">${teamLogo(n)}<span>${esc(n)}</span></button>`).join("")}
+              <button type="button" class="ez-team ez-other" id="ez-other">${icon("plus")}<span>Other team</span></button>
+            </div>
+            <div class="ez-step"><b>3</b> Check the matches</div>
+            <div class="ez-list" id="ez-list"></div>
             <p class="form-error" id="bk-err" role="alert"></p>
           </div>
-          <div class="sheet-f"><span class="hint" id="bk-count"></span><span class="sp"></span>
-            <button type="button" class="btn" id="bk-cancel">Cancel</button>
-            <button type="submit" class="btn primary">${icon("check")} Save all</button></div>
+          <div class="sheet-f">
+            <button type="button" class="btn ez-cancel" id="bk-cancel">Cancel</button><span class="sp"></span>
+            <button type="button" class="btn" id="bk-next" disabled>Save &amp; next day</button>
+            <button type="submit" class="btn primary" id="bk-save" disabled>${icon("check")} Save</button>
+          </div>
         </form>`;
-      fxDlg.classList.add("wide");
-      fxDlg.addEventListener("close", () => fxDlg.classList.remove("wide"), { once: true });
-      const rows = document.getElementById("bk-rows");
-      const count = () => {
-        const n = [...rows.children].filter(r => r.querySelector(".bk-h").value.trim() || r.querySelector(".bk-a").value.trim()).length;
-        document.getElementById("bk-count").textContent = n + (n === 1 ? " match" : " matches");
-      };
-      const addRow = () => {
-        const prev = rows.lastElementChild;
-        let day = lastDay + 1, date = "", time = "20:45";
-        if (prev) {
-          day = prev.querySelector(".bk-d").value;
-          date = prev.querySelector(".bk-dt").value;
-          const t = prev.querySelector(".bk-t").value;
-          if (t) { const [hh, mm] = t.split(":").map(Number); time = String((hh + 1) % 24).padStart(2, "0") + ":" + String(mm).padStart(2, "0"); }
-        }
-        const el = document.createElement("div");
-        el.className = "bk-row";
-        el.innerHTML = `
-          <label class="c-d"><span>Day</span><input class="bk-d" type="number" min="1" max="60" inputmode="numeric" value="${day}"></label>
-          <label class="c-n"><span>No.</span><input class="bk-n" type="number" min="1" max="200" inputmode="numeric" value="${nextNo++}"></label>
-          <label class="c-dt"><span>Date</span><input class="bk-dt" type="date" value="${date}"></label>
-          <label class="c-t"><span>Kick-off</span><input class="bk-t" type="time" value="${time}"></label>
-          <label class="c-h"><span>Home</span><input class="bk-h" list="bk-teams" placeholder="Home team" maxlength="60"></label>
-          <label class="c-a"><span>Away</span><input class="bk-a" list="bk-teams" placeholder="Away team" maxlength="60"></label>
-          <label class="c-s"><span>Stage</span><select class="bk-s">${STAGES.map(([k, l]) => `<option value="${k}">${l}</option>`).join("")}</select></label>
-          <button type="button" class="icon-btn c-x" aria-label="Remove row">${icon("x")}</button>`;
-        el.querySelector(".c-x").onclick = () => { el.remove(); count(); };
-        el.querySelectorAll("input").forEach(x => x.addEventListener("input", count));
-        rows.appendChild(el);
-        count();
-        return el;
-      };
-      for (let i = 0; i < 3; i++) addRow();
-      document.getElementById("bk-add").onclick = () => addRow().querySelector(".bk-h").focus();
-      document.getElementById("bk-close").onclick = document.getElementById("bk-cancel").onclick = () => fxDlg.close();
       const f = document.getElementById("bk-form");
-      f.onsubmit = async e => {
-        e.preventDefault();
-        const err = document.getElementById("bk-err");
-        rows.querySelectorAll(".bad").forEach(x => x.classList.remove("bad"));
-        const out = [];
-        let problem = "";
-        [...rows.children].forEach((r, i) => {
-          const home = r.querySelector(".bk-h").value.trim(), away = r.querySelector(".bk-a").value.trim();
-          if (!home && !away) return;
-          const day = Number(r.querySelector(".bk-d").value), no = r.querySelector(".bk-n").value;
-          const date = r.querySelector(".bk-dt").value, time = r.querySelector(".bk-t").value;
-          const bad = !home || !away ? "Row " + (i + 1) + " needs both teams." : home === away ? "Row " + (i + 1) + ": a team can't play itself."
-            : !day ? "Row " + (i + 1) + " needs a match day." : "";
-          if (bad) { problem = problem || bad; r.classList.add("bad"); return; }
-          out.push({ year: fx.year, day, no: no === "" ? null : Number(no), home, away, stage: r.querySelector(".bk-s").value || null,
-                     kickoff: date ? fromMvInput(date + "T" + (time || "00:00")) : null, goals: [] });
-        });
-        if (problem) { err.textContent = problem; return; }
-        if (!out.length) { err.textContent = "Fill in at least one match."; return; }
-        const btn = f.querySelector("[type=submit]"); btn.disabled = true;
-        const { error } = await db.from("matches").insert(out);
-        btn.disabled = false;
-        if (error) { err.textContent = "Couldn't save: " + error.message; return; }
-        fxDlg.close();
-        fx.tab = "fixtures";
-        toast(`✓ ${out.length} match${out.length === 1 ? "" : "es"} added`);
-        loadFixtures();
+
+      // Kick-off of the n-th match of the day, as "HH:MM"
+      const timeOf = n => {
+        const [h, m] = (f.first.value || "20:45").split(":").map(Number);
+        const t = h * 60 + m + n * (Number(f.gap.value) || 0);
+        return String(Math.floor(t / 60) % 24).padStart(2, "0") + ":" + String(t % 60).padStart(2, "0");
       };
-      fxDlg.showModal();
+      const draw = () => {
+        document.getElementById("ez-say").textContent = pick ? `Now tap the team playing ${pick}` : "Tap the home team";
+        document.querySelectorAll(".ez-team[data-team]").forEach(b => {
+          b.classList.toggle("on", b.dataset.team === pick);
+          b.classList.toggle("used", list.some(([h, a]) => h === b.dataset.team || a === b.dataset.team));
+        });
+        document.getElementById("ez-list").innerHTML = list.length ? list.map(([h, a], i) => `
+          <div class="ez-m">
+            <span class="ez-time">${timeOf(i)}</span>
+            <span class="ez-vs"><span>${teamLogo(h)}${esc(h)}</span><em>v</em><span>${teamLogo(a)}${esc(a)}</span></span>
+            <span class="ez-tools">
+              ${i ? `<button type="button" class="icon-btn" data-up="${i}" aria-label="Move earlier">${icon("chev")}</button>` : ""}
+              <button type="button" class="icon-btn" data-swap="${i}" aria-label="Swap home and away">⇄</button>
+              <button type="button" class="icon-btn" data-del="${i}" aria-label="Remove match">${icon("x")}</button>
+            </span>
+          </div>`).join("") : `<p class="hint ez-none">No matches yet. Tap two teams above.</p>`;
+        document.getElementById("bk-save").disabled = document.getElementById("bk-next").disabled = !list.length;
+        document.getElementById("bk-save").innerHTML = `${icon("check")} Save ${list.length || ""} match${list.length === 1 ? "" : "es"}`;
+      };
+      const choose = name => {
+        if (!pick) { pick = name; }
+        else if (pick === name) { pick = null; }
+        else { list.push([pick, name]); pick = null; }
+        draw();
+      };
+      document.getElementById("ez-teams").onclick = e => {
+        const b = e.target.closest(".ez-team[data-team]");
+        if (b) choose(b.dataset.team);
+      };
+      document.getElementById("ez-other").onclick = () => {
+        const name = (prompt("Team name") || "").trim().slice(0, 60);
+        if (name) choose(name);
+      };
+      document.getElementById("ez-list").onclick = e => {
+        const b = e.target.closest("button");
+        if (!b) return;
+        if (b.dataset.del) list.splice(+b.dataset.del, 1);
+        if (b.dataset.swap) list[+b.dataset.swap].reverse();
+        if (b.dataset.up) { const i = +b.dataset.up; [list[i - 1], list[i]] = [list[i], list[i - 1]]; }
+        draw();
+      };
+      ["first", "gap"].forEach(k => f[k].addEventListener("input", draw));
+      document.getElementById("bk-close").onclick = document.getElementById("bk-cancel").onclick = () => fxDlg.close();
+
+      const save = async next => {
+        const err = document.getElementById("bk-err");
+        const day = Number(f.day.value);
+        if (!day) { err.textContent = "Enter the match day."; return; }
+        if (!f.date.value && !confirm("No date set. Save these matches without a date and time?")) return;
+        let no = st.no;
+        const rows = list.map(([home, away], i) => ({
+          year: fx.year, day, no: no++, home, away, stage: f.stage.value || null, goals: [],
+          kickoff: f.date.value ? fromMvInput(f.date.value + "T" + timeOf(i)) : null
+        }));
+        document.querySelectorAll("#bk-next, #bk-save").forEach(b => b.disabled = true);
+        const { error } = await db.from("matches").insert(rows);
+        if (error) { err.textContent = "Couldn't save: " + error.message; draw(); return; }
+        toast(`✓ ${rows.length} match${rows.length === 1 ? "" : "es"} added`);
+        fx.tab = "fixtures";
+        await loadFixtures();
+        if (next) {
+          // Same settings, the next date and match day
+          let d = "";
+          if (f.date.value) { const x = new Date(f.date.value + "T00:00:00Z"); x.setUTCDate(x.getUTCDate() + 1); d = x.toISOString().slice(0, 10); }
+          bulkFixtures({ day: day + 1, no, date: d, first: f.first.value, gap: Number(f.gap.value) || 0, stage: f.stage.value });
+        } else fxDlg.close();
+      };
+      f.onsubmit = e => { e.preventDefault(); save(false); };
+      document.getElementById("bk-next").onclick = () => save(true);
+      draw();
+      if (!fxDlg.open) fxDlg.showModal();
     }
 
     // ---------- Match editor ----------
