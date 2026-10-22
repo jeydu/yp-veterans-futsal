@@ -3,6 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light only">
   <title>YP Veterans Futsal</title>
   <meta name="description" content="YP Veterans Futsal Tournament, organised by Young Players SC.">
   <!-- Site icon: shown by Google next to search results and in browser tabs (sizes are multiples of 48px) -->
@@ -47,23 +48,7 @@
       --ok-text: #16794a;
       color-scheme: light;
     }
-    /* Dark mode: follows the device setting */
-    @media (prefers-color-scheme: dark) {
-      :root {
-        --bg: #0e0909;
-        --surface: #191112;
-        --text: #f4ecec;
-        --muted: #b3a3a4;
-        --ink: #070404;
-        --border: #33262a;
-        --brand-text: #ff5a70;
-        --tint: #33171c;
-        --tint-strong: #241215;
-        --off: #554347;
-        --ok-text: #3fbf75;
-        color-scheme: dark;
-      }
-    }
+    /* Always the light (white) theme, whatever the device's dark-mode setting */
     body { transition: background-color .3s ease, color .3s ease; }
 
     /* Faruma, shipped with the site (fonts/Faruma.ttf) so every visitor sees it */

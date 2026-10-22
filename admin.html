@@ -3,6 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="color-scheme" content="light only">
   <!-- Installable as the "YP Organiser" app -->
   <link rel="manifest" href="admin.webmanifest">
   <meta name="theme-color" content="#8a0b1f">
@@ -40,25 +41,7 @@
       --shadow: 0 1px 2px rgba(60, 10, 20, .04), 0 6px 20px rgba(60, 10, 20, .06);
       color-scheme: light;
     }
-    @media (prefers-color-scheme: dark) {
-      :root {
-        --bg: #110a0b;
-        --surface: #1c1214;
-        --surface-2: #231719;
-        --text: #f3e8e9;
-        --muted: #b7a2a5;
-        --border: #362427;
-        --brand-text: #ff6b80;
-        --tint: #3a1a20;
-        --green: #4fd68b;
-        --green-bg: rgba(79, 214, 139, .12);
-        --amber: #f0b44c;
-        --amber-bg: rgba(240, 180, 76, .13);
-        --red-bg: rgba(255, 107, 128, .13);
-        --shadow: 0 1px 2px rgba(0, 0, 0, .3), 0 6px 20px rgba(0, 0, 0, .25);
-        color-scheme: dark;
-      }
-    }
+    /* Always the light (white) theme, whatever the device's dark-mode setting */
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body { font-family: "Inter", system-ui, sans-serif; background: var(--bg); color: var(--text); line-height: 1.5; }
     h1, h2, h3 { font-family: "Oswald", sans-serif; text-transform: uppercase; letter-spacing: .02em; line-height: 1.15; }
