@@ -460,11 +460,20 @@
     }
     .toast.show { transform: translate(-50%, 0); opacity: 1; }
 
-    #photo { border: 0; border-radius: 14px; padding: 0; max-width: min(900px, calc(100vw - 32px)); background: #111; color: #fff; overflow: hidden; }
-    #photo::backdrop { background: rgba(0,0,0,.82); }
-    #photo img { display: block; max-width: 100%; max-height: 80vh; margin: 0 auto; }
-    #photo p { padding: 10px 16px; font-size: .9rem; text-align: center; }
-    #photo button { position: absolute; top: 8px; right: 8px; width: 36px; height: 36px; border-radius: 50%; border: 0; background: rgba(0,0,0,.6); color: #fff; font-size: 1.4rem; }
+    /* Full-screen photo viewer with previous / next */
+    .pv { width: 100%; height: 100dvh; max-width: none; max-height: none; margin: 0; padding: 0; border: 0; background: rgba(8, 4, 5, .96); color: #fff; }
+    .pv[open] { display: flex; flex-direction: column; }
+    .pv::backdrop { background: transparent; }
+    .pv-top { display: flex; align-items: center; gap: 12px; padding: calc(12px + env(safe-area-inset-top)) 16px 12px; }
+    .pv-label { flex: 1; min-width: 0; font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .pv-count { font-size: .82rem; color: #c9b9bb; }
+    .pv-btn { display: grid; place-items: center; width: 44px; height: 44px; flex-shrink: 0; border: 0; border-radius: 50%; background: rgba(255,255,255,.12); color: #fff; font-size: 1.8rem; line-height: 1; cursor: pointer; }
+    .pv-btn:hover { background: rgba(255,255,255,.24); }
+    .pv-stage { position: relative; flex: 1; min-height: 0; display: flex; align-items: center; justify-content: center; padding: 0 70px 20px; touch-action: pan-y; }
+    .pv-stage img { max-width: 100%; max-height: 100%; object-fit: contain; border-radius: 6px; user-select: none; }
+    .pv-nav { position: absolute; top: 50%; transform: translateY(-50%); width: 52px; height: 52px; font-size: 2.2rem; }
+    #pv-prev { left: 12px; } #pv-next { right: 12px; }
+    @media (max-width: 640px) { .pv-stage { padding: 0 6px 16px; } .pv-nav { width: 42px; height: 42px; background: rgba(0,0,0,.5); } #pv-prev { left: 6px; } #pv-next { right: 6px; } }
 
 
     /* ---------- Fixtures & Results ---------- */
@@ -812,6 +821,47 @@
       .rg-status { flex-wrap: wrap; }
       .ph-act .btn { flex: 1 1 auto; }
     }
+
+    /* People: passport photo and ID card side by side */
+    .pp-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 10px; }
+    .pp { padding: 10px; border: 1px solid var(--border); border-radius: 14px; background: var(--surface); }
+    .pp.bad { border-color: var(--brand-text); }
+    .pp.missing { border-style: dashed; color: var(--muted); }
+    .pp-h { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; min-width: 0; }
+    .pp-h > div { min-width: 0; }
+    .pp-no { display: grid; place-items: center; min-width: 34px; height: 34px; padding: 0 6px; border-radius: 10px; background: var(--brand); color: #fff; font: 700 1rem "Oswald", sans-serif; flex-shrink: 0; }
+    .pp.missing .pp-no { background: var(--border); color: var(--muted); }
+    .pp-h b { display: block; font-weight: 600; font-size: .92rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .pp-h small { display: block; font-size: .76rem; color: var(--muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .pp-h .age.bad { color: var(--brand-text); font-weight: 700; }
+    .pp-pics { display: grid; grid-template-columns: 1fr 1.4fr; gap: 6px; }
+    .pp-ph { position: relative; display: grid; place-items: center; padding: 0; border: 1px solid var(--border); border-radius: 10px; overflow: hidden; background: var(--surface-2); color: var(--muted); cursor: zoom-in; }
+    .pp-ph.port { aspect-ratio: 3 / 4; }
+    .pp-ph.id { aspect-ratio: auto; min-height: 100%; }
+    .pp-ph img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0; transition: opacity .2s ease; }
+    .pp-ph.ready img { opacity: 1; }
+    .pp-ph .ic { font-size: 1.4rem; }
+    .pp-ph span { position: absolute; left: 0; right: 0; bottom: 0; padding: 14px 6px 5px; font-size: .68rem; font-weight: 600; color: #fff; background: linear-gradient(to top, rgba(0,0,0,.7), transparent); }
+    .pp-ph:not(.ready) span { color: var(--muted); background: none; }
+    .pp-ph:disabled { cursor: default; border-style: dashed; color: var(--brand-text); }
+    .pp-ph:disabled span { color: var(--brand-text); }
+    .pp-ph:hover.ready { border-color: var(--brand); }
+    .rg-view { margin-inline-start: auto; }
+    .rg-view .seg-b { display: inline-flex; align-items: center; gap: 6px; }
+    .pp-all { display: grid; gap: 14px; }
+    .pp-team { padding: 16px; }
+    .pp-team-h { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; flex-wrap: wrap; }
+    .pp-team-h > div { flex: 1; min-width: 150px; }
+    .pp-team-h b { font: 700 1.1rem "Oswald", sans-serif; text-transform: uppercase; }
+    .pp-team-h small { display: block; font-size: .78rem; color: var(--muted); }
+    .pp-grid > *, .pp-team, .pp-all { min-width: 0; }
+    @media (max-width: 640px) {
+      .pp-grid { grid-template-columns: 1fr; }
+      .pp-pics { grid-template-columns: 1fr 1.4fr; }
+      .pp-ph.port, .pp-ph.id { max-height: 150px; }
+      .pp-team { padding: 12px; }
+      .rg-view { flex: 1 1 100%; } .rg-view .seg-b { flex: 1; justify-content: center; }
+    }
     @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important; } }
     /* Phones */
     @media (max-width: 640px) {
@@ -923,15 +973,22 @@
     <p class="notice">Loading…</p>
   </main>
 
-  <dialog id="photo"><img alt="Photo"><p></p><button aria-label="Close">&times;</button></dialog>
+  <!-- Photo viewer: flick through a team's (or everyone's) passport photos and ID cards -->
+  <dialog id="photo" class="pv">
+    <div class="pv-top"><span class="pv-label" id="pv-label"></span><span class="pv-count" id="pv-count"></span>
+      <button type="button" class="pv-btn" id="pv-close" aria-label="Close">&times;</button></div>
+    <div class="pv-stage">
+      <button type="button" class="pv-btn pv-nav" id="pv-prev" aria-label="Previous photo">&#8249;</button>
+      <img id="pv-img" alt="">
+      <button type="button" class="pv-btn pv-nav" id="pv-next" aria-label="Next photo">&#8250;</button>
+    </div>
+  </dialog>
 
   <script type="module">
     const CONFIG = window.YP_CONFIG || {};
     const app = document.getElementById("app");
     const who = document.getElementById("who");
     const photoDlg = document.getElementById("photo");
-    photoDlg.querySelector("button").onclick = () => photoDlg.close();
-    photoDlg.onclick = e => { if (e.target === photoDlg) photoDlg.close(); };
 
     const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
     const icon = name => `<svg class="ic" aria-hidden="true"><use href="#i-${name}"/></svg>`;
@@ -996,6 +1053,7 @@
       return d > 0 ? `${d} day${d === 1 ? "" : "s"} ${h} h` : h > 0 ? `${h} h ${m} min` : `${m} min`;
     };
     let filter = "all";
+    let regView = "teams";   // "teams" = list of teams, "people" = everyone's photos on one page
     let sortBy = "newest";
     const openIds = new Set();   // teams the organiser has expanded; kept open across refreshes
     let lastSignature = "";
@@ -1262,6 +1320,10 @@
               ${["all", "pending", "confirmed", "rejected", "issues"].map(f =>
                 `<button class="tab ${filter === f ? "active" : ""}" data-filter="${f}">${tabNames[f]} <em>${counts[f]}</em></button>`).join("")}
             </div>
+            <div class="seg rg-view" role="tablist" aria-label="View">
+              <button class="seg-b ${regView === "teams" ? "on" : ""}" data-view="teams">${icon("team")} Teams</button>
+              <button class="seg-b ${regView === "people" ? "on" : ""}" data-view="people">${icon("users")} All players</button>
+            </div>
           </div>
           <div class="tb-row">
             <div class="search-box">${icon("search")}<input class="search" id="search" type="search" placeholder="Search team, player, manager, island or phone" value="${esc(query)}"></div>
@@ -1271,11 +1333,22 @@
             </select>
           </div>
         </div>
-        ${shown.length ? `
-        <div class="card tm-table">
+        ${!shown.length ? `<div class="teams">${emptyState(counts.all, open)}</div>`
+          : regView === "people" ? `<div class="pp-all">${shown.map(t => `
+            <section class="card pp-team">
+              <div class="pp-team-h"><span class="avatar sm" style="--h:${hue(t.team_name)}">${esc(initials(t.team_name))}</span>
+                <div><b>${esc(t.team_name)}</b><small>${esc(t.island)} · ${t.players.length} players · ${t.officials.length} officials</small></div>
+                <span class="pill ${t.status}">${statusLabel(t.status)}</span>
+                <button class="btn" data-review="${t.id}">${icon("eye")} Review</button></div>
+              <div class="pp-grid">${[...t.officials, ...t.players].map(x => personCard(x, t.team_name)).join("")}</div>
+            </section>`).join("")}</div>`
+          : `<div class="card tm-table">
           <div class="rg-row tm-hd"><span>Team</span><span>Manager</span><span>Players</span><span>Checks</span><span>Status</span><span></span></div>
           ${shown.map(teamRow).join("")}
-        </div>` : `<div class="teams">${emptyState(counts.all, open)}</div>`}`;
+        </div>`}`;
+      app.querySelectorAll("[data-view]").forEach(b => b.onclick = () => { regView = b.dataset.view; render(); });
+      const all = app.querySelector(".pp-all");
+      if (all) loadPhotos(all);
 
       app.querySelectorAll("[data-filter]").forEach(b => b.onclick = () => { filter = filter === b.dataset.filter && b.classList.contains("rg-tile") ? "all" : b.dataset.filter; render(); });
       const search = document.getElementById("search");
@@ -1313,6 +1386,21 @@
     }
 
     // ---------- Review a team (panel from the right) ----------
+    // One card per person: number or role, name, age, then passport photo and ID card side by side
+    function personCard(x, team) {
+      const isPlayer = x.position !== undefined;
+      const r = isPlayer ? null : roleInfo(x.role);
+      const who = (isPlayer ? "No. " + (x.jersey_number ?? "–") : r.label) + " · " + x.name + (team ? " · " + team : "");
+      const pic = (path, kind, label) => `<button type="button" class="pp-ph ${kind}" ${path ? `data-path="${esc(path)}" data-label="${esc(who + " · " + label)}"` : "disabled"}>
+          <img alt="">${icon(kind === "id" ? "idcard" : "portrait")}<span>${path ? label : "Missing"}</span></button>`;
+      return `
+        <div class="pp ${isPlayer && x.age < MIN_AGE ? "bad" : ""}">
+          <div class="pp-h"><span class="pp-no">${isPlayer ? (x.jersey_number ?? "–") : icon(r.icon)}</span>
+            <div><b>${esc(x.name)}</b><small>${isPlayer ? `<span class="${x.age < MIN_AGE ? "age bad" : ""}">Age ${x.age}</span>` : esc(r.label)}${team ? " · " + esc(team) : ""}${!isPlayer && x.phone ? " · " + esc(x.phone) : ""}</small></div></div>
+          <div class="pp-pics">${pic(x.passport_photo_path, "port", "Passport-size photo")}${pic(x.id_photo_path, "id", "ID card")}</div>
+        </div>`;
+    }
+
     const photoTag = (path, cls, alt, label) => path
       ? `<img class="thumb ${cls}" data-path="${esc(path)}" data-label="${esc(label)}" alt="${esc(alt)}">`
       : `<span class="thumb ${cls}" title="Missing"></span>`;
@@ -1346,24 +1434,13 @@
             <h4 class="sub-h">Checks</h4>
             <div class="checks">${c.list.map(k => `<div class="check ${k.ok ? "" : "bad"}">${icon(k.ok ? "check-circle" : "alert")}<div><b>${esc(k.title)}</b><span>${esc(k.detail)}</span></div></div>`).join("")}</div>
             <h4 class="sub-h">Officials · ${t.officials.length}</h4>
-            <div class="officials">
-              ${t.officials.map(o => { const r = roleInfo(o.role); return `
-                <div class="official"><div><small>${icon(r.icon)} ${esc(r.label)}</small><b>${esc(o.name)}</b>${o.phone ? `<a href="tel:${esc(o.phone)}">${esc(o.phone)}</a>` : ""}</div>
-                  <span class="pics">${photoTag(o.passport_photo_path, "", "Passport-size photo of " + o.name, r.label + " · " + o.name + " · passport-size photo")}${photoTag(o.id_photo_path, "wide", "ID card of " + o.name, r.label + " · " + o.name + " · ID card")}</span></div>`; }).join("")}
+            <div class="pp-grid">
+              ${t.officials.map(o => personCard(o)).join("")}
               ${ROLES.filter(r => !t.officials.some(o => o.role === r.role || (r.role === "official" && o.role === "assistant"))).map(r => `
-                <div class="official missing"><div><small>${icon(r.icon)} ${r.label}</small><b>Not given</b></div></div>`).join("")}
+                <div class="pp missing"><div class="pp-h"><span class="pp-no">${icon(r.icon)}</span><div><b>${r.label}</b><small>Not given</small></div></div></div>`).join("")}
             </div>
             <h4 class="sub-h">Players · ${t.players.length}</h4>
-            <div class="players">
-              ${t.players.map(p => `
-                <div class="player ${p.age < MIN_AGE ? "bad" : ""}">
-                  <div class="portrait-box"><span class="jersey">${p.jersey_number ?? "–"}</span>${icon("portrait")}
-                    ${p.passport_photo_path ? `<img class="thumb-fill" data-path="${esc(p.passport_photo_path)}" data-label="${esc("No. " + (p.jersey_number ?? "–") + " · " + p.name + " · passport-size photo")}" alt="Passport-size photo of ${esc(p.name)}">` : ""}</div>
-                  <div class="player-info"><b>${esc(p.name)}</b>
-                    <div class="player-row"><span class="age ${p.age < MIN_AGE ? "bad" : ""}">Age ${p.age}</span>
-                      <button class="id-btn" data-path="${esc(p.id_photo_path || "")}" data-label="${esc("No. " + (p.jersey_number ?? "–") + " · " + p.name + " · ID card")}" ${p.id_photo_path ? "" : "disabled"}>${icon("idcard")} ID</button></div></div>
-                </div>`).join("")}
-            </div>
+            <div class="pp-grid">${t.players.map(x => personCard(x)).join("")}</div>
           </div>
           <div class="sheet-f">
             <button type="button" class="btn danger" id="rg-del">${icon("trash")} Delete</button><span class="sp"></span>
@@ -1462,23 +1539,45 @@
     // Every stored photo of a team (passport and ID, officials and players)
     const teamPaths = t => [...t.officials, ...t.players].flatMap(p => [p.passport_photo_path, p.id_photo_path]).filter(Boolean);
 
-    function showPhoto(url, label) {
-      photoDlg.querySelector("img").src = url;
-      photoDlg.querySelector("p").textContent = label || "";
-      photoDlg.showModal();
+    // ---------- Photo viewer: ‹ › arrows, keyboard arrows or swipe ----------
+    let pvItems = [], pvAt = 0;
+    function showPv(i) {
+      pvAt = (i + pvItems.length) % pvItems.length;
+      document.getElementById("pv-img").src = pvItems[pvAt].url;
+      document.getElementById("pv-label").textContent = pvItems[pvAt].label;
+      document.getElementById("pv-count").textContent = (pvAt + 1) + " / " + pvItems.length;
+      document.querySelectorAll(".pv-nav").forEach(b => b.hidden = pvItems.length < 2);
     }
+    function openViewer(items, i) { pvItems = items; showPv(i); if (!photoDlg.open) photoDlg.showModal(); }
+    document.getElementById("pv-close").onclick = () => photoDlg.close();
+    document.getElementById("pv-prev").onclick = () => showPv(pvAt - 1);
+    document.getElementById("pv-next").onclick = () => showPv(pvAt + 1);
+    photoDlg.addEventListener("keydown", e => { if (e.key === "ArrowLeft") showPv(pvAt - 1); if (e.key === "ArrowRight") showPv(pvAt + 1); });
+    let pvX = null;
+    photoDlg.addEventListener("touchstart", e => pvX = e.touches[0].clientX, { passive: true });
+    photoDlg.addEventListener("touchend", e => {
+      if (pvX === null) return;
+      const dx = e.changedTouches[0].clientX - pvX; pvX = null;
+      if (Math.abs(dx) > 50) showPv(pvAt + (dx < 0 ? 1 : -1));
+    });
 
-    async function loadPhotos(card) {
-      if (card.dataset.loaded) return;
-      card.dataset.loaded = "1";
-      const els = [...card.querySelectorAll("[data-path]")].filter(el => el.dataset.path);
+    // Private photo links (valid for an hour), kept so a photo isn't fetched twice
+    const signed = new Map();
+    // Show every photo inside `box`, and open the viewer on tap (flicking through all of them in order)
+    async function loadPhotos(box) {
+      const els = [...box.querySelectorAll("[data-path]")].filter(el => el.dataset.path);
       if (!els.length) return;
-      const { data } = await db.storage.from("id-cards").createSignedUrls(els.map(el => el.dataset.path), 3600);
-      (data || []).forEach((d, i) => {
-        if (!d.signedUrl) return;
-        const el = els[i];
-        if (el.tagName === "IMG") el.src = d.signedUrl;
-        el.onclick = e => { e.stopPropagation(); showPhoto(d.signedUrl, el.dataset.label); };
+      const need = [...new Set(els.map(el => el.dataset.path).filter(p => !signed.has(p)))];
+      if (need.length) {
+        const { data } = await db.storage.from("id-cards").createSignedUrls(need, 3600);
+        (data || []).forEach((d, i) => { if (d.signedUrl) signed.set(need[i], d.signedUrl); });
+      }
+      const items = els.filter(el => signed.has(el.dataset.path)).map(el => ({ url: signed.get(el.dataset.path), label: el.dataset.label || "", el }));
+      items.forEach((it, i) => {
+        const img = it.el.tagName === "IMG" ? it.el : it.el.querySelector("img");
+        if (img) img.src = it.url;
+        it.el.classList.add("ready");
+        it.el.onclick = e => { e.stopPropagation(); openViewer(items, i); };
       });
     }
 
