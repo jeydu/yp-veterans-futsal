@@ -451,9 +451,11 @@
 
     /* Fixtures: one block per day; each match is a row of time, home v away, stage */
     #fixtures { padding-top: 0; }
-    .fx-list { display: grid; gap: 18px; margin-top: 18px; }
-    .fx-day { background: var(--surface); border: 1px solid var(--border); border-top: 4px solid var(--brand); }
-    .fx-day h3 { padding: 12px 18px; font-size: .95rem; letter-spacing: .06em; background: var(--ink); color: #fff; }
+    /* Always white, like the results popups, whatever the page theme */
+    .fx-list { display: grid; gap: 18px; margin-top: 18px;
+      --surface: #fff; --text: #221516; --muted: #7a6567; --border: #f1dadd; --brand-text: #c8102e; color-scheme: light; }
+    .fx-day { background: #fff; color: var(--text); border: 1px solid var(--border); border-top: 4px solid var(--brand); box-shadow: 0 6px 18px rgba(60, 10, 20, .06); }
+    .fx-day h3 { padding: 14px 18px 10px; font-size: .95rem; letter-spacing: .08em; background: #fff; color: var(--brand); border-bottom: 2px solid var(--border); }
     .fx-m { display: grid; grid-template-columns: 70px minmax(0, 1fr) 120px; align-items: center; gap: 14px; padding: 14px 18px; }
     .fx-m + .fx-m { border-top: 1px solid var(--border); }
     .fx-time { font: 700 1.25rem "Oswald", sans-serif; color: var(--brand-text); font-variant-numeric: tabular-nums; }
