@@ -41,3 +41,16 @@ select * from (values
   (2025, 7, 12, 'Afiyns SC', 'KK Kandumathi', 4, 3, null::int, null::int, 'final', null::text, '[]'::jsonb)
 ) v(year, day, no, home, away, home_score, away_score, pen_home, pen_away, stage, video, goals)
 where not exists (select 1 from public.matches m where m.year = 2025);
+
+-- 2027 TEST fixtures (upcoming, no score yet) so the website's Fixtures section can be tried out.
+-- Edit or delete them in the organiser portal: Fixtures & Results → season 2027.
+insert into public.seasons (year) values (2027) on conflict (year) do nothing;
+insert into public.matches (year, day, no, home, away, kickoff, stage)
+select * from (values
+  (2027, 1, 1, 'RK SC',       'BHC',           '2026-11-05 20:45+05'::timestamptz, null::text),
+  (2027, 1, 2, 'RBG SC',      'Stelco SC',     '2026-11-05 21:45+05'::timestamptz, null::text),
+  (2027, 2, 3, 'FT Nakasole', 'Afiyns SC',     '2026-11-06 20:45+05'::timestamptz, null::text),
+  (2027, 2, 4, 'Old Stars',   'KK Kandumathi', '2026-11-06 21:45+05'::timestamptz, null::text),
+  (2027, 3, 5, 'RBG SC',      'RK SC',         '2026-11-08 21:00+05'::timestamptz, 'final')
+) v(year, day, no, home, away, kickoff, stage)
+where not exists (select 1 from public.matches m where m.year = 2027);
