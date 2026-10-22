@@ -121,6 +121,7 @@
     .nav-item .ic { font-size: 1.1rem; color: #a8999a; transition: color .15s ease; }
     .nav-item:hover { background: rgba(255,255,255,.06); color: #fff; }
     .nav-item.active { background: var(--brand); color: #fff; }
+    .nav-item[hidden], .side-h[hidden] { display: none; }
     .nav-item.active .ic { color: #fff; }
     .side-foot { display: flex; flex-direction: column; gap: 6px; margin-top: auto; padding-top: 14px; border-top: 1px solid rgba(255,255,255,.08); }
     .side-user { padding: 4px 12px 6px; font-size: .78rem; color: #a8999a; line-height: 1.4; overflow-wrap: anywhere; }
@@ -611,6 +612,121 @@
       .tm-hd { display: none; }
       .tm-name { grid-area: name; } .tm-short { display: none; } .tm-mgr { grid-area: mgr; } .tm-pl { grid-area: pl; text-align: end; } .tm-row .fx-act { grid-area: act; }
     }
+
+    /* ---------- Dashboard ---------- */
+    .btn.static { cursor: default; }
+    .btn.static:hover { border-color: var(--border); color: var(--text); }
+    .dash { display: grid; grid-template-columns: 1.4fr 1fr; gap: 14px; }
+    .dash .card { padding: 20px 22px; }
+    .d-live { position: relative; overflow: hidden; color: #fff; border: 0; background: linear-gradient(135deg, #e0213f, #8a0b1f); }
+    .d-live::after { content: ""; position: absolute; right: -40px; top: -40px; width: 180px; height: 180px; border-radius: 50%; background: rgba(255,255,255,.1); }
+    .d-tag { display: inline-flex; align-items: center; gap: 6px; padding: 3px 10px; border-radius: 99px; background: rgba(255,255,255,.18); font-size: .75rem; font-weight: 700; }
+    .d-tag::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: #4ade80; }
+    .d-live small, .d-stat small { display: block; margin-top: 14px; font-size: .8rem; opacity: .85; }
+    .d-live b, .d-stat b { display: block; font: 700 2.8rem/1 "Oswald", sans-serif; margin: 4px 0; }
+    .d-live span:last-child, .d-stat span:last-child { font-size: .78rem; opacity: .85; }
+    .d-stat .d-ic { display: grid; place-items: center; width: 40px; height: 40px; border-radius: 12px; background: var(--tint); color: var(--brand-text); font-size: 1.1rem; }
+    .d-stat small, .d-stat span:last-child { color: var(--muted); opacity: 1; }
+    .d-chart { grid-column: 1 / -1; }
+    .d-h { display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; margin-bottom: 14px; }
+    .d-h h2 { font-size: 1.15rem; }
+    .d-h span { font-size: .8rem; color: var(--muted); }
+    .d-pill { padding: 3px 10px; border-radius: 99px; background: var(--surface-2); border: 1px solid var(--border); font-size: .75rem; font-weight: 600; color: var(--muted); white-space: nowrap; }
+    .bars { display: grid; grid-template-columns: repeat(7, 1fr); gap: 10px; align-items: end; height: 170px; }
+    .bar-c { display: flex; flex-direction: column; align-items: center; justify-content: flex-end; gap: 6px; height: 100%; }
+    .bar-c i { display: block; width: min(44px, 70%); border-radius: 10px 10px 4px 4px; background: rgba(200, 16, 46, .28); transition: height .4s ease; }
+    .bar-c.today i { background: var(--brand); }
+    .bar-c em { font-style: normal; font-size: .75rem; font-weight: 700; color: var(--muted); }
+    .bar-c span { font-size: .75rem; color: var(--muted); }
+    .bar-c.today span { color: var(--brand-text); font-weight: 700; }
+    .d-dev { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 16px; }
+    .d-dev div { padding: 12px; border-radius: 12px; background: var(--surface-2); border: 1px solid var(--border); text-align: center; }
+    .d-dev b { display: block; font: 700 1.5rem/1 "Oswald", sans-serif; }
+    .d-dev span { font-size: .75rem; color: var(--muted); }
+    .d-reg { text-decoration: none; color: inherit; }
+    .d-reg:hover { border-color: var(--brand); }
+    .d-match small { display: block; margin: 10px 0 6px; font-size: .75rem; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); }
+    .dm { display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 8px; font: 600 .9rem "Oswald", sans-serif; text-transform: uppercase; }
+    .dm > span { display: flex; align-items: center; gap: 6px; min-width: 0; }
+    .dm > span:last-child { justify-content: flex-end; }
+    .dm b { padding: 3px 8px; border-radius: 6px; background: #150c0d; color: #fff; }
+    .dm .tl { width: 26px; height: 26px; }
+    @media (max-width: 860px) { .dash { grid-template-columns: 1fr; } .bars { height: 130px; gap: 4px; } }
+
+    /* ---------- News, gallery, sponsors, users, roles ---------- */
+    .nw-row { display: grid; grid-template-columns: minmax(0, 1fr) 120px 110px 140px 90px; align-items: center; gap: 14px; padding: 10px 18px; border-top: 1px solid var(--border); }
+    .nw-row.tm-hd { border-top: 0; }
+    .nw-t { display: flex; align-items: center; gap: 12px; min-width: 0; }
+    .nw-t img, .nw-noimg { width: 56px; height: 40px; flex-shrink: 0; border-radius: 6px; object-fit: cover; }
+    .nw-noimg { display: grid; place-items: center; background: var(--surface-2); color: var(--muted); border: 1px solid var(--border); }
+    .nw-t b { font-weight: 600; font-size: .9rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .chip-t { display: inline-flex; align-items: center; gap: 5px; padding: 6px 11px; border-radius: 8px; border: 1px solid var(--border); background: var(--surface); color: var(--muted); font-size: .8rem; font-weight: 600; }
+    .chip-t.on { background: var(--green-bg); border-color: var(--green); color: var(--green); }
+    .chip-t:disabled { opacity: .5; cursor: not-allowed; }
+    .cover-prev { display: grid; place-items: center; aspect-ratio: 16 / 9; border-radius: 12px; overflow: hidden; background: var(--surface-2); border: 1px dashed var(--border); color: var(--muted); }
+    .cover-prev img { width: 100%; height: 100%; object-fit: cover; }
+    .cover-prev span { display: inline-flex; align-items: center; gap: 8px; }
+    .logo-btns.row { display: flex; gap: 8px; }
+    .sheet textarea { font: inherit; font-size: .92rem; color: var(--text); background: var(--surface-2); border: 1.5px solid var(--border); border-radius: 10px; padding: 10px 12px; resize: vertical; }
+    .sheet textarea:focus { outline: none; border-color: var(--brand); }
+    .seg.left { margin-inline-start: 0; display: inline-flex; margin-bottom: 14px; }
+    .drop { display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 30px 20px; cursor: pointer; text-align: center; border: 2px dashed var(--border); box-shadow: none; color: var(--muted); }
+    .drop .ic { font-size: 1.8rem; color: var(--brand-text); }
+    .drop b { color: var(--text); }
+    .drop.over, .drop:hover { border-color: var(--brand); background: var(--tint); }
+    .ph-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 8px; margin-top: 14px; }
+    .ph-cell { position: relative; aspect-ratio: 1; border-radius: 10px; overflow: hidden; background: var(--surface-2); }
+    .ph-cell img { width: 100%; height: 100%; object-fit: cover; }
+    .ph-cell .icon-btn { position: absolute; top: 6px; right: 6px; background: rgba(0,0,0,.6); border: 0; color: #fff; }
+    .ph-cell .icon-btn:hover { background: var(--brand); color: #fff; }
+    .vid-add { display: grid; grid-template-columns: 1fr 1fr; gap: 0; padding: 0; margin-bottom: 10px; }
+    .vid-col { display: grid; gap: 10px; align-content: start; padding: 18px 20px; }
+    .vid-col + .vid-col { border-inline-start: 1px solid var(--border); }
+    .vid-col h3 { font-size: 1rem; }
+    .vid-col input:not([type=file]), .vd-row input, .sp-card input:not([type=checkbox]):not([type=file]), .sp-card select, .rl-h input {
+      font: inherit; font-size: .9rem; color: var(--text); background: var(--surface-2); border: 1.5px solid var(--border); border-radius: 10px; padding: 9px 12px; min-width: 0; width: 100%; }
+    .vid-col .btn { justify-self: start; }
+    .vid-in { display: flex; align-items: center; gap: 10px; }
+    .vd-row { display: grid; grid-template-columns: 80px minmax(0, 1fr) auto minmax(0, 1fr) auto; align-items: center; gap: 10px; padding: 10px 16px; border-top: 1px solid var(--border); }
+    .vd-row:first-child { border-top: 0; }
+    .vd-row img, .vd-row .nw-noimg { width: 80px; height: 45px; border-radius: 6px; object-fit: cover; }
+    .vd-link { font-size: .8rem; color: var(--brand-text); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .sp-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 14px; }
+    .sp-card { display: grid; gap: 12px; padding: 18px; align-content: start; }
+    .sp-card.new { border: 2px dashed var(--border); box-shadow: none; }
+    .sp-card label { display: flex; flex-direction: column; gap: 5px; font-size: .8rem; font-weight: 600; color: var(--muted); }
+    .sp-card label small { font-weight: 400; }
+    .sp-card .fx-check { flex-direction: row; align-items: center; color: var(--text); font-weight: 500; }
+    .sp-top { display: flex; align-items: center; gap: 14px; }
+    .sp-prev { display: grid; place-items: center; width: 90px; height: 70px; flex-shrink: 0; border-radius: 10px; background: #fff; border: 1px solid var(--border); color: var(--muted); font-size: 1.4rem; overflow: hidden; }
+    .sp-prev img { max-width: 100%; max-height: 100%; object-fit: contain; padding: 4px; }
+    .sp-act { display: flex; align-items: center; gap: 8px; }
+    .sp-act .sp { flex: 1; }
+    .us-row { display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(0, 1.4fr) 160px 90px; align-items: center; gap: 14px; padding: 12px 18px; border-top: 1px solid var(--border); }
+    .us-row.tm-hd { border-top: 0; }
+    .you { padding: 2px 7px; border-radius: 6px; background: var(--tint); color: var(--brand-text); font-size: .7rem; font-weight: 700; }
+    .note { display: flex; gap: 12px; padding: 14px 16px; margin-top: 14px; background: var(--amber-bg); border-color: transparent; box-shadow: none; font-size: .85rem; }
+    .note .ic { color: var(--amber); font-size: 1.2rem; flex-shrink: 0; margin-top: 2px; }
+    .note p { color: var(--text); margin-top: 4px; }
+    .note code { background: rgba(0,0,0,.06); padding: 1px 5px; border-radius: 4px; font-size: .8rem; }
+    .rl-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 14px; }
+    .rl-card { display: grid; gap: 9px; padding: 18px; align-content: start; }
+    .rl-card .fx-check { display: flex; align-items: flex-start; gap: 9px; font-size: .86rem; color: var(--text); }
+    .rl-card .fx-check input { margin-top: 2px; width: 17px; height: 17px; accent-color: var(--brand); flex-shrink: 0; }
+    .rl-h { display: flex; align-items: center; gap: 10px; }
+    .rl-h input { font-weight: 700; }
+    .rl-h input:disabled { background: none; border-color: transparent; padding-left: 0; color: var(--text); }
+    .rl-note { padding: 8px 12px; border-radius: 8px; background: var(--surface-2); font-size: .8rem; color: var(--muted); }
+    @media (max-width: 860px) {
+      .nw-row { grid-template-columns: minmax(0, 1fr) auto; grid-template-areas: "t act" "d st"; }
+      .nw-row.tm-hd { display: none; }
+      .nw-row > :nth-child(1) { grid-area: t; } .nw-row > :nth-child(2) { grid-area: d; } .nw-row > :nth-child(3) { display: none; } .nw-row > :nth-child(4) { grid-area: st; justify-self: end; } .nw-row > :nth-child(5) { grid-area: act; }
+      .vid-add { grid-template-columns: 1fr; } .vid-col + .vid-col { border-inline-start: 0; border-top: 1px solid var(--border); }
+      .vd-row { grid-template-columns: 64px minmax(0, 1fr) auto; } .vd-row img, .vd-row .nw-noimg { width: 64px; height: 36px; } .vd-link { display: none; } .vd-row .danger { grid-column: 1 / -1; justify-self: end; }
+      .us-row { grid-template-columns: minmax(0, 1fr) auto; grid-template-areas: "n act" "l r"; } .us-row.tm-hd { display: none; }
+      .us-row > :nth-child(1) { grid-area: n; } .us-row > :nth-child(2) { grid-area: l; } .us-row > :nth-child(3) { grid-area: r; justify-self: end; } .us-row > :nth-child(4) { grid-area: act; }
+      .rl-grid, .sp-grid { grid-template-columns: 1fr; }
+    }
     @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important; } }
     /* Phones */
     @media (max-width: 640px) {
@@ -673,6 +789,11 @@
     <symbol id="i-calendar" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></symbol>
     <symbol id="i-external" viewBox="0 0 24 24"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6M15 3h6v6M10 14L21 3"/></symbol>
     <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
+    <symbol id="i-grid" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></symbol>
+    <symbol id="i-news" viewBox="0 0 24 24"><path d="M4 22h14a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2H8a2 2 0 0 0-2 2v16a2 2 0 0 1-2 2zm0 0a2 2 0 0 1-2-2v-9h4M10 6h6M10 10h6M10 14h4"/></symbol>
+    <symbol id="i-image" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></symbol>
+    <symbol id="i-star" viewBox="0 0 24 24"><path d="M12 2l3.1 6.3 6.9 1-5 4.9 1.2 6.8L12 17.8 5.8 21l1.2-6.8-5-4.9 6.9-1z"/></symbol>
+    <symbol id="i-camera" viewBox="0 0 24 24"><path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z"/><circle cx="12" cy="13" r="3"/></symbol>
     <symbol id="i-edit" viewBox="0 0 24 24"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/></symbol>
     <symbol id="i-play" viewBox="0 0 24 24"><path d="M6 4l14 8-14 8z"/></symbol>
     <symbol id="i-trophy" viewBox="0 0 24 24"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6M18 9h1.5a2.5 2.5 0 0 0 0-5H18M4 22h16M10 14.7V17c0 .6-.5 1-1 1.2C7.9 18.8 7 20.2 7 22M14 14.7V17c0 .6.5 1 1 1.2 1.1.6 2 2 2 3.8M18 2H6v7a6 6 0 0 0 12 0V2z"/></symbol>
@@ -681,17 +802,24 @@
 
   <!-- Menu: shown once signed in. Each link opens a page (#name in the address) -->
   <aside class="side" id="who" hidden>
-    <a class="side-brand" href="#registrations">
+    <a class="side-brand" href="#dashboard">
       <img src="images/veterans-logo.jpg" alt="">
       <span><b>YP Veterans</b><small>Organiser portal</small></span>
     </a>
     <nav class="side-nav" aria-label="Organiser pages">
-      <span class="side-h">Manage</span>
-      <a class="nav-item" href="#registrations" data-page="registrations"><svg class="ic" aria-hidden="true"><use href="#i-clipboard"/></svg><span>Registrations</span></a>
-      <a class="nav-item" href="#fixtures" data-page="fixtures"><svg class="ic" aria-hidden="true"><use href="#i-calendar"/></svg><span>Fixtures &amp; Results</span></a>
-      <a class="nav-item" href="#teams" data-page="teams"><svg class="ic" aria-hidden="true"><use href="#i-users"/></svg><span>Teams &amp; Players</span></a>
+      <a class="nav-item" href="#dashboard" data-page="dashboard" data-group="top"><svg class="ic" aria-hidden="true"><use href="#i-grid"/></svg><span>Dashboard</span></a>
+      <span class="side-h" data-group="manage">Manage</span>
+      <a class="nav-item" href="#registrations" data-page="registrations" data-group="manage"><svg class="ic" aria-hidden="true"><use href="#i-clipboard"/></svg><span>Registrations</span></a>
+      <a class="nav-item" href="#fixtures" data-page="fixtures" data-group="manage"><svg class="ic" aria-hidden="true"><use href="#i-calendar"/></svg><span>Fixtures &amp; Results</span></a>
+      <a class="nav-item" href="#teams" data-page="teams" data-group="manage"><svg class="ic" aria-hidden="true"><use href="#i-users"/></svg><span>Teams &amp; Players</span></a>
+      <a class="nav-item" href="#news" data-page="news" data-group="manage"><svg class="ic" aria-hidden="true"><use href="#i-news"/></svg><span>News &amp; Slider</span></a>
+      <a class="nav-item" href="#gallery" data-page="gallery" data-group="manage"><svg class="ic" aria-hidden="true"><use href="#i-image"/></svg><span>Gallery</span></a>
+      <a class="nav-item" href="#sponsors" data-page="sponsors" data-group="manage"><svg class="ic" aria-hidden="true"><use href="#i-star"/></svg><span>Sponsors</span></a>
+      <span class="side-h" data-group="admin">Super admin</span>
+      <a class="nav-item" href="#users" data-page="users" data-group="admin"><svg class="ic" aria-hidden="true"><use href="#i-user"/></svg><span>Users</span></a>
+      <a class="nav-item" href="#roles" data-page="roles" data-group="admin"><svg class="ic" aria-hidden="true"><use href="#i-shield"/></svg><span>User Roles</span></a>
       <span class="side-h">Website</span>
-      <a class="nav-item" href="./" target="_blank" rel="noopener"><svg class="ic" aria-hidden="true"><use href="#i-external"/></svg><span>View website</span></a>
+      <a class="nav-item" href="./" target="_blank" rel="noopener" data-group="site"><svg class="ic" aria-hidden="true"><use href="#i-external"/></svg><span>View website</span></a>
     </nav>
     <div class="side-foot">
       <button class="side-btn install-btn" data-install hidden><svg class="ic" aria-hidden="true"><use href="#i-download"/></svg><span>Install app</span></button>
@@ -883,12 +1011,23 @@
       document.getElementById("who-email").textContent = em.endsWith("@phone.ypveterans.com")
         ? "+" + em.slice(0, 3) + " " + em.slice(3, 6) + "-" + em.slice(6, em.indexOf("@")) : em;
 
-      const { data: me } = await db.from("organisers").select("email");
-      if (!me || !me.length) {
+      // The organiser list (with roles once setup.sql section 9 has run; before that everyone listed can do everything)
+      let res = await db.from("organisers").select("email, name, role");
+      if (res.error) res = await db.from("organisers").select("email");
+      const mine = (res.data || []).find(o => o.email.toLowerCase() === em.toLowerCase());
+      if (!mine) {
         app.innerHTML = `<div class="card notice"><h2>No access</h2>
-          <p>${esc(session.user.email)} isn't on the organiser list. Add it to the <code>organisers</code> table in Supabase.</p></div>`;
+          <p>${esc(session.user.email)} isn't on the organiser list. Ask a Super Admin to add you under Users.</p></div>`;
         return;
       }
+      me = { email: mine.email, name: mine.name || "", role: mine.role || "Super Admin" };
+      if (me.role === "Super Admin") perms = new Set(ALL_PERMS);
+      else {
+        const { data: r } = await db.from("roles").select("perms").eq("name", me.role).single();
+        perms = new Set(r ? r.perms : []);
+      }
+      document.getElementById("who-email").textContent = me.name || document.getElementById("who-email").textContent;
+      document.getElementById("updated").textContent = me.role;
       signedIn = true;
       document.body.classList.add("app-mode");
       route();
@@ -896,14 +1035,26 @@
 
     // ---------- Pages ----------
     // The menu links set #registrations, #fixtures … in the address; each opens its page
-    const PAGES = { registrations: () => load(), fixtures: () => loadFixtures(), teams: () => loadTeamsPage() };
-    let page = "registrations";
+    // Each page and the permission it needs
+    const PAGES = {
+      dashboard: ["dashboard", () => loadDashboard()], registrations: ["registrations", () => load()],
+      fixtures: ["fixtures", () => loadFixtures()], teams: ["teams", () => loadTeamsPage()],
+      news: ["news", () => loadNews()], gallery: ["gallery", () => loadGallery()], sponsors: ["sponsors", () => loadSponsors()],
+      users: ["users", () => loadUsers()], roles: ["users", () => loadRoles()]
+    };
+    const ALL_PERMS = ["dashboard", "registrations", "fixtures", "teams", "news", "gallery", "sponsors", "users"];
+    let me = { email: "", name: "", role: "" }, perms = new Set();
+    const can = p => perms.has(p);
+    let page = "dashboard";
     function route() {
       const want = location.hash.slice(1);
-      page = PAGES[want] ? want : "registrations";
-      document.querySelectorAll(".nav-item[data-page]").forEach(a => a.classList.toggle("active", a.dataset.page === page));
+      const allowed = Object.keys(PAGES).filter(k => can(PAGES[k][0]));
+      if (!allowed.length) { app.innerHTML = `<div class="card notice"><h2>No pages yet</h2><p>Your role (${esc(me.role)}) has no permissions. Ask a Super Admin.</p></div>`; return; }
+      page = allowed.includes(want) ? want : allowed[0];
+      document.querySelectorAll(".nav-item[data-page]").forEach(a => { a.hidden = !can(PAGES[a.dataset.page][0]); a.classList.toggle("active", a.dataset.page === page); });
+      document.querySelectorAll(".side-h[data-group]").forEach(h => h.hidden = ![...document.querySelectorAll(`.nav-item[data-group="${h.dataset.group}"]`)].some(a => !a.hidden));
       lastSignature = "";
-      PAGES[page]();
+      PAGES[page][1]();
       scrollTo(0, 0);
     }
     addEventListener("hashchange", () => { if (signedIn) route(); });
@@ -1901,6 +2052,467 @@
         loadTeamsPage();
       };
       fxDlg.showModal();
+    }
+
+    // ---------- Shared: uploads ----------
+    // Photos are shrunk before upload (to `max` px on the long side); videos go up as they are
+    function shrinkImage(file, max, type = "image/jpeg") {
+      return new Promise((resolve, reject) => {
+        const img = new Image();
+        img.onload = () => {
+          const k = Math.min(1, max / Math.max(img.width, img.height));
+          const c = document.createElement("canvas");
+          c.width = Math.round(img.width * k); c.height = Math.round(img.height * k);
+          c.getContext("2d").drawImage(img, 0, 0, c.width, c.height);
+          c.toBlob(b => b ? resolve(b) : reject(new Error("Couldn't read the image")), type, .85);
+          URL.revokeObjectURL(img.src);
+        };
+        img.onerror = () => reject(new Error("That file isn't an image"));
+        img.src = URL.createObjectURL(file);
+      });
+    }
+    async function uploadMedia(file, folder, { max = 1800, png = false } = {}) {
+      const video = file.type.startsWith("video/");
+      if (video && file.size > 50 * 1024 * 1024) throw new Error("Videos can be up to 50 MB. For longer videos, put them on YouTube and add the link.");
+      const body = video ? file : await shrinkImage(file, max, png ? "image/png" : "image/jpeg");
+      const ext = video ? (file.name.split(".").pop() || "mp4").toLowerCase() : png ? "png" : "jpg";
+      const path = `${folder}/${crypto.randomUUID()}.${ext}`;
+      const { error } = await db.storage.from("media").upload(path, body, { contentType: video ? file.type : png ? "image/png" : "image/jpeg" });
+      if (error) throw error;
+      return db.storage.from("media").getPublicUrl(path).data.publicUrl;
+    }
+    // Remove a file we uploaded earlier (links to other sites are left alone)
+    function removeMedia(url) {
+      const m = String(url || "").match(/\/storage\/v1\/object\/public\/media\/(.+)$/);
+      if (m) db.storage.from("media").remove([decodeURIComponent(m[1])]);
+    }
+    const setupNeeded = (head, error) => {
+      const missing = /does not exist|schema cache|42P01|PGRST20|42883/i.test(error.message + " " + error.code);
+      app.innerHTML = head + `<div class="card notice"><div class="big-ic">${icon("alert")}</div>
+        <h2>${missing ? "One-time setup needed" : "Couldn't load"}</h2>
+        <p>${missing ? "Open Supabase → SQL Editor and run <code>supabase/setup.sql</code> again (it now includes this page). Then reload." : esc(error.message)}</p></div>`;
+    };
+    const pageHead = (title, sub, actions = "") => `<div class="ph"><div><h1>${title}</h1><p>${sub}</p></div>${actions ? `<div class="ph-act">${actions}</div>` : ""}</div>`;
+    const fmtDay = d => new Intl.DateTimeFormat("en-GB", { day: "numeric", month: "short", year: "numeric" }).format(new Date(d + "T00:00:00"));
+
+    // ---------- Dashboard ----------
+    let dashTimer = null;
+    async function loadDashboard() {
+      const first = !document.querySelector(".dash");
+      if (first) app.innerHTML = pageHead(`Welcome back${me.name ? ", " + esc(me.name.split(" ")[0]) : ""}`, "Signed in as " + esc(me.role)) + `<p class="notice">Loading…</p>`;
+      const [st, tm, mt, se] = await Promise.all([
+        db.rpc("visit_stats"),
+        can("registrations") ? db.from("teams").select("status") : Promise.resolve({ data: null }),
+        db.from("matches").select("year,home,away,home_score,away_score,kickoff,day,no").order("year", { ascending: false }).order("day", { ascending: false }).order("no", { ascending: false, nullsFirst: false }).limit(200),
+        db.from("settings").select("registration_open, closes_at").eq("id", 1).single()
+      ]);
+      if (page !== "dashboard") return;
+      const s = st.data;
+      const today = new Intl.DateTimeFormat("en-GB", { timeZone: "Indian/Maldives", weekday: "short", day: "numeric", month: "short", year: "numeric" }).format(new Date());
+      const days = s ? s.days : [];
+      const peak = Math.max(1, ...days.map(d => d.visitors));
+      const dayName = d => new Date(d + "T00:00:00").toLocaleDateString("en-GB", { weekday: "short" });
+      const dev = s ? s.devices || {} : {};
+      const teamsList = tm.data || [];
+      const ms = mt.data || [];
+      const next = ms.filter(m => m.home_score === null && m.kickoff && new Date(m.kickoff) > Date.now()).sort((a, b) => new Date(a.kickoff) - new Date(b.kickoff))[0];
+      const last = ms.find(m => m.home_score !== null);
+      const regOpen = se.data && se.data.registration_open && !(se.data.closes_at && Date.now() >= new Date(se.data.closes_at));
+      const matchLine = m => `<span class="dm"><span>${teamLogo(m.home)}${esc(m.home)}</span><b>${m.home_score !== null ? m.home_score + " – " + m.away_score : "v"}</b><span>${esc(m.away)}${teamLogo(m.away)}</span></span>`;
+
+      app.innerHTML = pageHead(`Welcome back${me.name ? ", " + esc(me.name.split(" ")[0]) : ""}`, "Signed in as " + esc(me.role),
+        `<span class="btn static">${icon("calendar")} ${today}</span><a class="btn" href="./" target="_blank" rel="noopener">${icon("external")} View website</a>`) + `
+        <div class="dash">
+          ${s ? `
+          <div class="card d-live"><span class="d-tag">Live</span><small>Viewing the site now</small><b>${s.live}</b><span>Active in the last 5 minutes · updates every 30 s</span></div>
+          <div class="card d-stat"><span class="d-ic">${icon("calendar")}</span><small>Visitors today</small><b>${s.today}</b><span>${s.today_views} page views</span></div>
+          <div class="card d-chart">
+            <div class="d-h"><div><h2>Website visitors</h2><span>Last 7 days · ${days.reduce((n, d) => n + d.visitors, 0)} visits</span></div><span class="d-pill">All time: ${s.all_time}</span></div>
+            <div class="bars">${days.map((d, i) => `<div class="bar-c ${i === days.length - 1 ? "today" : ""}"><em>${d.visitors || ""}</em><i style="height:${Math.max(4, d.visitors / peak * 100)}%"></i><span>${i === days.length - 1 ? "Today" : dayName(d.day)}</span></div>`).join("")}</div>
+            <div class="d-dev">${[["phone", "Phones"], ["computer", "Computers"], ["tablet", "Tablets"]].map(([k, l]) => `<div><b>${dev[k] || 0}</b><span>${l}</span></div>`).join("")}</div>
+          </div>` : `<div class="card d-chart"><div class="d-h"><div><h2>Website visitors</h2><span>${st.error && /42501|No access/.test(st.error.message + st.error.code) ? "Your role can't see visitor numbers." : "Run supabase/setup.sql again to start counting visitors."}</span></div></div></div>`}
+          ${tm.data ? `
+          <a class="card d-reg" href="#registrations">
+            <div class="d-h"><div><h2>Registrations</h2><span>${regOpen ? "Open for teams" : "Closed"}</span></div><span class="pill ${regOpen ? "confirmed" : "rejected"}">${regOpen ? "Open" : "Closed"}</span></div>
+            <div class="d-dev">
+              <div><b>${teamsList.length}</b><span>Teams</span></div>
+              <div><b>${teamsList.filter(t => t.status === "pending").length}</b><span>Waiting</span></div>
+              <div><b>${teamsList.filter(t => t.status === "confirmed").length}</b><span>Confirmed</span></div>
+            </div>
+          </a>` : ""}
+          <div class="card d-match">
+            <div class="d-h"><div><h2>Matches</h2><span>From Fixtures &amp; Results</span></div></div>
+            ${next ? `<small>Next match · ${fmtKick(next.kickoff)} ${fmtKickTime(next.kickoff)}</small>${matchLine(next)}` : `<small>No upcoming match</small>`}
+            ${last ? `<small>Latest result · ${last.year}</small>${matchLine(last)}` : ""}
+          </div>
+        </div>`;
+      clearTimeout(dashTimer);
+      dashTimer = setTimeout(() => { if (page === "dashboard" && !document.hidden) loadDashboard(); }, 30000);
+    }
+
+    // ---------- News & Slider ----------
+    let posts = [];
+    const newsHead = () => pageHead("News &amp; Slider", "Stories marked “In slider” with a cover photo appear in the photo slider at the top of the News section.",
+      `<a class="btn" href="./#news" target="_blank" rel="noopener">${icon("external")} View news</a><button class="btn primary" id="nw-add">${icon("plus")} Write story</button>`);
+    async function loadNews() {
+      app.innerHTML = newsHead() + `<p class="notice">Loading stories…</p>`;
+      const { data, error } = await db.from("posts").select("*").order("posted_on", { ascending: false }).order("created_at", { ascending: false });
+      if (page !== "news") return;
+      if (error) return setupNeeded(newsHead(), error);
+      posts = data;
+      app.innerHTML = newsHead() + `
+        <div class="card tm-table">
+          <div class="nw-row tm-hd"><span>Story</span><span>Date</span><span>Status</span><span>Slider</span><span></span></div>
+          ${posts.length ? posts.map(p => `
+            <div class="nw-row">
+              <span class="nw-t">${p.cover ? `<img src="${esc(p.cover)}" alt="">` : `<span class="nw-noimg">${icon("edit")}</span>`}<b>${esc(p.title)}</b></span>
+              <span class="tm-mgr">${fmtDay(p.posted_on)}</span>
+              <span><span class="pill ${p.published ? "confirmed" : "pending"}">${p.published ? "Published" : "Draft"}</span></span>
+              <span><button class="chip-t ${p.in_slider ? "on" : ""}" data-slide="${p.id}" ${p.cover ? "" : "disabled title='Add a cover photo first'"}>${p.in_slider ? icon("check") + " In slider" : "Not in slider"}</button></span>
+              <span class="fx-act"><button class="btn" data-post="${p.id}">${icon("edit")} Edit</button></span>
+            </div>`).join("") : `<div class="fx-empty">${icon("edit")}<b>No stories yet</b><span>Write the first one.</span></div>`}
+        </div>`;
+      document.getElementById("nw-add").onclick = () => editPost(null);
+      app.querySelectorAll("[data-post]").forEach(b => b.onclick = () => editPost(posts.find(p => p.id === b.dataset.post)));
+      app.querySelectorAll("[data-slide]").forEach(b => b.onclick = async () => {
+        const p = posts.find(x => x.id === b.dataset.slide);
+        const { error } = await db.from("posts").update({ in_slider: !p.in_slider }).eq("id", p.id);
+        if (error) return alert("Couldn't change: " + error.message);
+        loadNews();
+      });
+    }
+    function editPost(p) {
+      const isNew = !p;
+      p = p || { title: "", body: "", cover: null, posted_on: new Date().toISOString().slice(0, 10), published: true, in_slider: false };
+      let cover = p.cover, newCover = null;
+      fxDlg.innerHTML = `
+        <form class="sheet-in" id="nw-form" novalidate>
+          <div class="sheet-h"><div><h2>${isNew ? "Write story" : "Edit story"}</h2><p>News</p></div>
+            <button type="button" class="icon-btn" id="sh-close" aria-label="Close">${icon("x")}</button></div>
+          <div class="sheet-b">
+            <fieldset class="fs"><legend>Cover photo</legend>
+              <div class="cover-prev" id="cv-prev">${cover ? `<img src="${esc(cover)}" alt="">` : `<span>${icon("camera")} No cover photo</span>`}</div>
+              <div class="logo-btns row"><label class="btn file-btn">${icon("plus")} ${cover ? "Change photo" : "Add photo"}<input type="file" accept="image/*" id="cv-file" hidden></label>
+                ${cover ? `<button type="button" class="btn danger" id="cv-rm">${icon("x")} Remove</button>` : ""}</div>
+            </fieldset>
+            <fieldset class="fs"><legend>Story</legend>
+              <label>Title<input name="title" maxlength="200" required value="${esc(p.title)}"></label>
+              <label>Date<input name="posted_on" type="date" value="${esc(p.posted_on)}"></label>
+              <label>Text <small>Leave an empty line between paragraphs</small><textarea name="body" rows="10" maxlength="20000">${esc(p.body || "")}</textarea></label>
+            </fieldset>
+            <fieldset class="fs"><legend>Show</legend>
+              <label class="fx-check"><input type="checkbox" name="published" ${p.published ? "checked" : ""}> Published on the website <small>(untick to keep it as a draft)</small></label>
+              <label class="fx-check"><input type="checkbox" name="in_slider" ${p.in_slider ? "checked" : ""}> In the photo slider <small>(needs a cover photo)</small></label>
+            </fieldset>
+            <p class="form-error" id="sh-err" role="alert"></p>
+          </div>
+          <div class="sheet-f">${isNew ? "" : `<button type="button" class="btn danger" id="sh-del">${icon("trash")} Delete</button>`}<span class="sp"></span>
+            <button type="button" class="btn" id="sh-cancel">Cancel</button><button type="submit" class="btn primary">${icon("check")} ${isNew ? "Publish" : "Save"}</button></div>
+        </form>`;
+      const f = document.getElementById("nw-form");
+      wireSheet(isNew ? null : async () => {
+        if (!confirm(`Delete “${p.title}”?`)) return false;
+        const { error } = await db.from("posts").delete().eq("id", p.id);
+        if (error) { alert("Couldn't delete: " + error.message); return false; }
+        removeMedia(p.cover);
+        toast("Story deleted"); loadNews(); return true;
+      });
+      document.getElementById("cv-file").onchange = e => {
+        newCover = e.target.files[0];
+        if (newCover) document.getElementById("cv-prev").innerHTML = `<img src="${URL.createObjectURL(newCover)}" alt="">`;
+      };
+      const rm = document.getElementById("cv-rm");
+      if (rm) rm.onclick = () => { cover = null; newCover = null; document.getElementById("cv-prev").innerHTML = `<span>${icon("camera")} No cover photo</span>`; rm.remove(); };
+      f.onsubmit = async e => {
+        e.preventDefault();
+        const err = document.getElementById("sh-err");
+        if (!f.title.value.trim()) { err.textContent = "Enter a title."; return; }
+        const btn = f.querySelector("[type=submit]"); btn.disabled = true;
+        try { if (newCover) cover = await uploadMedia(newCover, "news"); }
+        catch (x) { btn.disabled = false; err.textContent = "Couldn't upload the photo: " + x.message; return; }
+        const row = { title: f.title.value.trim(), body: f.body.value.trim() || null, posted_on: f.posted_on.value || new Date().toISOString().slice(0, 10),
+                      cover, published: f.published.checked, in_slider: f.in_slider.checked && !!cover };
+        const { error } = isNew ? await db.from("posts").insert(row) : await db.from("posts").update(row).eq("id", p.id);
+        btn.disabled = false;
+        if (error) { err.textContent = "Couldn't save: " + error.message; return; }
+        if (!isNew && p.cover && p.cover !== cover) removeMedia(p.cover);
+        fxDlg.close(); toast(isNew ? "✓ Story published" : "✓ Story saved"); loadNews();
+      };
+      fxDlg.showModal();
+    }
+    // Close / cancel / delete buttons of an editor panel
+    function wireSheet(onDelete) {
+      document.getElementById("sh-close").onclick = document.getElementById("sh-cancel").onclick = () => fxDlg.close();
+      const del = document.getElementById("sh-del");
+      if (del) del.onclick = async () => { if (await onDelete()) fxDlg.close(); };
+    }
+
+    // ---------- Gallery ----------
+    let gal = [], galTab = "photo";
+    const galHead = () => pageHead("Gallery", "Photos appear in the gallery grid on the website; videos play there and can be shared.",
+      `<a class="btn" href="./#gallery" target="_blank" rel="noopener">${icon("external")} View gallery</a>`);
+    async function loadGallery() {
+      if (!document.querySelector(".gal-adm")) app.innerHTML = galHead() + `<p class="notice">Loading gallery…</p>`;
+      const { data, error } = await db.from("gallery").select("*").order("created_at", { ascending: false });
+      if (page !== "gallery") return;
+      if (error) return setupNeeded(galHead(), error);
+      gal = data;
+      const photos = gal.filter(g => g.kind === "photo"), videos = gal.filter(g => g.kind === "video");
+      app.innerHTML = galHead() + `
+        <div class="gal-adm">
+          <div class="seg left">${[["photo", "Photos", photos.length], ["video", "Videos", videos.length]].map(([k, l, n]) => `<button class="seg-b ${galTab === k ? "on" : ""}" data-gt="${k}">${l} <em>${n}</em></button>`).join("")}</div>
+          ${galTab === "photo" ? `
+          <label class="card drop" id="drop">${icon("camera")}<b>Add photos</b><span>Tap to choose, or drop photos here. You can pick many at once.</span>
+            <input type="file" accept="image/*" multiple id="ph-files" hidden></label>
+          <p class="hint" id="up-state"></p>
+          <div class="ph-grid">${photos.map(g => `<div class="ph-cell"><img src="${esc(g.url)}" alt="" loading="lazy"><button class="icon-btn" data-rm="${g.id}" aria-label="Remove photo">${icon("trash")}</button></div>`).join("")}</div>
+          ${photos.length ? "" : `<div class="card fx-empty big">${icon("camera")}<b>No photos yet</b></div>`}` : `
+          <div class="card vid-add">
+            <div class="vid-col"><h3>Upload a video from this device</h3><p class="hint">MP4 works best on every phone and computer. Up to 50 MB.</p>
+              <div class="vid-in"><label class="btn file-btn">${icon("plus")} Choose video<input type="file" accept="video/mp4,video/webm,video/quicktime" id="vd-file" hidden></label><span class="hint" id="vd-name">No file chosen</span></div>
+              <input id="vd-title1" placeholder="Title, e.g. Final highlights" maxlength="200"><button class="btn primary" id="vd-up" disabled>${icon("plus")} Upload video</button></div>
+            <div class="vid-col"><h3>Or add a video link</h3><p class="hint">YouTube plays on the site. Facebook, TikTok and Instagram links open in a new tab.</p>
+              <input id="vd-link" placeholder="https://youtu.be/…" autocomplete="off"><input id="vd-title2" placeholder="Title" maxlength="200"><button class="btn primary" id="vd-add">${icon("plus")} Add video</button></div>
+          </div>
+          <p class="hint" id="up-state"></p>
+          <div class="card tm-table">${videos.length ? videos.map(g => `
+            <div class="vd-row">${youtubeId(g.url) ? `<img src="https://i.ytimg.com/vi/${youtubeId(g.url)}/default.jpg" alt="">` : `<span class="nw-noimg">${icon("play")}</span>`}
+              <input value="${esc(g.title || "")}" data-title="${g.id}" maxlength="200" aria-label="Title"><button class="btn" data-save="${g.id}">Save</button>
+              <a class="vd-link" href="${esc(g.url)}" target="_blank" rel="noopener">${esc(g.url.replace(/^https?:\/\//, "").slice(0, 40))}</a>
+              <button class="btn danger" data-rm="${g.id}">${icon("trash")} Remove</button></div>`).join("") : `<div class="fx-empty">${icon("play")}<b>No videos yet</b></div>`}</div>`}
+        </div>`;
+      app.querySelectorAll("[data-gt]").forEach(b => b.onclick = () => { galTab = b.dataset.gt; app.innerHTML = ""; loadGallery(); });
+      app.querySelectorAll("[data-rm]").forEach(b => b.onclick = async () => {
+        const g = gal.find(x => x.id === b.dataset.rm);
+        if (!confirm("Remove this " + g.kind + " from the gallery?")) return;
+        const { error } = await db.from("gallery").delete().eq("id", g.id);
+        if (error) return alert("Couldn't remove: " + error.message);
+        removeMedia(g.url); loadGallery();
+      });
+      app.querySelectorAll("[data-save]").forEach(b => b.onclick = async () => {
+        const { error } = await db.from("gallery").update({ title: app.querySelector(`[data-title="${b.dataset.save}"]`).value.trim() || null }).eq("id", b.dataset.save);
+        error ? alert("Couldn't save: " + error.message) : toast("✓ Title saved");
+      });
+      const state = msg => { const el = document.getElementById("up-state"); if (el) el.textContent = msg; };
+      const addPhotos = async files => {
+        files = [...files].filter(f => f.type.startsWith("image/"));
+        for (let i = 0; i < files.length; i++) {
+          state(`Uploading photo ${i + 1} of ${files.length}…`);
+          try { const url = await uploadMedia(files[i], "gallery"); await db.from("gallery").insert({ kind: "photo", url }); }
+          catch (x) { state("Couldn't upload " + files[i].name + ": " + x.message); return; }
+        }
+        toast(`✓ ${files.length} photo${files.length === 1 ? "" : "s"} added`); loadGallery();
+      };
+      const pf = document.getElementById("ph-files");
+      if (pf) {
+        pf.onchange = () => addPhotos(pf.files);
+        const drop = document.getElementById("drop");
+        drop.ondragover = e => { e.preventDefault(); drop.classList.add("over"); };
+        drop.ondragleave = () => drop.classList.remove("over");
+        drop.ondrop = e => { e.preventDefault(); drop.classList.remove("over"); addPhotos(e.dataTransfer.files); };
+      }
+      const vf = document.getElementById("vd-file");
+      if (vf) {
+        vf.onchange = () => { document.getElementById("vd-name").textContent = vf.files[0] ? vf.files[0].name : "No file chosen"; document.getElementById("vd-up").disabled = !vf.files[0]; };
+        document.getElementById("vd-up").onclick = async () => {
+          state("Uploading video… keep this page open");
+          try { const url = await uploadMedia(vf.files[0], "gallery"); await db.from("gallery").insert({ kind: "video", url, title: document.getElementById("vd-title1").value.trim() || null }); }
+          catch (x) { state("Couldn't upload: " + x.message); return; }
+          toast("✓ Video added"); loadGallery();
+        };
+        document.getElementById("vd-add").onclick = async () => {
+          const url = document.getElementById("vd-link").value.trim();
+          if (!/^https?:\/\//i.test(url)) return state("Paste the full link, starting with https://");
+          const { error } = await db.from("gallery").insert({ kind: "video", url, title: document.getElementById("vd-title2").value.trim() || null });
+          if (error) return state("Couldn't add: " + error.message);
+          toast("✓ Video added"); loadGallery();
+        };
+      }
+    }
+
+    // ---------- Sponsors ----------
+    const LEVELS = ["Main Sponsor", "Gold Sponsor", "Silver Sponsor", "Partner", "Media Partner"];
+    let sps = [];
+    const spHead = () => pageHead("Sponsors", "Logos are grouped by level on the website. Lower “Order” numbers show first within a level.",
+      `<a class="btn" href="./#sponsors" target="_blank" rel="noopener">${icon("external")} View page</a>`);
+    async function loadSponsors() {
+      app.innerHTML = spHead() + `<p class="notice">Loading sponsors…</p>`;
+      const { data, error } = await db.from("sponsors").select("*").order("sort").order("name");
+      if (page !== "sponsors") return;
+      if (error) return setupNeeded(spHead(), error);
+      sps = data;
+      const card = (s, isNew) => `
+        <form class="card sp-card ${isNew ? "new" : ""}" data-sp="${isNew ? "" : s.id}">
+          <div class="sp-top"><span class="sp-prev">${s.logo ? `<img src="${esc(s.logo)}" alt="">` : icon("camera")}</span>
+            <div class="logo-btns"><label class="btn file-btn">${icon("plus")} ${s.logo ? "Change logo" : "Choose logo"}<input type="file" accept="image/png,image/jpeg,image/webp" hidden></label>
+              <small class="hint">PNG with a transparent background looks best.</small></div></div>
+          <label>Name <small>(optional, shown under the logo)</small><input name="name" maxlength="100" value="${esc(s.name || "")}"></label>
+          <div class="g2"><label>Level<select name="level">${LEVELS.map(l => `<option ${s.level === l ? "selected" : ""}>${l}</option>`).join("")}</select></label>
+            <label>Order<input name="sort" type="number" value="${s.sort ?? 0}"></label></div>
+          <label>Website<input name="website" maxlength="300" placeholder="www.example.mv" value="${esc(s.website || "")}"></label>
+          ${isNew ? "" : `<label class="fx-check"><input type="checkbox" name="visible" ${s.visible ? "checked" : ""}> Show on the website</label>`}
+          <div class="sp-act">${isNew ? "" : `<button type="button" class="btn danger" data-sprm>${icon("trash")} Remove</button>`}<span class="sp"></span>
+            <button class="btn primary" type="submit">${icon(isNew ? "plus" : "check")} ${isNew ? "Add sponsor" : "Save"}</button></div>
+        </form>`;
+      app.innerHTML = spHead() + `<div class="sp-grid">${card({ level: "Partner", sort: 0, visible: true }, true)}${sps.map(s => card(s, false)).join("")}</div>`;
+      app.querySelectorAll(".sp-card").forEach(f => {
+        const s = sps.find(x => x.id === f.dataset.sp) || null;
+        let file = null;
+        f.querySelector("input[type=file]").onchange = e => { file = e.target.files[0]; if (file) f.querySelector(".sp-prev").innerHTML = `<img src="${URL.createObjectURL(file)}" alt="">`; };
+        const rm = f.querySelector("[data-sprm]");
+        if (rm) rm.onclick = async () => {
+          if (!confirm("Remove this sponsor?")) return;
+          const { error } = await db.from("sponsors").delete().eq("id", s.id);
+          if (error) return alert("Couldn't remove: " + error.message);
+          removeMedia(s.logo); loadSponsors();
+        };
+        f.onsubmit = async e => {
+          e.preventDefault();
+          if (!s && !file && !f.name.value.trim()) return alert("Choose a logo or enter a name.");
+          const btn = f.querySelector("[type=submit]"); btn.disabled = true;
+          let logo = s ? s.logo : null;
+          try { if (file) logo = await uploadMedia(file, "sponsors", { max: 600, png: true }); }
+          catch (x) { btn.disabled = false; return alert("Couldn't upload the logo: " + x.message); }
+          const row = { name: f.name.value.trim() || null, level: f.level.value, sort: Number(f.sort.value) || 0, website: f.website.value.trim() || null, logo,
+                        visible: s ? f.visible.checked : true };
+          const { error } = s ? await db.from("sponsors").update(row).eq("id", s.id) : await db.from("sponsors").insert(row);
+          btn.disabled = false;
+          if (error) return alert("Couldn't save: " + error.message);
+          if (s && file && s.logo) removeMedia(s.logo);
+          toast(s ? "✓ Sponsor saved" : "✓ Sponsor added"); loadSponsors();
+        };
+      });
+    }
+
+    // ---------- Users & roles ----------
+    const PERMS = [
+      ["dashboard", "Dashboard: website visitors and the overview"],
+      ["registrations", "Registrations: teams, ID photos, open or close registration"],
+      ["fixtures", "Fixtures & results: matches, scores, goals and videos"],
+      ["teams", "Teams: add teams, upload logos, edit squads"],
+      ["news", "News: write stories and choose the slider"],
+      ["gallery", "Gallery: photos and videos"],
+      ["sponsors", "Sponsors: sponsor logos"],
+      ["users", "Users & roles: add organisers and choose what they can do"]
+    ];
+    let people = [], roleList = [];
+    async function loadPeople() {
+      const [o, r] = await Promise.all([db.from("organisers").select("email,name,role").order("email"), db.from("roles").select("*").order("name")]);
+      return o.error || r.error || (people = o.data, roleList = r.data, null);
+    }
+    const shownLogin = em => em.endsWith("@phone.ypveterans.com") ? "+" + em.slice(0, 3) + " " + em.slice(3, em.indexOf("@")) : em;
+
+    const usersHead = () => pageHead("Users", "Organisers who can sign in to this portal, and what each can do.",
+      `<a class="btn" href="#roles">${icon("shield")} User roles</a><button class="btn primary" id="us-add">${icon("plus")} Add user</button>`);
+    async function loadUsers() {
+      app.innerHTML = usersHead() + `<p class="notice">Loading users…</p>`;
+      const err = await loadPeople();
+      if (page !== "users") return;
+      if (err) return setupNeeded(usersHead(), err);
+      app.innerHTML = usersHead() + `
+        <div class="card tm-table">
+          <div class="us-row tm-hd"><span>Name</span><span>Email or phone</span><span>Role</span><span></span></div>
+          ${people.map(u => `<div class="us-row">
+            <span class="tm-name"><span class="tl tl-i">${esc(initials(u.name || u.email))}</span><b>${esc(u.name || "—")}</b>${u.email.toLowerCase() === me.email.toLowerCase() ? `<span class="you">You</span>` : ""}</span>
+            <span class="tm-mgr">${esc(shownLogin(u.email))}</span>
+            <span><span class="pill ${u.role === "Super Admin" ? "rejected" : "confirmed"}">${esc(u.role || "Super Admin")}</span></span>
+            <span class="fx-act"><button class="btn" data-user="${esc(u.email)}">${icon("edit")} Edit</button></span></div>`).join("")}
+        </div>`;
+      document.getElementById("us-add").onclick = () => editUser(null);
+      app.querySelectorAll("[data-user]").forEach(b => b.onclick = () => editUser(people.find(u => u.email === b.dataset.user)));
+    }
+    function editUser(u) {
+      const isNew = !u;
+      u = u || { email: "", name: "", role: roleList.find(r => r.name === "Administrator") ? "Administrator" : roleList[0].name };
+      const self = !isNew && u.email.toLowerCase() === me.email.toLowerCase();
+      fxDlg.innerHTML = `
+        <form class="sheet-in" id="us-form" novalidate>
+          <div class="sheet-h"><div><h2>${isNew ? "Add user" : "Edit user"}</h2><p>${isNew ? "New organiser" : esc(shownLogin(u.email))}</p></div>
+            <button type="button" class="icon-btn" id="sh-close" aria-label="Close">${icon("x")}</button></div>
+          <div class="sheet-b">
+            <fieldset class="fs"><legend>User</legend>
+              <label>Name<input name="name" maxlength="100" value="${esc(u.name || "")}"></label>
+              <label>Email or phone number<input name="login" ${isNew ? "" : "disabled"} value="${esc(isNew ? "" : shownLogin(u.email))}" placeholder="name@example.com or 7XX XXXX" autocomplete="off"></label>
+              <label>Role<select name="role" ${self ? "disabled" : ""}>${roleList.map(r => `<option ${r.name === u.role ? "selected" : ""}>${esc(r.name)}</option>`).join("")}</select></label>
+              ${self ? `<small class="hint">You can't change your own role.</small>` : ""}
+            </fieldset>
+            ${isNew ? `<div class="card note">${icon("alert")}<div><b>They also need a password</b>
+              <p>In Supabase open <b>Authentication → Users → Add user</b>, enter the same email (or for a phone number: <code>960XXXXXXX@phone.ypveterans.com</code>) and a password, and tick “Auto Confirm User”. Then give them the password.</p></div></div>` : ""}
+            <p class="form-error" id="sh-err" role="alert"></p>
+          </div>
+          <div class="sheet-f">${isNew || self ? "" : `<button type="button" class="btn danger" id="sh-del">${icon("trash")} Remove</button>`}<span class="sp"></span>
+            <button type="button" class="btn" id="sh-cancel">Cancel</button><button type="submit" class="btn primary">${icon("check")} ${isNew ? "Add user" : "Save"}</button></div>
+        </form>`;
+      const f = document.getElementById("us-form");
+      wireSheet(async () => {
+        if (u.role === "Super Admin" && people.filter(x => x.role === "Super Admin").length < 2) { alert("This is the only Super Admin, so it can't be removed."); return false; }
+        if (!confirm(`Remove ${u.name || shownLogin(u.email)}? They won't be able to use the portal any more.`)) return false;
+        const { error } = await db.from("organisers").delete().eq("email", u.email);
+        if (error) { alert("Couldn't remove: " + error.message); return false; }
+        toast("User removed"); loadUsers(); return true;
+      });
+      f.onsubmit = async e => {
+        e.preventDefault();
+        const err = document.getElementById("sh-err");
+        const row = { name: f.name.value.trim() || null, role: f.role.value };
+        if (self) delete row.role;
+        if (!isNew && u.role === "Super Admin" && row.role && row.role !== "Super Admin" && people.filter(x => x.role === "Super Admin").length < 2) { err.textContent = "Keep at least one Super Admin."; return; }
+        let res;
+        if (isNew) {
+          if (!f.login.value.trim()) { err.textContent = "Enter an email or phone number."; return; }
+          row.email = loginEmail(f.login.value).toLowerCase();
+          if (people.some(x => x.email.toLowerCase() === row.email)) { err.textContent = "That user is already on the list."; return; }
+          res = await db.from("organisers").insert(row);
+        } else res = await db.from("organisers").update(row).eq("email", u.email);
+        if (res.error) { err.textContent = "Couldn't save: " + res.error.message; return; }
+        fxDlg.close(); toast(isNew ? "✓ User added" : "✓ User saved"); loadUsers();
+      };
+      fxDlg.showModal();
+    }
+
+    const rolesHead = () => pageHead("User Roles", "A role is a set of permissions. Give each user the role that matches their job.",
+      `<a class="btn" href="#users">${icon("users")} Users</a><button class="btn primary" id="rl-add">${icon("plus")} New role</button>`);
+    async function loadRoles() {
+      app.innerHTML = rolesHead() + `<p class="notice">Loading roles…</p>`;
+      const err = await loadPeople();
+      if (page !== "roles") return;
+      if (err) return setupNeeded(rolesHead(), err);
+      roleList.sort((a, b) => (b.name === "Super Admin") - (a.name === "Super Admin") || a.name.localeCompare(b.name));
+      app.innerHTML = rolesHead() + `<div class="rl-grid">${roleList.map(r => {
+        const n = people.filter(u => u.role === r.name).length, sup = r.name === "Super Admin";
+        return `<form class="card rl-card" data-role="${esc(r.name)}">
+          <div class="rl-h"><input name="name" value="${esc(r.name)}" maxlength="40" ${sup ? "disabled" : ""} aria-label="Role name"><span class="d-pill">${n} user${n === 1 ? "" : "s"}</span></div>
+          ${sup ? `<p class="rl-note">Super Admin always has every permission.</p>` : ""}
+          ${PERMS.map(([k, l]) => `<label class="fx-check"><input type="checkbox" name="p" value="${k}" ${sup || r.perms.includes(k) ? "checked" : ""} ${sup ? "disabled" : ""}> ${esc(l)}</label>`).join("")}
+          ${sup ? "" : `<div class="sp-act">${n ? "" : `<button type="button" class="btn danger" data-rlrm>${icon("trash")} Delete</button>`}<span class="sp"></span><button class="btn primary" type="submit">${icon("check")} Save role</button></div>`}
+        </form>`; }).join("")}</div>`;
+      document.getElementById("rl-add").onclick = async () => {
+        const name = (prompt("Name of the new role, e.g. Scorekeeper") || "").trim();
+        if (!name) return;
+        if (roleList.some(r => r.name.toLowerCase() === name.toLowerCase())) return alert("There's already a role with that name.");
+        const { error } = await db.from("roles").insert({ name: name.slice(0, 40), perms: [] });
+        if (error) return alert("Couldn't add: " + error.message);
+        loadRoles();
+      };
+      app.querySelectorAll(".rl-card").forEach(f => {
+        const r = roleList.find(x => x.name === f.dataset.role);
+        const rm = f.querySelector("[data-rlrm]");
+        if (rm) rm.onclick = async () => {
+          if (!confirm(`Delete the role “${r.name}”?`)) return;
+          const { error } = await db.from("roles").delete().eq("name", r.name);
+          if (error) return alert("Couldn't delete: " + error.message);
+          loadRoles();
+        };
+        f.onsubmit = async e => {
+          e.preventDefault();
+          const name = f.name.value.trim();
+          if (!name) return alert("Give the role a name.");
+          const perms = [...f.querySelectorAll("[name=p]:checked")].map(x => x.value);
+          const { error } = await db.from("roles").update({ name, perms }).eq("name", r.name);
+          if (error) return alert("Couldn't save: " + error.message);
+          toast("✓ Role saved"); loadRoles();
+        };
+      });
     }
 
     // ---------- App (install on the home screen) ----------

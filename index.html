@@ -476,6 +476,74 @@
       .fx-n, .fx-t.home .fx-n { font-size: .9rem; white-space: normal; text-align: center; }
       .fxl { width: 44px; height: 44px; }
     }
+
+    /* News: photo slider of featured stories, then story cards */
+    #news, #gallery, #sponsors { padding-top: 0; }
+    .slider { position: relative; margin-top: 18px; aspect-ratio: 16 / 7; background: var(--ink); overflow: hidden; }
+    .slide { position: absolute; inset: 0; padding: 0; border: 0; cursor: pointer; opacity: 0; transition: opacity .6s ease; background: none; }
+    .slide.on { opacity: 1; z-index: 1; }
+    .slide img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .slide-cap { position: absolute; inset: auto 0 0 0; padding: 60px 24px 22px; text-align: start; color: #fff; background: linear-gradient(to top, rgba(10,4,5,.85), transparent); }
+    .slide-cap small { display: block; font-size: .78rem; font-weight: 600; color: #ffd0d7; }
+    .slide-cap b { display: block; max-width: 30ch; font: 700 clamp(1.3rem, 3.4vw, 2.2rem)/1.1 "Oswald", sans-serif; text-transform: uppercase; }
+    .slide-dots { position: absolute; z-index: 2; right: 18px; bottom: 18px; display: flex; gap: 6px; }
+    .slide-dots button { width: 10px; height: 10px; padding: 0; border: 2px solid #fff; background: transparent; cursor: pointer; }
+    .slide-dots button.on { background: #fff; }
+    .news-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 16px; margin-top: 16px; }
+    .news-card { display: flex; flex-direction: column; padding: 0; text-align: start; cursor: pointer; background: var(--surface); border: 1px solid var(--border); border-top: 4px solid var(--brand); color: var(--text); font: inherit; transition: border-color .15s ease; }
+    .news-card:hover { border-color: var(--brand); }
+    .nc-img { aspect-ratio: 16 / 9; background: var(--tint); overflow: hidden; }
+    .nc-img img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform .4s ease; }
+    .news-card:hover .nc-img img { transform: scale(1.04); }
+    .nc-txt { padding: 12px 14px 16px; }
+    .nc-txt small { display: block; font-size: .75rem; font-weight: 600; color: var(--muted); }
+    .nc-txt b { font: 700 1.05rem/1.2 "Oswald", sans-serif; text-transform: uppercase; }
+    .story-img { display: block; width: 100%; max-height: 60vh; object-fit: cover; }
+    .story-txt { padding: 20px 24px 28px; color: #221516; }
+    .story-txt small { font-size: .8rem; font-weight: 600; color: #7a6567; }
+    .story-txt h3 { font-size: 1.6rem; margin: 4px 0 12px; }
+    .story-txt p { margin-bottom: 12px; line-height: 1.7; }
+    /* Gallery */
+    .gal-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 8px; margin-top: 18px; }
+    .gal-item { position: relative; aspect-ratio: 1; padding: 0; border: 0; overflow: hidden; cursor: pointer; background: var(--ink); }
+    .gal-item img, .gal-item video { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform .4s ease; }
+    .gal-item:hover img { transform: scale(1.05); }
+    .gal-play { position: absolute; inset: 0; margin: auto; display: grid; place-items: center; width: 52px; height: 52px; background: var(--brand); color: #fff; }
+    .gal-play svg { width: 22px; height: 22px; }
+    .gal-cap { position: absolute; inset: auto 0 0 0; padding: 18px 8px 6px; font-size: .75rem; font-weight: 600; color: #fff; text-align: start; background: linear-gradient(to top, rgba(0,0,0,.75), transparent); }
+    .gal-more { display: block; margin: 16px auto 0; padding: 12px 26px; border: 2px solid var(--brand); background: transparent; color: var(--brand-text); cursor: pointer; font: 600 .95rem "Oswald", sans-serif; text-transform: uppercase; letter-spacing: .08em; }
+    .gal-more:hover { background: var(--brand); color: #fff; }
+    .gal-more[hidden] { display: none; }
+    .gal-pop .res-top { flex-wrap: nowrap; }
+    .gal-count { font-size: .8rem; font-weight: 600; color: #ffe1e6; }
+    .gal-view { position: relative; display: flex; align-items: center; justify-content: center; min-height: 50vh; background: #0b0606; }
+    .gal-stage { width: 100%; display: flex; justify-content: center; }
+    .gal-stage img, .gal-stage video { max-width: 100%; max-height: 74vh; display: block; }
+    .gal-stage iframe { width: 100%; aspect-ratio: 16 / 9; border: 0; display: block; }
+    .gal-ext { margin: 60px auto; padding: 12px 22px; background: var(--brand); color: #fff; text-decoration: none; font-weight: 600; }
+    .gal-nav { position: absolute; z-index: 2; top: 50%; transform: translateY(-50%); width: 44px; height: 44px; display: grid; place-items: center; border: 0; cursor: pointer; background: rgba(0,0,0,.55); color: #fff; }
+    .gal-nav svg { width: 22px; height: 22px; }
+    .gal-prev { left: 8px; } .gal-next { right: 8px; }
+    /* Sponsors */
+    .sp-level { margin-top: 22px; }
+    .sp-level h3 { font-size: .85rem; letter-spacing: .12em; color: var(--muted); margin-bottom: 10px; }
+    .sp-logos { display: flex; flex-wrap: wrap; gap: 12px; }
+    .sp-logo { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; width: 170px; height: 110px; padding: 14px; background: #fff; border: 1px solid var(--border); text-decoration: none; color: #221516; font-size: .78rem; font-weight: 600; text-align: center; transition: border-color .15s ease; }
+    .sp-logo img { max-width: 100%; max-height: 70px; object-fit: contain; }
+    a.sp-logo:hover { border-color: var(--brand); }
+    .sp-level.main .sp-logo { width: 260px; height: 150px; }
+    .sp-level.main .sp-logo img { max-height: 100px; }
+    .sp-become { display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap; margin-top: 28px; padding: 20px 22px; background: var(--ink); color: #fff; border-inline-start: 6px solid var(--brand); }
+    .sp-become b { font: 700 1.3rem "Oswald", sans-serif; text-transform: uppercase; }
+    .sp-become p { color: #c9b9bb; font-size: .92rem; }
+    .sp-btn { padding: 12px 22px; background: var(--brand); color: #fff; text-decoration: none; font: 600 .95rem "Oswald", sans-serif; text-transform: uppercase; letter-spacing: .08em; }
+    .sp-btn:hover { background: #fff; color: var(--brand); }
+    @media (max-width: 720px) {
+      .slider { aspect-ratio: 4 / 3; }
+      .gal-grid { grid-template-columns: repeat(3, 1fr); gap: 4px; }
+      .sp-logo { width: calc(50% - 6px); }
+      .sp-level.main .sp-logo { width: 100%; }
+    }
     /* Score plus, under it, a penalty shootout when there was one */
     .m-scorebox { display: flex; flex-direction: column; align-items: center; gap: 4px; }
     .m-pens { font-size: .66rem; font-weight: 600; letter-spacing: .04em; color: #c8102e; white-space: nowrap; }
@@ -1103,6 +1171,35 @@
     </div>
   </section>
 
+  <!-- NEWS, GALLERY, SPONSORS: filled in from the organiser portal; each stays hidden until it has something -->
+  <section id="news" hidden>
+    <div class="wrap">
+      <span class="eyebrow"><svg class="ic" aria-hidden="true"><use href="#i-calendar"/></svg><span data-i18n="newsEyebrow">Latest</span></span>
+      <h2 data-i18n="newsTitle">News</h2>
+      <div id="news-body"></div>
+    </div>
+  </section>
+  <section id="gallery" hidden>
+    <div class="wrap">
+      <span class="eyebrow"><svg class="ic" aria-hidden="true"><use href="#i-camera"/></svg><span data-i18n="galEyebrow">Photos &amp; videos</span></span>
+      <h2 data-i18n="galTitle">Gallery</h2>
+      <div class="gal-grid" id="gal-grid"></div>
+      <button type="button" class="gal-more" id="gal-more" data-i18n="galMore" hidden>Show all</button>
+    </div>
+  </section>
+  <dialog id="story-pop" class="res-pop" aria-label="Story"><div class="res-card story"></div></dialog>
+  <dialog id="gal-pop" class="res-pop gal-pop" aria-label="Gallery">
+    <div class="res-card">
+      <div class="res-top"><h2 class="res-pop-title gal-title"></h2><span class="gal-count" dir="ltr"></span>
+        <button type="button" class="res-close" aria-label="Close"><svg class="ic" aria-hidden="true"><use href="#i-x"/></svg></button></div>
+      <div class="gal-view">
+        <button type="button" class="gal-nav gal-prev" aria-label="Previous"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 18l-6-6 6-6"/></svg></button>
+        <div class="gal-stage"></div>
+        <button type="button" class="gal-nav gal-next" aria-label="Next"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 18l6-6-6-6"/></svg></button>
+      </div>
+    </div>
+  </dialog>
+
   <!-- Popup with every past winner. Each card opens its photo. Add photos to images/ using the names in data-photo. -->
   <dialog id="winners-pop" class="res-pop" aria-labelledby="winners-pop-title">
     <div class="res-card">
@@ -1395,6 +1492,18 @@
     </div>
   </section>
 
+  <section id="sponsors" hidden>
+    <div class="wrap">
+      <span class="eyebrow"><span data-i18n="spEyebrow">Thank you</span></span>
+      <h2 data-i18n="spTitle">Our Sponsors</h2>
+      <div id="sp-body"></div>
+      <div class="sp-become">
+        <div><b data-i18n="spBecome">Become a sponsor</b><p data-i18n="spBecomeText">Support veterans futsal and get your brand in front of the island.</p></div>
+        <a class="sp-btn" href="https://wa.me/9609763551" target="_blank" rel="noopener" data-i18n="spContact">Contact us</a>
+      </div>
+    </div>
+  </section>
+
   <section id="contact">
     <div class="wrap">
       <h2 data-i18n="contactTitle">Get in Touch</h2>
@@ -1603,6 +1712,18 @@
       resGoals: "ގޯލު",
       resDay: n => n + " ވަނަ މެޗު ދުވަސް",
       fxEyebrow: "ކުޅެން އޮތް",
+      newsEyebrow: "އެންމެ ފަހުގެ",
+      newsTitle: "ޚަބަރު",
+      galEyebrow: "ފޮޓޯ އަދި ވީޑިއޯ",
+      galTitle: "ގެލަރީ",
+      galMore: "ހުރިހާ ބައްލަވާ",
+      galOpen: "ވީޑިއޯ ބައްލަވާ",
+      spEyebrow: "ޝުކުރިއްޔާ",
+      spTitle: "ސްޕޮންސަރުން",
+      spBecome: "ސްޕޮންސަރެއް ކަމުގައި ވެލައްވާ",
+      spBecomeText: "ވެޓެރަން ފުޓްސަލަށް އެހީވެދެއްވާ.",
+      spContact: "ގުޅުއްވާ",
+      lvl0: "މައި ސްޕޮންސަރު", lvl1: "ގޯލްޑް ސްޕޮންސަރުން", lvl2: "ސިލްވަރ ސްޕޮންސަރުން", lvl3: "ޕާޓްނަރުން", lvl4: "މީޑިއާ ޕާޓްނަރުން",
       fxTitle: "ފިކްސްޗަރސް",
       resMatch: n => "މެޗު " + n,
       stageSemi: "ސެމީ ފައިނަލް",
@@ -1638,6 +1759,9 @@
       resGoals: "Goals",
       resDay: n => "Match Day " + n,
       fxEyebrow: "Coming up",
+      newsTitle: "News",
+      galOpen: "Open video",
+      lvl0: "Main sponsor", lvl1: "Gold sponsors", lvl2: "Silver sponsors", lvl3: "Partners", lvl4: "Media partners",
       resMatch: n => "Match " + n,
       stageSemi: "Semi-final",
       stageSemis: "Semi-finals",
@@ -1691,6 +1815,7 @@
       if (typeof renderDeadline === "function") renderDeadline();
       if (typeof renderLocked === "function") renderLocked();
       if (typeof renderResults === "function") renderResults();
+      if (typeof renderMedia === "function") renderMedia();
       try { localStorage.setItem("lang", lang); } catch (e) {}
     }
 
@@ -2697,6 +2822,142 @@
       } catch (e) {}
     }
     loadResults();
+
+    // ---------- Visitors (for the organisers' dashboard) ----------
+    // One row per page view: a random id kept in this browser and the kind of device. Nothing personal.
+    if (USE_SERVER && !/bot|crawl|spider|slurp|headless/i.test(navigator.userAgent)) {
+      let vid = null;
+      try {
+        vid = localStorage.getItem("yp-visitor");
+        if (!vid) { vid = (crypto.randomUUID ? crypto.randomUUID() : String(Math.random()).slice(2) + Date.now()); localStorage.setItem("yp-visitor", vid); }
+      } catch (e) { vid = String(Math.random()).slice(2) + Date.now(); }
+      const device = /ipad|tablet/i.test(navigator.userAgent) ? "tablet" : /mobi|android|iphone/i.test(navigator.userAgent) ? "phone" : "computer";
+      fetch(CONFIG.supabaseUrl + "/rest/v1/visits", {
+        method: "POST",
+        headers: { apikey: CONFIG.supabaseKey, "Content-Type": "application/json", Prefer: "return=minimal" },
+        body: JSON.stringify({ visitor: vid.slice(0, 40), path: (location.pathname || "/").slice(0, 100), device }),
+        keepalive: true
+      }).catch(() => {});
+    }
+
+    // ---------- News, gallery and sponsors (added in the organiser portal) ----------
+    const api = path => fetch(CONFIG.supabaseUrl + "/rest/v1/" + path, { headers: { apikey: CONFIG.supabaseKey } })
+      .then(r => r.ok ? r.json() : Promise.reject(r.status));
+    const fmtDay = d => new Intl.DateTimeFormat(lang === "dv" ? "dv" : "en-GB", { day: "numeric", month: "long", year: "numeric" }).format(new Date(d + "T00:00:00"));
+    let posts = [], gallery = [], sponsors = [];
+
+    // News: a slider of the stories marked "in slider", then cards for the latest stories
+    const storyPop = document.getElementById("story-pop");
+    wirePop(storyPop);
+    let slideAt = 0, slideTimer = null;
+    function renderNews() {
+      const sec = document.getElementById("news");
+      sec.hidden = !posts.length;
+      if (!posts.length) return;
+      const slides = posts.filter(p => p.in_slider && p.cover);
+      const card = p => `<button type="button" class="news-card" data-post="${p.id}">
+          <span class="nc-img">${p.cover ? `<img loading="lazy" decoding="async" src="${escH(p.cover)}" alt="">` : ""}</span>
+          <span class="nc-txt"><small>${fmtDay(p.posted_on)}</small><b>${escH(p.title)}</b></span>
+        </button>`;
+      document.getElementById("news-body").innerHTML = `
+        ${slides.length ? `<div class="slider" id="slider">
+          ${slides.map((p, i) => `<button type="button" class="slide ${i === 0 ? "on" : ""}" data-post="${p.id}">
+            <img src="${escH(p.cover)}" alt="" ${i ? 'loading="lazy"' : ""}>
+            <span class="slide-cap"><small>${fmtDay(p.posted_on)}</small><b>${escH(p.title)}</b></span>
+          </button>`).join("")}
+          ${slides.length > 1 ? `<div class="slide-dots">${slides.map((_, i) => `<button type="button" class="${i === 0 ? "on" : ""}" data-dot="${i}" aria-label="Story ${i + 1}"></button>`).join("")}</div>` : ""}
+        </div>` : ""}
+        <div class="news-grid">${posts.slice(0, 6).map(card).join("")}</div>`;
+      slideAt = 0;
+      clearInterval(slideTimer);
+      const show = i => {
+        const s = [...document.querySelectorAll("#slider .slide")], d = [...document.querySelectorAll("#slider [data-dot]")];
+        slideAt = (i + s.length) % s.length;
+        s.forEach((x, n) => x.classList.toggle("on", n === slideAt));
+        d.forEach((x, n) => x.classList.toggle("on", n === slideAt));
+      };
+      document.querySelectorAll("#slider [data-dot]").forEach(b => b.onclick = e => { e.stopPropagation(); show(+b.dataset.dot); });
+      if (slides.length > 1 && !matchMedia("(prefers-reduced-motion: reduce)").matches) slideTimer = setInterval(() => show(slideAt + 1), 6000);
+      document.querySelectorAll("#news [data-post]").forEach(b => b.onclick = () => openStory(posts.find(p => p.id === b.dataset.post), b));
+    }
+    function openStory(p, from) {
+      storyPop.querySelector(".story").innerHTML = `
+        <div class="res-top"><h2 class="res-pop-title">${t("newsTitle")}</h2>
+          <button type="button" class="res-close" aria-label="${t("close")}"><svg class="ic" aria-hidden="true"><use href="#i-x"/></svg></button></div>
+        ${p.cover ? `<img class="story-img" src="${escH(p.cover)}" alt="">` : ""}
+        <div class="story-txt"><small>${fmtDay(p.posted_on)}</small><h3>${escH(p.title)}</h3>
+          ${(p.body || "").split(/\n{2,}/).map(par => `<p>${escH(par).replace(/\n/g, "<br>")}</p>`).join("")}</div>`;
+      openPop(storyPop, from);
+    }
+
+    // Gallery: photos and videos; a photo or video opens in a viewer
+    const galPop = document.getElementById("gal-pop");
+    wirePop(galPop, () => { galPop.querySelector(".gal-stage").innerHTML = ""; });
+    let galAll = false, galAt = 0;
+    const ytId = u => (String(u).match(/(?:v=|youtu\.be\/|embed\/|live\/|shorts\/)([\w-]{11})/) || [])[1];
+    const isFile = u => /\.(mp4|webm|mov)(\?|$)/i.test(u);
+    function renderGallery() {
+      const sec = document.getElementById("gallery");
+      sec.hidden = !gallery.length;
+      if (!gallery.length) return;
+      const shown = galAll ? gallery : gallery.slice(0, 12);
+      document.getElementById("gal-grid").innerHTML = shown.map((g, i) => {
+        const yt = g.kind === "video" && ytId(g.url);
+        const thumb = g.kind === "photo" ? g.url : yt ? `https://i.ytimg.com/vi/${yt}/hqdefault.jpg` : "";
+        return `<button type="button" class="gal-item ${g.kind}" data-g="${i}" aria-label="${escH(g.title || (g.kind === "photo" ? "Photo" : "Video"))}">
+          ${thumb ? `<img loading="lazy" decoding="async" src="${escH(thumb)}" alt="">` : isFile(g.url) ? `<video src="${escH(g.url)}#t=1" preload="metadata" muted></video>` : ""}
+          ${g.kind === "video" ? `<span class="gal-play"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5.5v13l11-6.5z"/></svg></span>` : ""}
+          ${g.title ? `<span class="gal-cap">${escH(g.title)}</span>` : ""}
+        </button>`;
+      }).join("");
+      const more = document.getElementById("gal-more");
+      more.hidden = galAll || gallery.length <= 12;
+      more.onclick = () => { galAll = true; renderGallery(); };
+      document.querySelectorAll("#gal-grid [data-g]").forEach(b => b.onclick = () => openGal(+b.dataset.g, b));
+    }
+    function showGal(i) {
+      galAt = (i + gallery.length) % gallery.length;
+      const g = gallery[galAt], yt = g.kind === "video" && ytId(g.url);
+      galPop.querySelector(".gal-title").textContent = g.title || "";
+      galPop.querySelector(".gal-count").textContent = (galAt + 1) + " / " + gallery.length;
+      galPop.querySelector(".gal-stage").innerHTML = g.kind === "photo" ? `<img src="${escH(g.url)}" alt="${escH(g.title || "")}">`
+        : yt ? `<iframe src="https://www.youtube-nocookie.com/embed/${yt}?autoplay=1&rel=0" allow="autoplay; encrypted-media; picture-in-picture; fullscreen" allowfullscreen title="${escH(g.title || "Video")}"></iframe>`
+        : isFile(g.url) ? `<video src="${escH(g.url)}" controls autoplay playsinline></video>`
+        : `<a class="gal-ext" href="${escH(g.url)}" target="_blank" rel="noopener">${t("galOpen")}</a>`;
+    }
+    function openGal(i, from) { showGal(i); openPop(galPop, from); }
+    galPop.querySelector(".gal-prev").onclick = () => showGal(galAt - 1);
+    galPop.querySelector(".gal-next").onclick = () => showGal(galAt + 1);
+    galPop.addEventListener("keydown", e => { if (e.key === "ArrowLeft") showGal(galAt - 1); if (e.key === "ArrowRight") showGal(galAt + 1); });
+
+    // Sponsors: logos grouped by level
+    const LEVELS = ["Main Sponsor", "Gold Sponsor", "Silver Sponsor", "Partner", "Media Partner"];
+    function renderSponsors() {
+      const sec = document.getElementById("sponsors");
+      sec.hidden = !sponsors.length;
+      if (!sponsors.length) return;
+      document.getElementById("sp-body").innerHTML = LEVELS.map(lv => {
+        const list = sponsors.filter(s => s.level === lv);
+        if (!list.length) return "";
+        return `<div class="sp-level ${lv === "Main Sponsor" ? "main" : ""}"><h3>${t("lvl" + LEVELS.indexOf(lv))}</h3><div class="sp-logos">
+          ${list.map(s => { const inner = `${s.logo ? `<img loading="lazy" decoding="async" src="${escH(s.logo)}" alt="${escH(s.name || "")}">` : ""}${s.name ? `<span>${escH(s.name)}</span>` : ""}`;
+            return s.website ? `<a class="sp-logo" href="${escH(/^https?:/i.test(s.website) ? s.website : "https://" + s.website)}" target="_blank" rel="noopener">${inner}</a>` : `<span class="sp-logo">${inner}</span>`; }).join("")}
+        </div></div>`;
+      }).join("");
+    }
+
+    function renderMedia() { renderNews(); renderGallery(); renderSponsors(); }
+    async function loadMedia() {
+      if (!USE_SERVER) return;
+      const [p, g, s] = await Promise.all([
+        api("posts?select=id,title,body,cover,posted_on,in_slider&published=is.true&order=posted_on.desc,created_at.desc&limit=30").catch(() => []),
+        api("gallery?select=*&order=created_at.desc&limit=200").catch(() => []),
+        api("sponsors?select=*&visible=is.true&order=sort.asc,name.asc").catch(() => [])
+      ]);
+      posts = p; gallery = g; sponsors = s;
+      renderMedia();
+    }
+    loadMedia();
 
     // ---------- Scroll animations ----------
     if ("IntersectionObserver" in window && !matchMedia("(prefers-reduced-motion: reduce)").matches) {
