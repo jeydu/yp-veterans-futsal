@@ -356,3 +356,61 @@ create policy "anyone reads matches" on public.matches for select to anon, authe
 drop policy if exists "organisers edit matches" on public.matches;
 create policy "organisers edit matches" on public.matches for all to authenticated
   using (public.is_organiser()) with check (public.is_organiser());
+
+
+-- 8. Teams & players (organiser portal → Teams & Players) --------------------------------------
+-- One row per club. The name must match the name used in fixtures so its logo shows.
+
+create table if not exists public.clubs (
+  id          uuid primary key default gen_random_uuid(),
+  name        text not null unique check (char_length(name) between 1 and 60),
+  short       text check (char_length(short) <= 20),
+  manager     text check (char_length(manager) <= 100),
+  phone       text check (char_length(phone) <= 20),
+  -- full web address of the logo, or a path on the website like images/rbg-logo.jpg
+  logo        text check (char_length(logo) <= 500),
+  -- true for logos that aren't round: the whole logo shows inside the circle
+  logo_fit    boolean not null default false,
+  -- squad: [{ "name": "...", "no": 10 }]
+  players     jsonb not null default '[]'::jsonb
+              check (jsonb_typeof(players) = 'array' and jsonb_array_length(players) <= 40),
+  created_at  timestamptz not null default now()
+);
+
+alter table public.clubs enable row level security;
+grant select on public.clubs to anon, authenticated;
+grant insert, update, delete on public.clubs to authenticated;
+drop policy if exists "anyone reads clubs" on public.clubs;
+create policy "anyone reads clubs" on public.clubs for select to anon, authenticated using (true);
+drop policy if exists "organisers edit clubs" on public.clubs;
+create policy "organisers edit clubs" on public.clubs for all to authenticated
+  using (public.is_organiser()) with check (public.is_organiser());
+
+-- Club logos: a public bucket (anyone can see logos), only organisers upload or remove
+insert into storage.buckets (id, name, public, file_size_limit, allowed_mime_types)
+values ('club-logos', 'club-logos', true, 2097152, array['image/png', 'image/jpeg', 'image/webp'])
+on conflict (id) do update set public = true, file_size_limit = excluded.file_size_limit, allowed_mime_types = excluded.allowed_mime_types;
+drop policy if exists "organisers add club logos" on storage.objects;
+create policy "organisers add club logos" on storage.objects for insert to authenticated
+  with check (bucket_id = 'club-logos' and public.is_organiser());
+drop policy if exists "organisers change club logos" on storage.objects;
+create policy "organisers change club logos" on storage.objects for update to authenticated
+  using (bucket_id = 'club-logos' and public.is_organiser());
+drop policy if exists "organisers remove club logos" on storage.objects;
+create policy "organisers remove club logos" on storage.objects for delete to authenticated
+  using (bucket_id = 'club-logos' and public.is_organiser());
+
+-- The clubs already on the website (only added if missing)
+insert into public.clubs (name, short, logo, logo_fit) values
+  ('RK SC', 'RK', 'images/royal-knights-logo.jpg', false),
+  ('RBG SC', 'RBG', 'images/rbg-logo.jpg', true),
+  ('Stelco SC', 'STELCO', 'images/stelco-logo.jpg', false),
+  ('BHC', 'BHC', 'images/bhc-logo.jpg', false),
+  ('FT Nakasole', 'NAKASOLE', 'images/ft-nakasole-logo.png', true),
+  ('Afiyns SC', 'AFIYNS', 'images/afiyns-logo.jpg', false),
+  ('KK Kandumathi', 'KANDUMATHI', 'images/kk-kandumathi-logo.jpg', true),
+  ('Old Stars', 'OLD STARS', 'images/old-stars-logo.jpg', true),
+  ('FC Mathiveri', 'MATHIVERI', 'images/fc-mathiveri-logo.jpg', true),
+  ('Mathiveri Veterans', 'MATH VETS', 'images/mathiveri-veterans-logo.jpg', true),
+  ('Aaru FT', 'AARU', 'images/aaru-ft-logo.jpg', false)
+on conflict (name) do nothing;

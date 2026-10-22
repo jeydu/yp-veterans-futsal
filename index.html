@@ -2669,6 +2669,12 @@
       try {
         const get = path => fetch(CONFIG.supabaseUrl + "/rest/v1/" + path, { headers: { apikey: CONFIG.supabaseKey } })
           .then(r => r.ok ? r.json() : Promise.reject(r.status));
+        // Club logos saved in the organiser portal (Teams & Players) replace the built-in ones
+        get("clubs?select=name,logo,logo_fit").then(list => {
+          list.forEach(c => { if (c.logo) window.YP_TEAMS[c.name] = { logo: c.logo, fit: c.logo_fit }; });
+          renderResults();
+          if (resOpen) fillResults();
+        }).catch(() => {});
         const [seasons, matches] = await Promise.all([
           get("seasons?select=*&order=year.desc"),
           get("matches?select=*&order=year.desc,day.asc,no.asc.nullslast,kickoff.asc")

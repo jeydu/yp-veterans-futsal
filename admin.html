@@ -583,6 +583,34 @@
     .ge-row input { text-align: center; }
     .goals-ed .btn { justify-self: start; }
     @media (max-width: 560px) { .g4 { grid-template-columns: 1fr 1fr; } .sheet { width: 100%; } }
+
+    /* ---------- Teams & Players ---------- */
+    .tm-table { overflow: hidden; }
+    .tm-row { display: grid; grid-template-columns: minmax(0, 2fr) minmax(0, 1fr) minmax(0, 1.5fr) 100px 90px; align-items: center; gap: 14px; padding: 12px 18px; border-top: 1px solid var(--border); }
+    .tm-row:hover:not(.tm-hd) { background: var(--surface-2); }
+    .tm-hd { border-top: 0; font-size: .72rem; font-weight: 700; text-transform: uppercase; letter-spacing: .07em; color: var(--muted); background: var(--surface-2); }
+    .tm-name { display: flex; align-items: center; gap: 12px; min-width: 0; }
+    .tm-name .tl { width: 36px; height: 36px; }
+    .tm-name b { font: 700 1rem "Oswald", sans-serif; text-transform: uppercase; letter-spacing: .02em; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .tm-short, .tm-mgr { color: var(--muted); font-size: .88rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .tm-pl b { font: 700 1.05rem "Oswald", sans-serif; }
+    .tm-pl small { color: var(--muted); }
+    .logo-ed { display: flex; align-items: center; gap: 16px; }
+    .logo-prev { display: grid; place-items: center; width: 84px; height: 84px; flex-shrink: 0; border-radius: 50%; overflow: hidden; background: #fff; border: 1px solid var(--border); color: var(--muted); font-size: 2rem; }
+    .logo-prev img { width: 100%; height: 100%; object-fit: cover; }
+    .logo-prev.fit img { object-fit: contain; padding: 6px; }
+    .logo-btns { display: grid; gap: 10px; }
+    .file-btn { cursor: pointer; justify-self: start; flex-direction: row !important; color: var(--text) !important; }
+    .sheet .fx-check { flex-direction: row; align-items: center; gap: 8px; font-weight: 500; color: var(--text); }
+    .pl-rows { display: grid; gap: 6px; }
+    .pl-row { display: grid; grid-template-columns: 70px minmax(0, 1fr) 36px; gap: 6px; align-items: center; }
+    .pl-no { text-align: center; }
+    .fs > .btn { justify-self: start; }
+    @media (max-width: 860px) {
+      .tm-row { grid-template-columns: minmax(0, 1fr) auto; grid-template-areas: "name act" "mgr pl"; gap: 6px 12px; }
+      .tm-hd { display: none; }
+      .tm-name { grid-area: name; } .tm-short { display: none; } .tm-mgr { grid-area: mgr; } .tm-pl { grid-area: pl; text-align: end; } .tm-row .fx-act { grid-area: act; }
+    }
     @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important; } }
     /* Phones */
     @media (max-width: 640px) {
@@ -661,6 +689,7 @@
       <span class="side-h">Manage</span>
       <a class="nav-item" href="#registrations" data-page="registrations"><svg class="ic" aria-hidden="true"><use href="#i-clipboard"/></svg><span>Registrations</span></a>
       <a class="nav-item" href="#fixtures" data-page="fixtures"><svg class="ic" aria-hidden="true"><use href="#i-calendar"/></svg><span>Fixtures &amp; Results</span></a>
+      <a class="nav-item" href="#teams" data-page="teams"><svg class="ic" aria-hidden="true"><use href="#i-users"/></svg><span>Teams &amp; Players</span></a>
       <span class="side-h">Website</span>
       <a class="nav-item" href="./" target="_blank" rel="noopener"><svg class="ic" aria-hidden="true"><use href="#i-external"/></svg><span>View website</span></a>
     </nav>
@@ -867,7 +896,7 @@
 
     // ---------- Pages ----------
     // The menu links set #registrations, #fixtures … in the address; each opens its page
-    const PAGES = { registrations: () => load(), fixtures: () => loadFixtures() };
+    const PAGES = { registrations: () => load(), fixtures: () => loadFixtures(), teams: () => loadTeamsPage() };
     let page = "registrations";
     function route() {
       const want = location.hash.slice(1);
@@ -1379,7 +1408,7 @@
       const t = TEAMS[name];
       return t ? `<img class="tl${t.fit ? " fit" : ""}" src="${esc(t.logo)}" alt="">` : `<span class="tl tl-i">${esc(initials(name))}</span>`;
     };
-    const teamNames = () => [...new Set([...Object.keys(TEAMS), ...fx.matches.flatMap(m => [m.home, m.away])])].sort((a, b) => a.localeCompare(b));
+    const teamNames = () => [...new Set([...Object.keys(TEAMS), ...clubs.map(c => c.name), ...fx.matches.flatMap(m => [m.home, m.away])])].sort((a, b) => a.localeCompare(b));
     // Video time written as 1:02:03, 34:05 or plain seconds
     const toClock = sec => {
       if (sec === null || sec === undefined || sec === "") return "";
@@ -1405,8 +1434,9 @@
 
     async function loadFixtures() {
       app.innerHTML = fixturesHead + `<p class="notice">Loading matches…</p>`;
-      const [s, m] = await Promise.all([
+      const [s, , m] = await Promise.all([
         db.from("seasons").select("*").order("year", { ascending: false }),
+        loadClubs(),
         db.from("matches").select("*").order("day").order("no", { nullsFirst: false }).order("kickoff", { nullsFirst: false })
       ]);
       fx.error = s.error || m.error || null;
@@ -1686,6 +1716,189 @@
         fxDlg.close();
         toast(isNew ? "✓ Match added" : "✓ Match saved");
         loadFixtures();
+      };
+      fxDlg.showModal();
+    }
+
+    // ---------- Teams & Players ----------
+    // One row per club: logo, short name, manager and squad. Logos also show on the website's results and fixtures.
+    let clubs = [];
+    let clubsError = null;
+    // Put saved clubs into the shared team list, so their logos show everywhere in the portal
+    function mergeClubs() {
+      clubs.forEach(c => { if (c.logo) TEAMS[c.name] = { logo: c.logo, fit: c.logo_fit }; });
+    }
+    async function loadClubs() {
+      const { data, error } = await db.from("clubs").select("*").order("name");
+      clubsError = error || null;
+      if (!error) { clubs = data; mergeClubs(); }
+    }
+
+    const teamsHead = `<div class="ph"><div><h1>Teams &amp; Players</h1><p>Add teams, upload logos and keep squad lists up to date.</p></div>
+      <div class="ph-act"><button class="btn primary" id="tm-add">${icon("plus")} Add team</button></div></div>`;
+
+    async function loadTeamsPage() {
+      app.innerHTML = teamsHead + `<p class="notice">Loading teams…</p>`;
+      await loadClubs();
+      if (page === "teams") renderTeamsPage();
+    }
+
+    function renderTeamsPage() {
+      if (clubsError) {
+        const missing = /does not exist|schema cache|42P01|PGRST205/i.test(clubsError.message + " " + clubsError.code);
+        app.innerHTML = teamsHead + `<div class="card notice"><div class="big-ic">${icon("alert")}</div>
+          <h2>${missing ? "One-time setup needed" : "Couldn't load teams"}</h2>
+          <p>${missing ? "Open Supabase → SQL Editor and run <code>supabase/setup.sql</code> again (it now includes teams). Then reload this page." : esc(clubsError.message)}</p></div>`;
+        return;
+      }
+      app.innerHTML = teamsHead + `
+        <div class="card tm-table">
+          <div class="tm-row tm-hd"><span>Team</span><span>Short</span><span>Manager</span><span>Players</span><span></span></div>
+          ${clubs.length ? clubs.map(c => `
+            <div class="tm-row">
+              <span class="tm-name">${teamLogo(c.name)}<b>${esc(c.name)}</b></span>
+              <span class="tm-short">${esc(c.short || "—")}</span>
+              <span class="tm-mgr">${esc(c.manager || "—")}</span>
+              <span class="tm-pl"><b>${(c.players || []).length}</b><small> players</small></span>
+              <span class="fx-act"><button class="btn" data-club="${c.id}">${icon("edit")} Edit</button></span>
+            </div>`).join("")
+          : `<div class="fx-empty">${icon("team")}<b>No teams yet</b><span>Add the first team.</span></div>`}
+        </div>`;
+      document.getElementById("tm-add").onclick = () => editClub(null);
+      app.querySelectorAll("[data-club]").forEach(b => b.onclick = () => editClub(clubs.find(c => c.id === b.dataset.club)));
+    }
+
+    // Shrink a picked logo to at most 400 px (PNG keeps a transparent background)
+    function shrinkLogo(file) {
+      return new Promise((resolve, reject) => {
+        const img = new Image();
+        img.onload = () => {
+          const k = Math.min(1, 400 / Math.max(img.width, img.height));
+          const c = document.createElement("canvas");
+          c.width = Math.round(img.width * k); c.height = Math.round(img.height * k);
+          c.getContext("2d").drawImage(img, 0, 0, c.width, c.height);
+          c.toBlob(b => b ? resolve(b) : reject(new Error("Couldn't read the image")), "image/png");
+          URL.revokeObjectURL(img.src);
+        };
+        img.onerror = () => reject(new Error("That file isn't an image"));
+        img.src = URL.createObjectURL(file);
+      });
+    }
+
+    function editClub(c) {
+      const isNew = !c;
+      c = c || { name: "", short: "", manager: "", phone: "", logo: null, logo_fit: false, players: [] };
+      let newLogo = null;   // picked file, uploaded on save
+      fxDlg.innerHTML = `
+        <form class="sheet-in" id="tm-form" novalidate>
+          <div class="sheet-h">
+            <div><h2>${isNew ? "Add team" : "Edit team"}</h2><p>${isNew ? "New club" : esc(c.name)}</p></div>
+            <button type="button" class="icon-btn" id="tm-close" aria-label="Close">${icon("x")}</button>
+          </div>
+          <div class="sheet-b">
+            <fieldset class="fs">
+              <legend>Logo</legend>
+              <div class="logo-ed">
+                <span class="logo-prev ${c.logo_fit ? "fit" : ""}" id="logo-prev">${c.logo ? `<img src="${esc(c.logo)}" alt="">` : icon("team")}</span>
+                <div class="logo-btns">
+                  <label class="btn file-btn">${icon("plus")} ${c.logo ? "Change logo" : "Upload logo"}<input type="file" accept="image/png,image/jpeg,image/webp" id="logo-file" hidden></label>
+                  <label class="fx-check"><input type="checkbox" name="logo_fit" ${c.logo_fit ? "checked" : ""}> Show the whole logo <small>(for logos that aren't round)</small></label>
+                </div>
+              </div>
+            </fieldset>
+            <fieldset class="fs">
+              <legend>Team</legend>
+              <label>Team name<input name="name" required maxlength="60" value="${esc(c.name)}" autocomplete="off"></label>
+              ${isNew ? "" : `<small class="hint">Fixtures use this exact name. If you rename the team, edit its matches too.</small>`}
+              <div class="g2">
+                <label>Short name<input name="short" maxlength="20" value="${esc(c.short || "")}" placeholder="e.g. RBG"></label>
+                <label>Manager phone<input name="phone" type="tel" maxlength="20" value="${esc(c.phone || "")}" placeholder="7XX XXXX"></label>
+              </div>
+              <label>Manager<input name="manager" maxlength="100" value="${esc(c.manager || "")}"></label>
+            </fieldset>
+            <fieldset class="fs">
+              <legend>Players <span id="pl-count"></span></legend>
+              <div id="pl-rows" class="pl-rows"></div>
+              <button type="button" class="btn" id="pl-add">${icon("plus")} Add player</button>
+            </fieldset>
+            <p class="form-error" id="tm-err" role="alert"></p>
+          </div>
+          <div class="sheet-f">
+            ${isNew ? "" : `<button type="button" class="btn danger" id="tm-del">${icon("trash")} Delete</button>`}
+            <span class="sp"></span>
+            <button type="button" class="btn" id="tm-cancel">Cancel</button>
+            <button type="submit" class="btn primary">${icon("check")} ${isNew ? "Add team" : "Save"}</button>
+          </div>
+        </form>`;
+
+      const f = document.getElementById("tm-form");
+      const rows = document.getElementById("pl-rows");
+      const count = () => document.getElementById("pl-count").textContent = "· " + rows.children.length;
+      const playerRow = p => {
+        const el = document.createElement("div");
+        el.className = "pl-row";
+        el.innerHTML = `<input class="pl-no" type="number" min="0" max="99" inputmode="numeric" placeholder="No." aria-label="Jersey number" value="${p.no ?? ""}">
+          <input class="pl-name" maxlength="100" placeholder="Player name" aria-label="Player name" value="${esc(p.name || "")}">
+          <button type="button" class="icon-btn" aria-label="Remove player">${icon("x")}</button>`;
+        el.querySelector("button").onclick = () => { el.remove(); count(); };
+        rows.appendChild(el);
+        count();
+      };
+      (c.players || []).forEach(playerRow);
+      document.getElementById("pl-add").onclick = () => { playerRow({}); rows.lastElementChild.querySelector(".pl-name").focus(); };
+      count();
+
+      const prev = document.getElementById("logo-prev");
+      f.logo_fit.onchange = () => prev.classList.toggle("fit", f.logo_fit.checked);
+      document.getElementById("logo-file").onchange = e => {
+        const file = e.target.files[0];
+        if (!file) return;
+        newLogo = file;
+        prev.innerHTML = `<img src="${URL.createObjectURL(file)}" alt="">`;
+      };
+      document.getElementById("tm-close").onclick = document.getElementById("tm-cancel").onclick = () => fxDlg.close();
+      const del = document.getElementById("tm-del");
+      if (del) del.onclick = async () => {
+        if (!confirm(`Delete ${c.name}? Its matches stay, but its logo won't show any more.`)) return;
+        const { error } = await db.from("clubs").delete().eq("id", c.id);
+        if (error) return alert("Couldn't delete: " + error.message);
+        delete TEAMS[c.name];
+        fxDlg.close();
+        toast(c.name + " deleted");
+        loadTeamsPage();
+      };
+
+      f.onsubmit = async e => {
+        e.preventDefault();
+        const err = document.getElementById("tm-err");
+        const name = f.name.value.trim();
+        if (!name) { err.textContent = "Enter the team name."; return; }
+        if (clubs.some(x => x.name.toLowerCase() === name.toLowerCase() && x.id !== c.id)) { err.textContent = "There's already a team with that name."; return; }
+        const players = [...rows.children].map(el => ({ no: el.querySelector(".pl-no").value === "" ? null : Number(el.querySelector(".pl-no").value), name: el.querySelector(".pl-name").value.trim() }))
+          .filter(p => p.name);
+        const nums = players.map(p => p.no).filter(n => n !== null);
+        if (new Set(nums).size !== nums.length) { err.textContent = "Two players have the same jersey number."; return; }
+        const btn = f.querySelector("[type=submit]");
+        btn.disabled = true;
+        let logo = c.logo;
+        if (newLogo) {
+          try {
+            const blob = await shrinkLogo(newLogo);
+            const path = crypto.randomUUID() + ".png";
+            const up = await db.storage.from("club-logos").upload(path, blob, { contentType: "image/png" });
+            if (up.error) throw up.error;
+            logo = db.storage.from("club-logos").getPublicUrl(path).data.publicUrl;
+          } catch (x) { btn.disabled = false; err.textContent = "Couldn't upload the logo: " + x.message; return; }
+        }
+        const row = { name, short: f.short.value.trim() || null, manager: f.manager.value.trim() || null, phone: f.phone.value.trim() || null,
+                      logo, logo_fit: f.logo_fit.checked, players };
+        const { error } = isNew ? await db.from("clubs").insert(row) : await db.from("clubs").update(row).eq("id", c.id);
+        btn.disabled = false;
+        if (error) { err.textContent = "Couldn't save: " + error.message; return; }
+        if (!isNew && c.name !== name) delete TEAMS[c.name];
+        fxDlg.close();
+        toast(isNew ? "✓ " + name + " added" : "✓ " + name + " saved");
+        loadTeamsPage();
       };
       fxDlg.showModal();
     }
