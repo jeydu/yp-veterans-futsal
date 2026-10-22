@@ -775,6 +775,13 @@
     }
 
     /* ---------- Registrations list ---------- */
+    .ck-list { display: grid; gap: 6px; }
+    .ck-row { display: grid; grid-template-columns: 24px minmax(0, 1fr) 34px 34px; align-items: center; gap: 6px; }
+    .ck-tick { display: grid; place-items: center; width: 22px; height: 22px; border-radius: 6px; background: var(--brand); color: #fff; font-size: .75rem; }
+    .ck-row .icon-btn { width: 34px; height: 34px; }
+    .ck-row [data-ck="up"] .ic { transform: rotate(180deg); }
+    .ck-row:first-child [data-ck="up"] { visibility: hidden; }
+    .rc-actions .sp { flex: 1; }
     .rg-status { display: flex; align-items: center; gap: 14px; padding: 16px 20px; margin-bottom: 14px; border-inline-start: 5px solid var(--green); }
     .rg-status.closed { border-inline-start-color: var(--brand); }
     .rg-st-ic { display: grid; place-items: center; width: 42px; height: 42px; flex-shrink: 0; border-radius: 12px; background: var(--green-bg); color: var(--green); font-size: 1.2rem; }
@@ -1417,14 +1424,21 @@
                 </div>
               </div>
             </fieldset>
-            <fieldset class="fs"><legend>Checklist for teams <small>one item per line · empty = the standard list</small></legend>
-              <textarea id="instructions" rows="6" maxlength="1000" placeholder="10 to 12 players, all aged 35 or older&#10;4 officials: manager, coach, official and medic&#10;A passport-size photo and an ID card photo for everyone&#10;The manager's phone number (on WhatsApp)">${esc(settings.instructions || "")}</textarea>
-              <div class="rc-actions"><button type="button" class="btn" id="save-extra">${icon("check")} Save checklist</button><span class="rc-saved" id="extra-saved" hidden>✓ Saved</span></div>
+            <fieldset class="fs"><legend>Checklist for teams <small>shown next to the registration form on the website</small></legend>
+              <div class="ck-list" id="ck-list"></div>
+              <div class="rc-actions">
+                <button type="button" class="btn" id="ck-add">${icon("plus")} Add item</button>
+                <button type="button" class="btn danger" id="ck-reset">${icon("undo")} Standard list</button>
+                <span class="sp"></span>
+                <button type="button" class="btn primary" id="save-extra">${icon("check")} Save checklist</button>
+                <span class="rc-saved" id="extra-saved" hidden>✓ Saved</span>
+              </div>
             </fieldset>
           </div>
         </div>`;
       document.getElementById("sh-close").onclick = () => fxDlg.close();
       document.getElementById("save-extra").onclick = saveChecklist;
+      wireChecklist();
       wireDeadline();
     }
 
@@ -1527,8 +1541,32 @@
       toast(closes_at ? "✓ Closing date saved" : "Closing date removed");
     }
 
+    // The checklist as editable lines: type to change, ↑ to move up, ✕ to remove
+    const STANDARD_CHECKLIST = ["10 to 12 players, all aged 35 or older", "4 officials: manager, coach, official and medic",
+      "A passport-size photo and an ID card photo for everyone", "The manager's phone number (on WhatsApp)"];
+    function wireChecklist() {
+      const box = document.getElementById("ck-list");
+      const items = (settings.instructions || "").split("\n").map(l => l.trim()).filter(Boolean);
+      const add = text => {
+        const row = document.createElement("div");
+        row.className = "ck-row";
+        row.innerHTML = `<span class="ck-tick">${icon("check")}</span><input maxlength="200" placeholder="New item" value="${esc(text)}" aria-label="Checklist item">
+          <button type="button" class="icon-btn" data-ck="up" aria-label="Move up">${icon("chev")}</button>
+          <button type="button" class="icon-btn" data-ck="rm" aria-label="Remove item">${icon("x")}</button>`;
+        row.querySelector('[data-ck="up"]').onclick = () => { if (row.previousElementSibling) box.insertBefore(row, row.previousElementSibling); };
+        row.querySelector('[data-ck="rm"]').onclick = () => row.remove();
+        box.appendChild(row);
+        return row;
+      };
+      (items.length ? items : STANDARD_CHECKLIST).forEach(add);
+      document.getElementById("ck-add").onclick = () => add("").querySelector("input").focus();
+      document.getElementById("ck-reset").onclick = () => { box.innerHTML = ""; STANDARD_CHECKLIST.forEach(add); };
+    }
+
     async function saveChecklist() {
-      const instructions = document.getElementById("instructions").value.trim() || null;
+      const lines = [...document.querySelectorAll("#ck-list input")].map(i => i.value.trim()).filter(Boolean);
+      // The standard list is stored as "nothing", so the website keeps its translated version
+      const instructions = lines.length && lines.join("\n") !== STANDARD_CHECKLIST.join("\n") ? lines.join("\n") : null;
       const { error } = await db.from("settings").update({ instructions, updated_at: new Date().toISOString() }).eq("id", 1);
       if (error) return alert("Couldn't save: " + error.message);
       settings.instructions = instructions;
