@@ -1013,7 +1013,9 @@
       return d > 0 ? `${d} day${d === 1 ? "" : "s"} ${h} h` : h > 0 ? `${h} h ${m} min` : `${m} min`;
     };
     let filter = "all";
-    let regView = "teams";   // "teams" = list of teams, "people" = everyone's photos on one page
+    let regView = "teams";
+    let lastShown = [];
+    const shownTeams = () => lastShown;   // "teams" = list of teams, "people" = everyone's photos on one page
     let sortBy = "newest";
     const openIds = new Set();   // teams the organiser has expanded; kept open across refreshes
     let lastSignature = "";
@@ -1235,6 +1237,7 @@
         (filter === "all" || (filter === "issues" ? t.checks.issues && t.status !== "rejected" : t.status === filter)) &&
         (!q || [t.team_name, t.manager, t.island, t.phone, ...t.players.map(p => p.name), ...t.officials.map(o => o.name)].some(v => (v || "").toLowerCase().includes(q))))
         .sort(sorters[sortBy]);
+      lastShown = shown;
 
       const deadlinePassed = settings.closes_at && Date.now() >= new Date(settings.closes_at);
       const open = settings.registration_open && !deadlinePassed;
@@ -1245,7 +1248,7 @@
         <div class="ph"><div><h1>Registrations</h1><p>Teams that registered on the website. Review each squad, then confirm or reject it.</p></div>
           <div class="ph-act">
             <button class="btn" id="refresh" title="Check for new registrations">${icon("refresh")} Refresh</button>
-            <button class="btn" id="export" ${counts.all ? "" : "disabled"}>${icon("download")} Export CSV</button>
+            <button class="btn" id="export" ${shown.length ? "" : "disabled"} title="Download a ZIP: Excel list + every passport photo and ID card">${icon("download")} Export</button>
             <button class="btn" id="reg-settings">${icon("calendar")} Registration settings</button>
           </div></div>
 
@@ -1309,7 +1312,7 @@
       search.oninput = () => { query = search.value; render(); const s = document.getElementById("search"); s.focus(); s.setSelectionRange(s.value.length, s.value.length); };
       document.getElementById("sort").onchange = e => { sortBy = e.target.value; render(); };
       document.getElementById("refresh").onclick = () => load();
-      document.getElementById("export").onclick = exportCsv;
+      document.getElementById("export").onclick = exportZip;
       document.getElementById("reg-settings").onclick = openRegSettings;
       document.getElementById("reg-switch").onclick = e => { e.preventDefault(); toggleRegistration(); };
       const clearBtn = document.getElementById("clear-filters");
@@ -1646,22 +1649,81 @@
       return true;
     }
 
-    function exportCsv() {
-      const cell = v => `"${String(v ?? "").replace(/"/g, '""')}"`;
-      const rows = [["Team", "Status", "Problems", "Manager", "Phone", "Coach", "Official", "Medic", "Island", "Registered", "Player #", "Jersey", "Player", "Age", "Notes"]];
-      teams.forEach(t => {
-        const off = role => t.officials.find(o => o.role === role) || {};
-        const problems = t.checks.list.filter(k => !k.ok).map(k => k.title).join("; ");
-        t.players.forEach(p => rows.push([
-          t.team_name, t.status, problems, t.manager, t.phone, off("coach").name, off("official").name || off("assistant").name, off("medic").name,
-          t.island, fmtDate(t.created_at), p.position, p.jersey_number, p.name, p.age, t.notes
-        ]));
-      });
-      const blob = new Blob(["﻿" + rows.map(r => r.map(cell).join(",")).join("\n")], { type: "text/csv;charset=utf-8" });
-      const a = document.createElement("a");
-      a.href = URL.createObjectURL(blob);
-      a.download = "yp-veterans-registrations.csv";
-      a.click();
+    // ---------- Export: a ZIP with an Excel-ready list and every team's photos ----------
+    // Exports the teams shown now (the tab, search and sort you picked).
+    // registrations.csv  one row per person, with "View" links to the photos (they work once the ZIP is unzipped)
+    // <Team>/Officials/…  and  <Team>/Players/07 - Name - Passport photo.jpg / - ID card.jpg
+    async function exportZip() {
+      const list = shownTeams();
+      if (!list.length) return;
+      const btn = document.getElementById("export");
+      const label = txt => btn.innerHTML = `${icon("download")} ${txt}`;
+      btn.disabled = true;
+      try {
+        const { default: JSZip } = await import("https://cdn.jsdelivr.net/npm/jszip@3.10.1/+esm");
+        const zip = new JSZip();
+        // Safe file and folder names
+        const clean = v => String(v ?? "").replace(/[\\/:*?"<>|#%]+/g, " ").replace(/\s+/g, " ").trim().slice(0, 60) || "x";
+        // Text cells; anything that looks like a formula is kept as text
+        const cell = v => { let x = String(v ?? ""); if (/^[=+\-@\t\r]/.test(x)) x = "'" + x; return `"${x.replace(/"/g, '""')}"`; };
+        const link = path => path ? `"=HYPERLINK(""${path.replace(/"/g, "")}"",""View"")"` : `"Missing"`;
+        const rows = [["Team", "Status", "Island", "Registered", "Role", "No.", "Name", "Age", "Phone", "Passport photo", "ID card", "Problems"].map(cell).join(",")];
+        const files = [];   // { from: storage path, to: path inside the ZIP }
+        const used = new Set();
+        list.forEach(t => {
+          let folder = clean(t.team_name);
+          for (let n = 2; used.has(folder); n++) folder = clean(t.team_name) + " (" + n + ")";
+          used.add(folder);
+          const problems = t.checks.list.filter(k => !k.ok).map(k => k.title).join("; ");
+          const people = [
+            ...t.officials.map(o => ({ x: o, role: roleInfo(o.role).label, no: "", sub: "Officials", name: roleInfo(o.role).label + " - " + clean(o.name) })),
+            ...t.players.map(x => ({ x, role: "Player", no: x.jersey_number ?? "", sub: "Players", name: String(x.jersey_number ?? x.position).padStart(2, "0") + " - " + clean(x.name) }))
+          ];
+          people.forEach(({ x, role, no, sub, name }, i) => {
+            const target = (path, kind) => {
+              if (!path) return "";
+              const to = `${folder}/${sub}/${name} - ${kind}.jpg`;
+              files.push({ from: path, to });
+              return to;
+            };
+            const pass = target(x.passport_photo_path, "Passport photo"), id = target(x.id_photo_path, "ID card");
+            rows.push([
+              cell(t.team_name), cell(statusLabel(t.status)), cell(t.island), cell(fmtDate(t.created_at)), cell(role), cell(no),
+              cell(x.name), cell(x.age ?? ""), cell(x.phone || (role === "Manager" ? t.phone : "")), link(pass), link(id), cell(i ? "" : problems)
+            ].join(","));
+          });
+        });
+        zip.file("registrations.csv", "﻿" + rows.join("\r\n"));
+
+        // Photos: private links in batches, then download each one
+        for (let i = 0; i < files.length; i += 50) {
+          const batch = files.slice(i, i + 50);
+          const { data } = await db.storage.from("id-cards").createSignedUrls(batch.map(f => f.from), 600);
+          (data || []).forEach((d, k) => batch[k].url = d.signedUrl);
+        }
+        let done = 0;
+        const next = async () => {
+          while (files.length) {
+            const f = files.shift();
+            if (f.url) { try { const r = await fetch(f.url); if (r.ok) zip.file(f.to, await r.blob()); } catch (e) {} }
+            label(`Photos ${++done}…`);
+          }
+        };
+        await Promise.all([next(), next(), next(), next()]);
+        label("Making ZIP…");
+        const blob = await zip.generateAsync({ type: "blob" });
+        const a = document.createElement("a");
+        a.href = URL.createObjectURL(blob);
+        a.download = `yp-veterans-registrations-${new Date().toISOString().slice(0, 10)}.zip`;
+        a.click();
+        setTimeout(() => URL.revokeObjectURL(a.href), 60000);
+        toast(`✓ Exported ${list.length} team${list.length === 1 ? "" : "s"} with photos`);
+      } catch (e) {
+        alert("Couldn't export: " + e.message);
+      } finally {
+        btn.disabled = false;
+        label("Export");
+      }
     }
 
     // ---------- Fixtures & Results ----------
