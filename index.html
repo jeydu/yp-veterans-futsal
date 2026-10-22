@@ -24,6 +24,8 @@
   <script>
     // Lets the CSS hide parts that the script fills in (e.g. registration, until we know it is open)
     document.documentElement.classList.add("js");
+    // Registration closed last time: hide it straight away (the check below confirms or shows it again)
+    try { if (localStorage.getItem("yp-reg") === "closed") document.documentElement.classList.add("reg-off"); } catch (e) {}
   </script>
   <script src="config.js"></script>
   <script src="teams.js"></script>
@@ -609,6 +611,8 @@
     .reg-deadline.soon .rd-unit { background: var(--brand); }
     /* Locked: the whole card follows the "closed" state */
     .reg.is-closed { grid-template-columns: 1fr; max-width: 760px; margin: 0 auto; }
+    /* Registration closed: no registration section, menu link or header button */
+    .reg-off #register, .reg-off nav li:has(a[href="#register"]), .reg-off .hero-btns a[href="#register"] { display: none !important; }
     /* Hidden until we know whether registration is open, so the form doesn't flash before "closed" */
     .reg { transition: opacity .3s ease; }
     .js .reg.checking { opacity: 0; pointer-events: none; }
@@ -2388,7 +2392,11 @@
         renderDeadline();
         renderInstructions();
         const deadlinePassed = settings.closes_at && Date.now() >= new Date(settings.closes_at);
-        if (settings.registration_open && !deadlinePassed) return;
+        const open = settings.registration_open && !deadlinePassed;
+        // Closed: the registration section, its menu link and the header button all disappear
+        document.documentElement.classList.toggle("reg-off", !open);
+        try { localStorage.setItem("yp-reg", open ? "open" : "closed"); } catch (e) {}
+        if (open) return;
         reg.classList.add("is-closed");
         regClosedOn = deadlinePassed ? settings.closes_at : null;
         renderLocked();
