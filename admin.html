@@ -822,6 +822,77 @@
       .pp-team { padding: 12px; }
       .rg-view { flex: 1 1 100%; } .rg-view .seg-b { flex: 1; justify-content: center; }
     }
+
+    /* ---------- Easy use ---------- */
+    /* Home: big quick-action buttons */
+    .qa { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; margin-bottom: 18px; }
+    .qa-it { position: relative; display: grid; grid-template-columns: 52px 1fr; grid-template-rows: auto auto; column-gap: 12px; align-items: center; padding: 16px; text-align: start; text-decoration: none; color: var(--text); background: var(--surface); border: 1px solid var(--border); border-radius: 16px; box-shadow: var(--shadow); transition: border-color .15s ease, transform .15s ease; }
+    .qa-it:hover { border-color: var(--brand); }
+    .qa-it:active { transform: scale(.98); }
+    .qa-ic { grid-row: span 2; display: grid; place-items: center; width: 52px; height: 52px; border-radius: 14px; background: var(--brand); color: #fff; font-size: 1.5rem; }
+    .qa-it b { font-size: 1rem; }
+    .qa-it small { font-size: .8rem; color: var(--muted); }
+    .qa-it em { position: absolute; top: 10px; right: 10px; min-width: 24px; height: 24px; padding: 0 7px; display: grid; place-items: center; border-radius: 99px; background: var(--amber); color: #fff; font-style: normal; font-size: .78rem; font-weight: 700; }
+    /* Enter a score */
+    .qs-list { display: grid; gap: 8px; }
+    .qs-m { display: grid; grid-template-columns: minmax(0, 1fr) 20px; grid-template-areas: "w x" "t x"; gap: 6px 10px; align-items: center; padding: 14px; text-align: start; background: var(--surface); border: 1px solid var(--border); border-radius: 14px; color: var(--text); }
+    .qs-m:hover { border-color: var(--brand); }
+    .qs-m.qs-live { border-color: var(--brand); background: #fff5f6; }
+    .qs-m > .ic { grid-area: x; transform: rotate(-90deg); color: var(--muted); }
+    .qs-when { grid-area: w; font-size: .8rem; color: var(--muted); }
+    .live-b { color: var(--brand-text); }
+    .qs-teams { grid-area: t; display: grid; grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr); align-items: center; gap: 8px; font: 700 .95rem "Oswald", sans-serif; text-transform: uppercase; }
+    .qs-teams > span { display: flex; align-items: center; gap: 7px; min-width: 0; overflow: hidden; white-space: nowrap; }
+    .qs-teams > span:last-child { justify-content: flex-end; }
+    .qs-teams em { font-style: normal; color: var(--muted); }
+    .sc-board { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 16px; }
+    .sc-side { display: flex; flex-direction: column; align-items: center; gap: 12px; padding: 18px 10px; border: 1px solid var(--border); border-radius: 16px; background: var(--surface-2); text-align: center; }
+    .sc-team { display: flex; flex-direction: column; align-items: center; gap: 8px; }
+    .sc-team .tl { width: 56px; height: 56px; }
+    .sc-team b { font: 700 1.05rem "Oswald", sans-serif; text-transform: uppercase; }
+    .sc-step { display: flex; align-items: center; gap: 10px; }
+    .sc-step output { min-width: 56px; font: 700 3rem/1 "Oswald", sans-serif; text-align: center; }
+    .sc-btn { width: 52px; height: 52px; border-radius: 50%; border: 2px solid var(--border); background: var(--surface); font-size: 1.8rem; font-weight: 700; line-height: 1; color: var(--text); }
+    .sc-btn.plus { border-color: var(--brand); background: var(--brand); color: #fff; }
+    .sc-btn:active { transform: scale(.94); }
+    .sc-board > * { min-width: 0; }
+    .sc-board.small .sc-side { padding: 12px 8px; }
+    .sc-board.small output { font-size: 2rem; min-width: 40px; }
+    .sc-board.small .sc-btn { width: 42px; height: 42px; font-size: 1.4rem; }
+    .sc-pens { margin-top: 18px; padding: 14px; border-radius: 14px; background: var(--amber-bg); }
+    .sc-pens[hidden] { display: none; }
+    .sc-save { padding: 13px 22px; font-size: 1rem; }
+    /* Menu sheet */
+    .more-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; padding-top: 12px; }
+    .more-it { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; min-height: 96px; padding: 12px; border: 1px solid var(--border); border-radius: 16px; background: var(--surface); color: var(--text); text-decoration: none; font-weight: 600; font-size: .9rem; text-align: center; }
+    .more-it .ic { font-size: 1.6rem; color: var(--brand-text); }
+    .more-it.on { border-color: var(--brand); background: var(--tint); }
+    /* Phones: bottom menu bar */
+    .bnav { display: none; }
+    @media (max-width: 860px) {
+      .bnav:not([hidden]) { position: fixed; z-index: 30; left: 0; right: 0; bottom: 0; display: grid; grid-auto-flow: column; grid-auto-columns: 1fr;
+        padding: 6px 4px calc(6px + env(safe-area-inset-bottom)); background: #150c0d; border-top: 1px solid rgba(255,255,255,.08); }
+      .bn { display: flex; flex-direction: column; align-items: center; gap: 3px; padding: 6px 2px; border: 0; border-radius: 12px; background: none; color: #a8999a; text-decoration: none; font-size: .68rem; font-weight: 600; }
+      .bn .ic { font-size: 1.35rem; }
+      .bn.on { color: #fff; }
+      .bn.on .ic { color: #ff5a70; }
+      body.app-mode main.wrap { padding-bottom: calc(96px + env(safe-area-inset-bottom)); }
+      /* The top bar keeps only the logo and log out; the page links live in the bottom bar */
+      .side-nav { display: none; }
+      .side { padding-bottom: 10px; }
+      .qa { grid-template-columns: 1fr 1fr; gap: 10px; }
+      .qa-it { grid-template-columns: 1fr; grid-template-rows: auto; row-gap: 8px; padding: 14px; }
+      .qa-ic { grid-row: auto; width: 46px; height: 46px; font-size: 1.3rem; }
+      .qa-it small { display: none; }
+      /* Score: one team per row, the − / + buttons on the right */
+      .sc-board { grid-template-columns: 1fr; }
+      .sc-side { flex-direction: row; justify-content: space-between; padding: 14px; }
+      .sc-team { flex-direction: row; gap: 10px; min-width: 0; text-align: start; }
+      .sc-team .tl { width: 44px; height: 44px; }
+      .sc-team b { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+      .sc-step { flex-shrink: 0; gap: 6px; }
+      .sc-step output { min-width: 44px; font-size: 2.4rem; }
+    }
     @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important; } }
     /* Phones */
     @media (max-width: 640px) {
@@ -923,6 +994,8 @@
       <button class="side-btn" id="logout"><svg class="ic" aria-hidden="true"><use href="#i-logout"/></svg><span>Log out</span></button>
     </div>
   </aside>
+  <!-- Phones: menu along the bottom (filled in by the script) -->
+  <nav class="bnav" id="bnav" aria-label="Organiser pages" hidden></nav>
 
   <div class="glass-scene" aria-hidden="true">
     <span class="blob b1"></span><span class="blob b2"></span><span class="blob b3"></span>
@@ -1055,6 +1128,7 @@
     }
     function showLogin(message = "") {
       who.hidden = true;
+      document.getElementById("bnav").hidden = true;
       document.body.classList.remove("app-mode");
       document.body.classList.add("login-mode");
       app.innerHTML = `
@@ -1154,6 +1228,9 @@
       document.querySelectorAll(".nav-item[data-page]").forEach(a => { a.hidden = !can(PAGES[a.dataset.page][0]); a.classList.toggle("active", a.dataset.page === page); });
       document.querySelectorAll(".side-h[data-group]").forEach(h => h.hidden = ![...document.querySelectorAll(`.nav-item[data-group="${h.dataset.group}"]`)].some(a => !a.hidden));
       lastSignature = "";
+      document.getElementById("bnav").hidden = false;
+      drawBottomNav();
+      if (fxDlg.open && fxDlg.dataset.sheet === "more") fxDlg.close();
       PAGES[page][1]();
       scrollTo(0, 0);
     }
@@ -1896,6 +1973,7 @@
 
     const fixturesHead = `<div class="ph"><div><h1>Fixtures &amp; Results</h1><p>Add matches, enter scores, goals and match videos. The website updates as soon as you save.</p></div>
       <div class="ph-act"><a class="btn" href="./#results" target="_blank" rel="noopener">${icon("external")} View on website</a>
+      <button class="btn" id="fx-score">${icon("ball")} Enter a score</button>
       <button class="btn primary" id="fx-bulk">${icon("plus")} Add matches</button></div></div>`;
 
     async function loadFixtures() {
@@ -1961,6 +2039,7 @@
 
       document.getElementById("fx-bulk").disabled = !season;
       document.getElementById("fx-bulk").onclick = () => bulkFixtures();
+      document.getElementById("fx-score").onclick = quickScore;
       document.getElementById("fx-new-season").onclick = newSeason;
       const yearSel = document.getElementById("fx-year");
       if (yearSel) yearSel.onchange = () => { fx.year = Number(yearSel.value); renderFixtures(); };
@@ -2580,6 +2659,7 @@
 
       app.innerHTML = pageHead(`Welcome back${me.name ? ", " + esc(me.name.split(" ")[0]) : ""}`, "Signed in as " + esc(me.role),
         `<span class="btn static">${icon("calendar")} ${today}</span><a class="btn" href="./" target="_blank" rel="noopener">${icon("external")} View website</a>`) + `
+        ${quickActions(teamsList.filter(t => t.status === "pending").length)}
         <div class="dash">
           ${s ? `
           <div class="card d-live"><span class="d-tag">Live</span><small>Viewing the site now</small><b>${s.live}</b><span>Active in the last 5 minutes · updates every 30 s</span></div>
@@ -2604,6 +2684,7 @@
             ${last ? `<small>Latest result · ${last.year}</small>${matchLine(last)}` : ""}
           </div>
         </div>`;
+      app.querySelectorAll("[data-qa]").forEach(b => b.onclick = () => b.dataset.qa === "score" ? quickScore() : (location.hash = "#fixtures", setTimeout(() => bulkFixtures(), 400)));
       clearTimeout(dashTimer);
       dashTimer = setTimeout(() => { if (page === "dashboard" && !document.hidden) loadDashboard(); }, 30000);
     }
@@ -3020,6 +3101,144 @@
         const reset = f.querySelector("[data-reset]");
         if (reset) reset.onclick = () => { if (confirm("Go back to the original logo?")) save(null); };
       });
+    }
+
+    // ---------- Easy score entry (match days) ----------
+    // A list of matches without a score (live and today's first); tap one for big − / + buttons.
+    async function quickScore() {
+      fxDlg.dataset.sheet = "score";
+      fxDlg.innerHTML = `<div class="sheet-in"><div class="sheet-h"><div><h2>Enter a score</h2><p>Loading matches…</p></div>
+        <button type="button" class="icon-btn" id="sh-close" aria-label="Close">${icon("x")}</button></div></div>`;
+      document.getElementById("sh-close").onclick = () => fxDlg.close();
+      if (!fxDlg.open) fxDlg.showModal();
+      const { data, error } = await db.from("matches").select("*").is("home_score", null).order("kickoff", { nullsFirst: false }).limit(200);
+      if (error) { fxDlg.querySelector(".sheet-h p").textContent = "Couldn't load matches: " + error.message; return; }
+      const now = Date.now(), DAY = 864e5;
+      const when = m => m.kickoff ? Date.parse(m.kickoff) : null;
+      const isLiveM = m => when(m) && now >= when(m) && now < when(m) + 2 * 3600e3;
+      const groups = [
+        ["Live now", data.filter(isLiveM)],
+        ["Today and earlier, waiting for a score", data.filter(m => !isLiveM(m) && when(m) && when(m) < now)],
+        ["Coming up", data.filter(m => when(m) && when(m) > now).slice(0, 12)],
+        ["No date", data.filter(m => !when(m))]
+      ].filter(([, l]) => l.length);
+      const row = m => `<button type="button" class="qs-m ${isLiveM(m) ? "qs-live" : ""}" data-qs="${m.id}">
+          <span class="qs-when">${isLiveM(m) ? `<b class="live-b">● LIVE</b>` : m.kickoff ? `${fmtKick(m.kickoff)} · ${fmtKickTime(m.kickoff)}` : "Match day " + m.day}</span>
+          <span class="qs-teams"><span>${teamLogo(m.home)}${esc(m.home)}</span><em>v</em><span>${esc(m.away)}${teamLogo(m.away)}</span></span>
+          ${icon("chev")}</button>`;
+      fxDlg.innerHTML = `
+        <div class="sheet-in">
+          <div class="sheet-h"><div><h2>Enter a score</h2><p>Tap a match</p></div>
+            <button type="button" class="icon-btn" id="sh-close" aria-label="Close">${icon("x")}</button></div>
+          <div class="sheet-b">
+            ${groups.length ? groups.map(([h, l]) => `<h4 class="sub-h">${h}</h4><div class="qs-list">${l.map(row).join("")}</div>`).join("")
+              : `<div class="fx-empty">${icon("check-circle")}<b>Every match has a score</b><span>Nothing to enter right now.</span></div>`}
+          </div>
+        </div>`;
+      document.getElementById("sh-close").onclick = () => fxDlg.close();
+      fxDlg.querySelectorAll("[data-qs]").forEach(b => b.onclick = () => scoreMatch(data.find(m => m.id === b.dataset.qs)));
+    }
+
+    function scoreMatch(m) {
+      const s = { h: 0, a: 0, ph: 0, pa: 0 };
+      const knockout = !!m.stage;
+      fxDlg.innerHTML = `
+        <div class="sheet-in">
+          <div class="sheet-h"><div><h2>Score</h2><p>${m.kickoff ? fmtKick(m.kickoff) + " · " + fmtKickTime(m.kickoff) : "Match day " + m.day}${m.no ? " · Match " + m.no : ""}</p></div>
+            <button type="button" class="icon-btn" id="sh-close" aria-label="Close">${icon("x")}</button></div>
+          <div class="sheet-b">
+            <div class="sc-board">
+              ${[["h", m.home], ["a", m.away]].map(([k, name]) => `
+                <div class="sc-side">
+                  <span class="sc-team">${teamLogo(name)}<b>${esc(name)}</b></span>
+                  <div class="sc-step">
+                    <button type="button" class="sc-btn" data-k="${k}" data-d="-1" aria-label="${esc(name)} minus one">−</button>
+                    <output id="sc-${k}">0</output>
+                    <button type="button" class="sc-btn plus" data-k="${k}" data-d="1" aria-label="${esc(name)} plus one">+</button>
+                  </div>
+                </div>`).join("")}
+            </div>
+            <div class="sc-pens" id="sc-pens" hidden>
+              <b>Level. Penalty shootout?</b>
+              <div class="sc-board small">
+                ${[["ph", m.home], ["pa", m.away]].map(([k, name]) => `
+                  <div class="sc-side"><span class="sc-team"><b>${esc(name)}</b></span>
+                    <div class="sc-step"><button type="button" class="sc-btn" data-k="${k}" data-d="-1">−</button><output id="sc-${k}">0</output><button type="button" class="sc-btn plus" data-k="${k}" data-d="1">+</button></div></div>`).join("")}
+              </div>
+              <small class="hint">Leave both at 0 if there was no shootout.</small>
+            </div>
+            <p class="form-error" id="sc-err" role="alert"></p>
+          </div>
+          <div class="sheet-f">
+            <button type="button" class="btn" id="sc-back">${icon("undo")} Matches</button><span class="sp"></span>
+            <button type="button" class="btn primary sc-save" id="sc-save">${icon("check")} Save score</button>
+          </div>
+        </div>`;
+      const draw = () => {
+        ["h", "a", "ph", "pa"].forEach(k => document.getElementById("sc-" + k).textContent = s[k]);
+        document.getElementById("sc-pens").hidden = !(knockout && s.h === s.a);
+        document.getElementById("sc-save").innerHTML = `${icon("check")} Save ${s.h} – ${s.a}`;
+      };
+      fxDlg.querySelectorAll(".sc-btn").forEach(b => b.onclick = () => { s[b.dataset.k] = Math.max(0, Math.min(99, s[b.dataset.k] + Number(b.dataset.d))); draw(); });
+      document.getElementById("sh-close").onclick = () => fxDlg.close();
+      document.getElementById("sc-back").onclick = quickScore;
+      document.getElementById("sc-save").onclick = async () => {
+        const pens = knockout && s.h === s.a && (s.ph || s.pa);
+        if (pens && s.ph === s.pa) { document.getElementById("sc-err").textContent = "A shootout can't end level."; return; }
+        if (!confirm(`Save ${m.home} ${s.h} – ${s.a} ${m.away}${pens ? ` (${s.ph}–${s.pa} on penalties)` : ""}?`)) return;
+        const btn = document.getElementById("sc-save"); btn.disabled = true;
+        const { error } = await db.from("matches").update({ home_score: s.h, away_score: s.a, pen_home: pens ? s.ph : null, pen_away: pens ? s.pa : null, updated_at: new Date().toISOString() }).eq("id", m.id);
+        btn.disabled = false;
+        if (error) { document.getElementById("sc-err").textContent = "Couldn't save: " + error.message; return; }
+        toast(`✓ ${m.home} ${s.h} – ${s.a} ${m.away} saved`);
+        if (page === "fixtures") loadFixtures();
+        if (page === "dashboard") loadDashboard();
+        quickScore();
+      };
+      draw();
+    }
+
+    // ---------- Phones: bottom menu ----------
+    // Home, Registrations, Fixtures, Teams and More (every other page, the website and Log out)
+    const BOTTOM = [["dashboard", "grid", "Home"], ["registrations", "clipboard", "Registrations"], ["fixtures", "calendar", "Fixtures"], ["teams", "users", "Teams"]];
+    function drawBottomNav() {
+      const bar = document.getElementById("bnav");
+      const items = BOTTOM.filter(([k]) => can(PAGES[k][0]));
+      bar.innerHTML = items.map(([k, ic, l]) => `<a href="#${k}" class="bn ${page === k ? "on" : ""}">${icon(ic)}<span>${l}</span></a>`).join("")
+        + `<button type="button" class="bn ${BOTTOM.some(([k]) => k === page) ? "" : "on"}" id="bn-more">${icon("grid")}<span>More</span></button>`;
+      document.getElementById("bn-more").onclick = openMore;
+    }
+    function openMore() {
+      const links = [...document.querySelectorAll(".side-nav .nav-item")].filter(a => !a.hidden);
+      fxDlg.dataset.sheet = "more";
+      fxDlg.innerHTML = `
+        <div class="sheet-in">
+          <div class="sheet-h"><div><h2>Menu</h2><p>${esc(me.name || me.email)} · ${esc(me.role)}</p></div>
+            <button type="button" class="icon-btn" id="sh-close" aria-label="Close">${icon("x")}</button></div>
+          <div class="sheet-b"><div class="more-grid">
+            ${links.map(a => `<a class="more-it ${a.classList.contains("active") ? "on" : ""}" href="${esc(a.getAttribute("href"))}" ${a.target ? 'target="_blank" rel="noopener"' : ""}>${a.querySelector("svg").outerHTML}<span>${esc(a.textContent.trim())}</span></a>`).join("")}
+            <button type="button" class="more-it" id="more-out">${icon("logout")}<span>Log out</span></button>
+          </div></div>
+        </div>`;
+      document.getElementById("sh-close").onclick = () => fxDlg.close();
+      fxDlg.querySelectorAll("a.more-it:not([target])").forEach(a => a.onclick = () => fxDlg.close());
+      document.getElementById("more-out").onclick = () => { fxDlg.close(); document.getElementById("logout").click(); };
+      fxDlg.showModal();
+    }
+
+    // ---------- Home: big quick-action buttons ----------
+    function quickActions(waiting) {
+      const acts = [
+        can("fixtures") && ["score", "ball", "Enter a score", "Live and finished matches"],
+        can("registrations") && ["#registrations", "clipboard", "Check registrations", waiting ? `${waiting} waiting for you` : "See every team"],
+        can("fixtures") && ["add", "calendar", "Add matches", "Build the schedule"],
+        can("news") && ["#news", "news", "Write news", "Story and photo slider"],
+        can("gallery") && ["#gallery", "image", "Add photos", "Photos and videos"],
+        can("teams") && ["#teams", "users", "Teams & logos", "Squads and club logos"]
+      ].filter(Boolean);
+      return `<div class="qa">${acts.map(([go, ic, t, sub]) => go.startsWith("#")
+        ? `<a class="qa-it" href="${go}"><span class="qa-ic">${icon(ic)}</span><b>${t}</b><small>${sub}</small>${go === "#registrations" && waiting ? `<em>${waiting}</em>` : ""}</a>`
+        : `<button type="button" class="qa-it" data-qa="${go}"><span class="qa-ic">${icon(ic)}</span><b>${t}</b><small>${sub}</small></button>`).join("")}</div>`;
     }
 
     // ---------- App (install on the home screen) ----------
