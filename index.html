@@ -446,6 +446,36 @@
       font: 700 1.3rem "Oswald", sans-serif; font-variant-numeric: tabular-nums; white-space: nowrap;
     }
     .m-score.vs { background: #fff; color: #c8102e; box-shadow: inset 0 0 0 2px #c8102e; font-size: 1rem; }
+
+    /* Fixtures: one block per day; each match is a row of time, home v away, stage */
+    #fixtures { padding-top: 0; }
+    .fx-list { display: grid; gap: 18px; margin-top: 18px; }
+    .fx-day { background: var(--surface); border: 1px solid var(--border); border-top: 4px solid var(--brand); }
+    .fx-day h3 { padding: 12px 18px; font-size: .95rem; letter-spacing: .06em; background: var(--ink); color: #fff; }
+    .fx-m { display: grid; grid-template-columns: 70px minmax(0, 1fr) 120px; align-items: center; gap: 14px; padding: 14px 18px; }
+    .fx-m + .fx-m { border-top: 1px solid var(--border); }
+    .fx-time { font: 700 1.25rem "Oswald", sans-serif; color: var(--brand-text); font-variant-numeric: tabular-nums; }
+    .fx-teams { display: grid; grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr); align-items: center; gap: 14px; }
+    .fx-t { display: flex; align-items: center; gap: 10px; min-width: 0; }
+    .fx-t.home { justify-content: flex-end; }
+    .fx-n { font: 700 1.05rem "Oswald", sans-serif; text-transform: uppercase; letter-spacing: .02em; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .fx-t.home .fx-n { text-align: right; }
+    .fxl { flex-shrink: 0; width: 40px; height: 40px; border-radius: 50%; overflow: hidden; background: #fff; border: 1px solid var(--border); }
+    .fxl img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .fxl.fit img { object-fit: contain; padding: 3px; }
+    .fxl-i { display: grid; place-items: center; background: var(--brand); border: 0; color: #fff; font: 700 .8rem "Inter", sans-serif; }
+    .fx-vs { padding: 4px 9px; border: 2px solid var(--brand); color: var(--brand-text); font: 700 .8rem "Oswald", sans-serif; letter-spacing: .06em; }
+    .fx-tag { justify-self: end; font-size: .74rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); text-align: end; }
+    @media (max-width: 720px) {
+      .fx-m { grid-template-columns: 1fr auto; grid-template-areas: "time tag" "teams teams"; gap: 8px; padding: 12px 14px; }
+      .fx-time { grid-area: time; font-size: 1.1rem; }
+      .fx-tag { grid-area: tag; }
+      .fx-teams { grid-area: teams; gap: 8px; }
+      .fx-t { flex-direction: column; gap: 5px; text-align: center; }
+      .fx-t.home { flex-direction: column-reverse; }
+      .fx-n, .fx-t.home .fx-n { font-size: .9rem; white-space: normal; text-align: center; }
+      .fxl { width: 44px; height: 44px; }
+    }
     /* Score plus, under it, a penalty shootout when there was one */
     .m-scorebox { display: flex; flex-direction: column; align-items: center; gap: 4px; }
     .m-pens { font-size: .66rem; font-weight: 600; letter-spacing: .04em; color: #c8102e; white-space: nowrap; }
@@ -1064,6 +1094,15 @@
     </div>
   </section>
 
+  <!-- FIXTURES: upcoming matches, filled in by the script from the organiser portal; hidden when there are none -->
+  <section id="fixtures" hidden>
+    <div class="wrap">
+      <span class="eyebrow"><svg class="ic" aria-hidden="true"><use href="#i-calendar"/></svg><span data-i18n="fxEyebrow">Coming up</span></span>
+      <h2 data-i18n="fxTitle">Fixtures</h2>
+      <div class="fx-list" id="fx-list"></div>
+    </div>
+  </section>
+
   <!-- Popup with every past winner. Each card opens its photo. Add photos to images/ using the names in data-photo. -->
   <dialog id="winners-pop" class="res-pop" aria-labelledby="winners-pop-title">
     <div class="res-card">
@@ -1563,6 +1602,8 @@
       resMatches: "މެޗު",
       resGoals: "ގޯލު",
       resDay: n => n + " ވަނަ މެޗު ދުވަސް",
+      fxEyebrow: "ކުޅެން އޮތް",
+      fxTitle: "ފިކްސްޗަރސް",
       resMatch: n => "މެޗު " + n,
       stageSemi: "ސެމީ ފައިނަލް",
       stageSemis: "ސެމީ ފައިނަލްތައް",
@@ -1596,6 +1637,7 @@
       resMatches: "Matches",
       resGoals: "Goals",
       resDay: n => "Match Day " + n,
+      fxEyebrow: "Coming up",
       resMatch: n => "Match " + n,
       stageSemi: "Semi-final",
       stageSemis: "Semi-finals",
@@ -2393,7 +2435,40 @@
           </span>`}`;
     }
 
+    // Fixtures: every match not played yet, grouped by day, soonest first
+    function renderFixtures() {
+      const sec = document.getElementById("fixtures");
+      const list = RESULTS.flatMap(r => r.matches.filter(m => !m.score && !m.won).map(m => ({ ...m, year: r.year })))
+        .sort((a, b) => (a.kickoff ? Date.parse(a.kickoff) : Infinity) - (b.kickoff ? Date.parse(b.kickoff) : Infinity) || a.day - b.day || (a.no || 0) - (b.no || 0));
+      sec.hidden = !list.length;
+      if (!list.length) return;
+      const fmt = (iso, o) => new Intl.DateTimeFormat(lang === "dv" ? "dv" : "en-GB", { timeZone: "Indian/Maldives", ...o }).format(new Date(iso));
+      const dayOf = m => m.kickoff ? fmt(m.kickoff, { weekday: "long", day: "numeric", month: "long" }) : m.year + " · " + t("resDay", m.day);
+      const logo = name => {
+        const l = (window.YP_TEAMS || {})[name];
+        return l ? `<span class="fxl${l.fit ? " fit" : ""}"><img loading="lazy" decoding="async" src="${escH(l.logo)}" alt=""></span>`
+                 : `<span class="fxl fxl-i" aria-hidden="true">${escH(name.split(" ").map(w => w[0]).join("").slice(0, 2))}</span>`;
+      };
+      const groups = [];
+      list.forEach(m => { const d = dayOf(m); (groups.at(-1) && groups.at(-1).d === d ? groups.at(-1).ms : (groups.push({ d, ms: [] }), groups.at(-1).ms)).push(m); });
+      document.getElementById("fx-list").innerHTML = groups.map(g => `
+        <div class="fx-day">
+          <h3>${escH(g.d)}</h3>
+          ${g.ms.map(m => `
+            <div class="fx-m">
+              <span class="fx-time" dir="ltr">${m.kickoff ? fmt(m.kickoff, { hour: "2-digit", minute: "2-digit", hour12: false }) : "—"}</span>
+              <span class="fx-teams" dir="ltr">
+                <span class="fx-t home"><span class="fx-n">${escH(m.home)}</span>${logo(m.home)}</span>
+                <span class="fx-vs">VS</span>
+                <span class="fx-t">${logo(m.away)}<span class="fx-n">${escH(m.away)}</span></span>
+              </span>
+              <span class="fx-tag">${m.stage ? t(STAGE_KEYS[m.stage]) : m.no ? t("resMatch", m.no) : ""}</span>
+            </div>`).join("")}
+        </div>`).join("");
+    }
+
     function renderResults() {
+      renderFixtures();
       const list = document.getElementById("res-list");
       list.innerHTML = RESULTS.map(r =>
         `<button type="button" class="res-year" aria-label="${t("resPopTitle", r.year)}"><span class="res-big">${r.year}</span></button>`).join("");
@@ -2611,7 +2686,7 @@
     // ---------- Scroll animations ----------
     if ("IntersectionObserver" in window && !matchMedia("(prefers-reduced-motion: reduce)").matches) {
       document.documentElement.classList.add("js-reveal");
-      const groups = [".champ-head", ".poster", ".gallery .photo", ".sec-head", ".stat", "#history h2", "#results h2", ".res-year", ".reg-info", "#contact h2", "#contact .lead", ".contact-num", ".contact-btn"];
+      const groups = [".champ-head", ".poster", ".gallery .photo", ".sec-head", ".stat", "#history h2", "#results h2", ".res-year", "#fixtures h2", ".fx-day", ".reg-info", "#contact h2", "#contact .lead", ".contact-num", ".contact-btn"];
       groups.forEach(sel => document.querySelectorAll(sel).forEach((el, i) => {
         el.classList.add("reveal");
         el.style.setProperty("--d", (i % 4) * 0.1 + "s");
