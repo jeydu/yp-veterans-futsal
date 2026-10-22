@@ -1575,7 +1575,7 @@
     // Seasons (one per year) and their matches. The website's Match Results read these same tables.
     const TEAMS = window.YP_TEAMS || {};
     const fx = { seasons: [], matches: [], year: null, tab: "all", error: null };
-    const STAGES = [["", "League"], ["semi", "Semi-final"], ["playoff", "Playoff"], ["final", "Final"]];
+    const STAGES = [["", "Group stage"], ["semi", "Semi-final"], ["playoff", "Playoff"], ["final", "Final"]];
     const isPlayed = m => m.home_score !== null && m.away_score !== null;
     const teamLogo = name => {
       const t = TEAMS[name];
