@@ -468,6 +468,12 @@
     .fxl-i { display: grid; place-items: center; background: var(--brand); border: 0; color: #fff; font: 700 .8rem "Inter", sans-serif; }
     .fx-vs { padding: 4px 9px; border: 2px solid var(--brand); color: var(--brand-text); font: 700 .8rem "Oswald", sans-serif; letter-spacing: .06em; }
     .fx-tag { justify-self: end; font-size: .74rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); text-align: end; }
+    /* A played match keeps its row, with the full-time score instead of "VS" */
+    .fx-score { display: flex; flex-direction: column; align-items: center; min-width: 74px; padding: 5px 10px; background: var(--brand); color: #fff; font: 700 1.25rem/1.1 "Oswald", sans-serif; font-variant-numeric: tabular-nums; }
+    .fx-score small { font: 600 .62rem "Inter", sans-serif; letter-spacing: .04em; opacity: .85; }
+    .fx-m.played .fx-time { color: var(--muted); font-size: .95rem; letter-spacing: .08em; }
+    .fx-t.lose .fx-n { color: var(--muted); font-weight: 500; }
+    .fx-t.win .fx-n { color: var(--text); }
     @media (max-width: 720px) {
       .fx-m { grid-template-columns: 1fr auto; grid-template-areas: "time tag" "teams teams"; gap: 8px; padding: 12px 14px; }
       .fx-time { grid-area: time; font-size: 1.1rem; }
@@ -1169,7 +1175,7 @@
   <!-- FIXTURES: upcoming matches, filled in by the script from the organiser portal; hidden when there are none -->
   <section id="fixtures" hidden>
     <div class="wrap">
-      <span class="eyebrow"><svg class="ic" aria-hidden="true"><use href="#i-calendar"/></svg><span data-i18n="fxEyebrow">Coming up</span></span>
+      <span class="eyebrow"><svg class="ic" aria-hidden="true"><use href="#i-calendar"/></svg><span id="fx-season"></span></span>
       <h2 data-i18n="fxTitle">Fixtures</h2>
       <div class="fx-list" id="fx-list"></div>
     </div>
@@ -1715,7 +1721,9 @@
       resMatches: "މެޗު",
       resGoals: "ގޯލު",
       resDay: n => n + " ވަނަ މެޗު ދުވަސް",
-      fxEyebrow: "ކުޅެން އޮތް",
+      fxSeason: y => y + " ގެ މުބާރާތް",
+      fxFt: "ނިމުނީ",
+      fxPens: "ޕެނަލްޓީ",
       newsEyebrow: "އެންމެ ފަހުގެ",
       newsTitle: "ޚަބަރު",
       galEyebrow: "ފޮޓޯ އަދި ވީޑިއޯ",
@@ -1762,7 +1770,9 @@
       resMatches: "Matches",
       resGoals: "Goals",
       resDay: n => "Match Day " + n,
-      fxEyebrow: "Coming up",
+      fxSeason: y => y + " season",
+      fxFt: "FT",
+      fxPens: "pens",
       newsTitle: "News",
       galOpen: "Open video",
       lvl0: "Main sponsor", lvl1: "Gold sponsors", lvl2: "Silver sponsors", lvl3: "Partners", lvl4: "Media partners",
@@ -2579,13 +2589,16 @@
       { year: 2027, day: 3, no: 5, home: "RBG SC",      away: "RK SC",       kickoff: "2026-11-08T16:00:00Z", stage: "final" }
     ];
 
-    // Fixtures: every match not played yet, grouped by day, soonest first
+    // Fixtures: every match of the current season, grouped by day. Played ones show their score and stay listed.
+    // The current season is the newest one with a match still to play or a kick-off date (older years only have results).
     function renderFixtures() {
       const sec = document.getElementById("fixtures");
-      const list = RESULTS.flatMap(r => r.matches.filter(m => !m.score && !m.won).map(m => ({ ...m, year: r.year }))).concat(fromDatabase ? [] : TEST_FIXTURES)
-        .sort((a, b) => (a.kickoff ? Date.parse(a.kickoff) : Infinity) - (b.kickoff ? Date.parse(b.kickoff) : Infinity) || a.day - b.day || (a.no || 0) - (b.no || 0));
+      const season = fromDatabase ? RESULTS.find(r => r.matches.some(m => (!m.score && !m.won) || m.kickoff)) : null;
+      const list = (season ? season.matches.map(m => ({ ...m, year: season.year })) : fromDatabase ? [] : TEST_FIXTURES)
+        .slice().sort((a, b) => (a.kickoff ? Date.parse(a.kickoff) : Infinity) - (b.kickoff ? Date.parse(b.kickoff) : Infinity) || a.day - b.day || (a.no || 0) - (b.no || 0));
       sec.hidden = !list.length;
       if (!list.length) return;
+      document.getElementById("fx-season").textContent = t("fxSeason", season ? season.year : list[0].year);
       const fmt = (iso, o) => new Intl.DateTimeFormat(lang === "dv" ? "dv" : "en-GB", { timeZone: "Indian/Maldives", ...o }).format(new Date(iso));
       const dayOf = m => m.kickoff ? fmt(m.kickoff, { weekday: "long", day: "numeric", month: "long" }) : m.year + " · " + t("resDay", m.day);
       const logo = name => {
@@ -2598,16 +2611,20 @@
       document.getElementById("fx-list").innerHTML = groups.map(g => `
         <div class="fx-day">
           <h3>${escH(g.d)}</h3>
-          ${g.ms.map(m => `
-            <div class="fx-m">
-              <span class="fx-time" dir="ltr">${m.kickoff ? fmt(m.kickoff, { hour: "2-digit", minute: "2-digit", hour12: false }) : "—"}</span>
+          ${g.ms.map(m => {
+            // Winner: more goals, or the shootout when level
+            const [a, b] = m.score ? (m.score[0] === m.score[1] && m.pens ? m.pens : m.score) : [0, 0];
+            const res = side => !m.score ? "" : (side ? b > a : a > b) ? " win" : (side ? b < a : a < b) ? " lose" : "";
+            return `
+            <div class="fx-m${m.score ? " played" : ""}">
+              <span class="fx-time" dir="ltr">${m.score ? t("fxFt") : m.kickoff ? fmt(m.kickoff, { hour: "2-digit", minute: "2-digit", hour12: false }) : "—"}</span>
               <span class="fx-teams" dir="ltr">
-                <span class="fx-t home"><span class="fx-n">${escH(m.home)}</span>${logo(m.home)}</span>
-                <span class="fx-vs">VS</span>
-                <span class="fx-t">${logo(m.away)}<span class="fx-n">${escH(m.away)}</span></span>
+                <span class="fx-t home${res(0)}"><span class="fx-n">${escH(m.home)}</span>${logo(m.home)}</span>
+                ${m.score ? `<span class="fx-score">${m.score[0]} – ${m.score[1]}${m.pens ? `<small>${m.pens[0]}–${m.pens[1]} ${t("fxPens")}</small>` : ""}</span>` : `<span class="fx-vs">VS</span>`}
+                <span class="fx-t${res(1)}">${logo(m.away)}<span class="fx-n">${escH(m.away)}</span></span>
               </span>
               <span class="fx-tag">${m.stage ? t(STAGE_KEYS[m.stage]) : m.no ? t("resMatch", m.no) : ""}</span>
-            </div>`).join("")}
+            </div>`; }).join("")}
         </div>`).join("");
     }
 
