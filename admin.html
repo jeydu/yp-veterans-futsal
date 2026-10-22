@@ -733,6 +733,21 @@
       .us-row > :nth-child(1) { grid-area: n; } .us-row > :nth-child(2) { grid-area: l; } .us-row > :nth-child(3) { grid-area: r; justify-self: end; } .us-row > :nth-child(4) { grid-area: act; }
       .rl-grid, .sp-grid { grid-template-columns: 1fr; }
     }
+
+    /* Add many matches: a wide panel with one row per match */
+    .sheet.wide { width: min(1100px, 100%); }
+    .bk-head, .bk-row { display: grid; grid-template-columns: 58px 58px 150px 105px minmax(0, 1fr) minmax(0, 1fr) 120px 36px; gap: 6px; align-items: center; }
+    .bk-head { padding: 14px 0 6px; font-size: .7rem; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); }
+    .bk-rows { display: grid; gap: 6px; margin-bottom: 12px; }
+    .bk-row input, .bk-row select { padding: 8px 9px !important; font-size: .88rem !important; }
+    .bk-row.bad { outline: 2px solid var(--brand); outline-offset: 2px; border-radius: 8px; }
+    @media (max-width: 860px) {
+      .bk-head { display: none; }
+      .bk-row { grid-template-columns: 1fr 1fr 36px; padding: 10px; border: 1px solid var(--border); border-radius: 10px; }
+      .bk-row .bk-d, .bk-row .bk-n { grid-column: span 1; }
+      .bk-row .icon-btn { grid-column: 3; grid-row: 1; }
+      .bk-row .bk-dt, .bk-row .bk-t, .bk-row .bk-h, .bk-row .bk-a, .bk-row .bk-s { grid-column: span 1; }
+    }
     @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important; } }
     /* Phones */
     @media (max-width: 640px) {
@@ -1588,6 +1603,7 @@
 
     const fixturesHead = `<div class="ph"><div><h1>Fixtures &amp; Results</h1><p>Add matches, enter scores, goals and match videos. The website updates as soon as you save.</p></div>
       <div class="ph-act"><a class="btn" href="./#results" target="_blank" rel="noopener">${icon("external")} View on website</a>
+      <button class="btn" id="fx-bulk">${icon("calendar")} Add many matches</button>
       <button class="btn primary" id="fx-add">${icon("plus")} Add match</button></div></div>`;
 
     async function loadFixtures() {
@@ -1651,8 +1667,9 @@
         </div>` : `
         <div class="card fx-empty big">${icon("calendar")}<b>No seasons yet</b><span>Start with “New season”, then add its matches.</span></div>`}`;
 
-      document.getElementById("fx-add").disabled = !season;
+      document.getElementById("fx-add").disabled = document.getElementById("fx-bulk").disabled = !season;
       document.getElementById("fx-add").onclick = () => editMatch(null);
+      document.getElementById("fx-bulk").onclick = bulkFixtures;
       document.getElementById("fx-new-season").onclick = newSeason;
       const yearSel = document.getElementById("fx-year");
       if (yearSel) yearSel.onchange = () => { fx.year = Number(yearSel.value); renderFixtures(); };
@@ -1703,6 +1720,97 @@
       if (error) return alert("Couldn't save: " + error.message);
       Object.assign(season, row);
       toast("✓ Season " + season.year + " saved");
+    }
+
+
+    // ---------- Add many matches at once ----------
+    // One row per match. A new row copies the date of the row above and kicks off an hour later.
+    function bulkFixtures() {
+      const all = fx.matches.filter(x => x.year === fx.year);
+      let nextNo = all.length ? Math.max(0, ...all.map(x => x.no || 0)) + 1 : 1;
+      const lastDay = all.length ? Math.max(...all.map(x => x.day)) : 0;
+      fxDlg.innerHTML = `
+        <form class="sheet-in" id="bk-form" novalidate>
+          <div class="sheet-h"><div><h2>Add many matches</h2><p>Season ${fx.year} · fill in the schedule, then save all at once</p></div>
+            <button type="button" class="icon-btn" id="bk-close" aria-label="Close">${icon("x")}</button></div>
+          <div class="sheet-b">
+            <div class="bk-head"><span>Day</span><span>No.</span><span>Date</span><span>Kick-off</span><span>Home</span><span>Away</span><span>Stage</span><span></span></div>
+            <div id="bk-rows" class="bk-rows"></div>
+            <datalist id="bk-teams">${teamNames().map(n => `<option value="${esc(n)}">`).join("")}</datalist>
+            <button type="button" class="btn" id="bk-add">${icon("plus")} Add row</button>
+            <small class="hint">Times are Maldives time. Pick team names from the list so their logos show. Empty rows are skipped.</small>
+            <p class="form-error" id="bk-err" role="alert"></p>
+          </div>
+          <div class="sheet-f"><span class="hint" id="bk-count"></span><span class="sp"></span>
+            <button type="button" class="btn" id="bk-cancel">Cancel</button>
+            <button type="submit" class="btn primary">${icon("check")} Save all</button></div>
+        </form>`;
+      fxDlg.classList.add("wide");
+      fxDlg.addEventListener("close", () => fxDlg.classList.remove("wide"), { once: true });
+      const rows = document.getElementById("bk-rows");
+      const count = () => {
+        const n = [...rows.children].filter(r => r.querySelector(".bk-h").value.trim() || r.querySelector(".bk-a").value.trim()).length;
+        document.getElementById("bk-count").textContent = n + (n === 1 ? " match" : " matches");
+      };
+      const addRow = () => {
+        const prev = rows.lastElementChild;
+        let day = lastDay + 1, date = "", time = "20:45";
+        if (prev) {
+          day = prev.querySelector(".bk-d").value;
+          date = prev.querySelector(".bk-dt").value;
+          const t = prev.querySelector(".bk-t").value;
+          if (t) { const [hh, mm] = t.split(":").map(Number); time = String((hh + 1) % 24).padStart(2, "0") + ":" + String(mm).padStart(2, "0"); }
+        }
+        const el = document.createElement("div");
+        el.className = "bk-row";
+        el.innerHTML = `
+          <input class="bk-d" type="number" min="1" max="60" value="${day}" aria-label="Match day">
+          <input class="bk-n" type="number" min="1" max="200" value="${nextNo++}" aria-label="Match number">
+          <input class="bk-dt" type="date" value="${date}" aria-label="Date">
+          <input class="bk-t" type="time" value="${time}" aria-label="Kick-off">
+          <input class="bk-h" list="bk-teams" placeholder="Home team" maxlength="60" aria-label="Home team">
+          <input class="bk-a" list="bk-teams" placeholder="Away team" maxlength="60" aria-label="Away team">
+          <select class="bk-s" aria-label="Stage">${STAGES.map(([k, l]) => `<option value="${k}">${l}</option>`).join("")}</select>
+          <button type="button" class="icon-btn" aria-label="Remove row">${icon("x")}</button>`;
+        el.querySelector("button").onclick = () => { el.remove(); count(); };
+        el.querySelectorAll("input").forEach(x => x.addEventListener("input", count));
+        rows.appendChild(el);
+        count();
+        return el;
+      };
+      for (let i = 0; i < 3; i++) addRow();
+      document.getElementById("bk-add").onclick = () => addRow().querySelector(".bk-h").focus();
+      document.getElementById("bk-close").onclick = document.getElementById("bk-cancel").onclick = () => fxDlg.close();
+      const f = document.getElementById("bk-form");
+      f.onsubmit = async e => {
+        e.preventDefault();
+        const err = document.getElementById("bk-err");
+        rows.querySelectorAll(".bad").forEach(x => x.classList.remove("bad"));
+        const out = [];
+        let problem = "";
+        [...rows.children].forEach((r, i) => {
+          const home = r.querySelector(".bk-h").value.trim(), away = r.querySelector(".bk-a").value.trim();
+          if (!home && !away) return;
+          const day = Number(r.querySelector(".bk-d").value), no = r.querySelector(".bk-n").value;
+          const date = r.querySelector(".bk-dt").value, time = r.querySelector(".bk-t").value;
+          const bad = !home || !away ? "Row " + (i + 1) + " needs both teams." : home === away ? "Row " + (i + 1) + ": a team can't play itself."
+            : !day ? "Row " + (i + 1) + " needs a match day." : "";
+          if (bad) { problem = problem || bad; r.classList.add("bad"); return; }
+          out.push({ year: fx.year, day, no: no === "" ? null : Number(no), home, away, stage: r.querySelector(".bk-s").value || null,
+                     kickoff: date ? fromMvInput(date + "T" + (time || "00:00")) : null, goals: [] });
+        });
+        if (problem) { err.textContent = problem; return; }
+        if (!out.length) { err.textContent = "Fill in at least one match."; return; }
+        const btn = f.querySelector("[type=submit]"); btn.disabled = true;
+        const { error } = await db.from("matches").insert(out);
+        btn.disabled = false;
+        if (error) { err.textContent = "Couldn't save: " + error.message; return; }
+        fxDlg.close();
+        fx.tab = "fixtures";
+        toast(`✓ ${out.length} match${out.length === 1 ? "" : "es"} added`);
+        loadFixtures();
+      };
+      fxDlg.showModal();
     }
 
     // ---------- Match editor ----------
