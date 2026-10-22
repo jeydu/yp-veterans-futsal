@@ -583,7 +583,12 @@
     .ge-row { display: grid; grid-template-columns: minmax(0, 1fr) 110px 36px; gap: 8px; align-items: center; }
     .ge-row input { text-align: center; }
     .goals-ed .btn { justify-self: start; }
+    .sheet { height: 100dvh; }
     @media (max-width: 560px) { .g4 { grid-template-columns: 1fr 1fr; } .sheet { width: 100%; } }
+    @media (max-width: 860px) {
+      .sheet input:not([type=checkbox]), .sheet select, .sheet textarea { font-size: 16px !important; }
+      .sheet-b { padding: 6px 16px 18px; } .sheet-h { padding-left: 16px; padding-right: 16px; } .sheet-f { padding-left: 16px; padding-right: 16px; }
+    }
 
     /* ---------- Teams & Players ---------- */
     .tm-table { overflow: hidden; }
@@ -739,14 +744,19 @@
     .bk-head, .bk-row { display: grid; grid-template-columns: 58px 58px 150px 105px minmax(0, 1fr) minmax(0, 1fr) 120px 36px; gap: 6px; align-items: center; }
     .bk-head { padding: 14px 0 6px; font-size: .7rem; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); }
     .bk-rows { display: grid; gap: 6px; margin-bottom: 12px; }
-    .bk-row input, .bk-row select { padding: 8px 9px !important; font-size: .88rem !important; }
+    .bk-row input, .bk-row select { width: 100%; padding: 8px 9px !important; font-size: .88rem !important; }
+    .bk-row label { gap: 0 !important; }
+    .bk-row label > span { display: none; }
     .bk-row.bad { outline: 2px solid var(--brand); outline-offset: 2px; border-radius: 8px; }
+    /* Phones: each match is a small card with labelled boxes */
     @media (max-width: 860px) {
       .bk-head { display: none; }
-      .bk-row { grid-template-columns: 1fr 1fr 36px; padding: 10px; border: 1px solid var(--border); border-radius: 10px; }
-      .bk-row .bk-d, .bk-row .bk-n { grid-column: span 1; }
-      .bk-row .icon-btn { grid-column: 3; grid-row: 1; }
-      .bk-row .bk-dt, .bk-row .bk-t, .bk-row .bk-h, .bk-row .bk-a, .bk-row .bk-s { grid-column: span 1; }
+      .bk-row { grid-template-columns: 1fr 1fr 40px; grid-template-areas: "d n x" "dt t t" "h h h" "a a a" "s s s";
+        gap: 8px; padding: 12px; border: 1px solid var(--border); border-radius: 12px; background: var(--surface-2); }
+      .bk-row label { gap: 4px !important; }
+      .bk-row label > span { display: block; font-size: .72rem; }
+      .c-d { grid-area: d; } .c-n { grid-area: n; } .c-dt { grid-area: dt; } .c-t { grid-area: t; }
+      .c-h { grid-area: h; } .c-a { grid-area: a; } .c-s { grid-area: s; } .c-x { grid-area: x; align-self: end; }
     }
     @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important; } }
     /* Phones */
@@ -1764,15 +1774,15 @@
         const el = document.createElement("div");
         el.className = "bk-row";
         el.innerHTML = `
-          <input class="bk-d" type="number" min="1" max="60" value="${day}" aria-label="Match day">
-          <input class="bk-n" type="number" min="1" max="200" value="${nextNo++}" aria-label="Match number">
-          <input class="bk-dt" type="date" value="${date}" aria-label="Date">
-          <input class="bk-t" type="time" value="${time}" aria-label="Kick-off">
-          <input class="bk-h" list="bk-teams" placeholder="Home team" maxlength="60" aria-label="Home team">
-          <input class="bk-a" list="bk-teams" placeholder="Away team" maxlength="60" aria-label="Away team">
-          <select class="bk-s" aria-label="Stage">${STAGES.map(([k, l]) => `<option value="${k}">${l}</option>`).join("")}</select>
-          <button type="button" class="icon-btn" aria-label="Remove row">${icon("x")}</button>`;
-        el.querySelector("button").onclick = () => { el.remove(); count(); };
+          <label class="c-d"><span>Day</span><input class="bk-d" type="number" min="1" max="60" inputmode="numeric" value="${day}"></label>
+          <label class="c-n"><span>No.</span><input class="bk-n" type="number" min="1" max="200" inputmode="numeric" value="${nextNo++}"></label>
+          <label class="c-dt"><span>Date</span><input class="bk-dt" type="date" value="${date}"></label>
+          <label class="c-t"><span>Kick-off</span><input class="bk-t" type="time" value="${time}"></label>
+          <label class="c-h"><span>Home</span><input class="bk-h" list="bk-teams" placeholder="Home team" maxlength="60"></label>
+          <label class="c-a"><span>Away</span><input class="bk-a" list="bk-teams" placeholder="Away team" maxlength="60"></label>
+          <label class="c-s"><span>Stage</span><select class="bk-s">${STAGES.map(([k, l]) => `<option value="${k}">${l}</option>`).join("")}</select></label>
+          <button type="button" class="icon-btn c-x" aria-label="Remove row">${icon("x")}</button>`;
+        el.querySelector(".c-x").onclick = () => { el.remove(); count(); };
         el.querySelectorAll("input").forEach(x => x.addEventListener("input", count));
         rows.appendChild(el);
         count();
