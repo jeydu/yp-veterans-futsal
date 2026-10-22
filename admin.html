@@ -1642,8 +1642,7 @@
 
     const fixturesHead = `<div class="ph"><div><h1>Fixtures &amp; Results</h1><p>Add matches, enter scores, goals and match videos. The website updates as soon as you save.</p></div>
       <div class="ph-act"><a class="btn" href="./#results" target="_blank" rel="noopener">${icon("external")} View on website</a>
-      <button class="btn" id="fx-bulk">${icon("calendar")} Add many matches</button>
-      <button class="btn primary" id="fx-add">${icon("plus")} Add match</button></div></div>`;
+      <button class="btn primary" id="fx-bulk">${icon("plus")} Add matches</button></div></div>`;
 
     async function loadFixtures() {
       app.innerHTML = fixturesHead + `<p class="notice">Loading matches…</p>`;
@@ -1706,8 +1705,7 @@
         </div>` : `
         <div class="card fx-empty big">${icon("calendar")}<b>No seasons yet</b><span>Start with “New season”, then add its matches.</span></div>`}`;
 
-      document.getElementById("fx-add").disabled = document.getElementById("fx-bulk").disabled = !season;
-      document.getElementById("fx-add").onclick = () => editMatch(null);
+      document.getElementById("fx-bulk").disabled = !season;
       document.getElementById("fx-bulk").onclick = () => bulkFixtures();
       document.getElementById("fx-new-season").onclick = newSeason;
       const yearSel = document.getElementById("fx-year");
@@ -1778,7 +1776,7 @@
 
       fxDlg.innerHTML = `
         <form class="sheet-in" id="bk-form" novalidate>
-          <div class="sheet-h"><div><h2>Add many matches</h2><p>Season ${fx.year}</p></div>
+          <div class="sheet-h"><div><h2>Add matches</h2><p>Season ${fx.year}</p></div>
             <button type="button" class="icon-btn" id="bk-close" aria-label="Close">${icon("x")}</button></div>
           <div class="sheet-b">
             <div class="ez-step"><b>1</b> Set the day</div>
