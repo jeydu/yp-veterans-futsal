@@ -303,3 +303,56 @@ create policy "public can upload id cards" on storage.objects
       )
     )
   );
+
+
+-- 7. Fixtures & results (shown on the website, edited in the organiser portal) ------------------
+-- One row per tournament year, and one row per match. Anyone can read them; organisers edit them.
+
+create table if not exists public.seasons (
+  year         int primary key check (year between 2000 and 2100),
+  champion     text check (char_length(champion) <= 100),
+  champion_dv  text check (char_length(champion_dv) <= 100),
+  -- true while some results of that year are missing (hides the match and goal totals)
+  partial      boolean not null default false
+);
+
+create table if not exists public.matches (
+  id          uuid primary key default gen_random_uuid(),
+  year        int not null references public.seasons (year) on delete cascade,
+  day         int not null default 1 check (day between 1 and 60),
+  no          int check (no between 1 and 200),
+  kickoff     timestamptz,
+  home        text not null check (char_length(home) between 1 and 60),
+  away        text not null check (char_length(away) between 1 and 60),
+  -- both empty = not played yet
+  home_score  int check (home_score between 0 and 99),
+  away_score  int check (away_score between 0 and 99),
+  pen_home    int check (pen_home between 0 and 99),
+  pen_away    int check (pen_away between 0 and 99),
+  stage       text check (stage in ('semi', 'playoff', 'final')),
+  -- YouTube video id of the match stream
+  video       text check (video ~ '^[A-Za-z0-9_-]{11}$'),
+  -- highlight clips: [{ "at": seconds, "s": clip start, "t": clip end - 5, "team": "...", "score": "1–0" }]
+  goals       jsonb not null default '[]'::jsonb
+              check (jsonb_typeof(goals) = 'array' and jsonb_array_length(goals) <= 60),
+  updated_at  timestamptz not null default now()
+);
+
+create index if not exists matches_year_idx on public.matches (year, day, no);
+
+alter table public.seasons enable row level security;
+alter table public.matches enable row level security;
+grant select on public.seasons, public.matches to anon, authenticated;
+grant insert, update, delete on public.seasons, public.matches to authenticated;
+
+drop policy if exists "anyone reads seasons" on public.seasons;
+create policy "anyone reads seasons" on public.seasons for select to anon, authenticated using (true);
+drop policy if exists "organisers edit seasons" on public.seasons;
+create policy "organisers edit seasons" on public.seasons for all to authenticated
+  using (public.is_organiser()) with check (public.is_organiser());
+
+drop policy if exists "anyone reads matches" on public.matches;
+create policy "anyone reads matches" on public.matches for select to anon, authenticated using (true);
+drop policy if exists "organisers edit matches" on public.matches;
+create policy "organisers edit matches" on public.matches for all to authenticated
+  using (public.is_organiser()) with check (public.is_organiser());

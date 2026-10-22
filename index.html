@@ -26,6 +26,7 @@
     document.documentElement.classList.add("js");
   </script>
   <script src="config.js"></script>
+  <script src="teams.js"></script>
   <style>
     :root {
       --bg: #f4efec;
@@ -444,6 +445,7 @@
       background: #c8102e; color: #fff;
       font: 700 1.3rem "Oswald", sans-serif; font-variant-numeric: tabular-nums; white-space: nowrap;
     }
+    .m-score.vs { background: #fff; color: #c8102e; box-shadow: inset 0 0 0 2px #c8102e; font-size: 1rem; }
     /* Score plus, under it, a penalty shootout when there was one */
     .m-scorebox { display: flex; flex-direction: column; align-items: center; gap: 4px; }
     .m-pens { font-size: .66rem; font-weight: 600; letter-spacing: .04em; color: #c8102e; white-space: nowrap; }
@@ -1567,6 +1569,8 @@
       stagePlayoff: "ޕްލޭއޮފް",
       resPens: s => "ޕެނަލްޓީ " + s,
       resNoScore: "ނަތީޖާ ނޭނގެ",
+      resUpcoming: "ކުޅެން އޮތް",
+      resTbd: "އަދި ނުނިމޭ",
       resWatch: "މުޅި މެޗު",
       resHighlights: "ހައިލައިޓްސް",
       stageFinal: "ފައިނަލް"
@@ -1598,6 +1602,8 @@
       stagePlayoff: "Playoff",
       resPens: s => s + " on penalties",
       resNoScore: "Score not known",
+      resUpcoming: "Coming up",
+      resTbd: "To be decided",
       resWatch: "Full match",
       resHighlights: "Highlights",
       stageFinal: "Final",
@@ -2239,7 +2245,8 @@
     // ---------- Match results ----------
     // One entry per year, newest first. Use short team names (RBG SC, RK SC, BHC, Stelco SC).
     // stage: "semi" or "final" (leave it out for other matches)
-    const RESULTS = [
+    // Built-in copy; replaced by the results saved in the organiser portal once they load (loadResults below)
+    let RESULTS = [
       {
         year: 2026,
         champion: { en: "Royal Knights Sports Club", dv: DV.rkName },
@@ -2360,36 +2367,28 @@
         ]
       }
     ];
-    // Club logos shown in the results. "fit" shows the whole logo for ones that aren't round.
-    // Teams missing here get a badge with their initials.
-    const TEAM_LOGOS = {
-      "RK SC":       { src: "images/royal-knights-logo.jpg" },
-      "RBG SC":      { src: "images/rbg-logo.jpg", fit: true },
-      "Stelco SC":   { src: "images/stelco-logo.jpg" },
-      "BHC":         { src: "images/bhc-logo.jpg" },
-      "FT Nakasole": { src: "images/ft-nakasole-logo.png", fit: true },
-      "Afiyns SC":     { src: "images/afiyns-logo.jpg" },
-      "KK Kandumathi": { src: "images/kk-kandumathi-logo.jpg", fit: true },
-      "Old Stars":     { src: "images/old-stars-logo.jpg", fit: true },
-      "FC Mathiveri":  { src: "images/fc-mathiveri-logo.jpg", fit: true },
-      "Mathiveri Veterans": { src: "images/mathiveri-veterans-logo.jpg", fit: true },
-      "Aaru FT":       { src: "images/aaru-ft-logo.jpg" }
-    };
     const STAGE_KEYS = { semi: "stageSemi", playoff: "stagePlayoff", final: "stageFinal" };
     const STAGE_DAY_KEYS = { semi: "stageSemis", playoff: "stagePlayoff", final: "stageFinal" };
     const resPop = document.getElementById("res-pop");
     let resOpen = null;   // the year shown in the popup
 
+    // Team names and other saved text go into the page as plain text
+    const escH = v => String(v ?? "").replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+    const kickoffText = iso => new Intl.DateTimeFormat(lang === "dv" ? "dv" : "en-GB",
+      { timeZone: "Indian/Maldives", weekday: "short", day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" }).format(new Date(iso));
+
     // Year, champion and totals: the face of a year card, and the top of the popup
     function resSummary(r) {
       const goals = r.matches.reduce((sum, m) => sum + (m.score ? m.score[0] + m.score[1] : 0), 0);
+      const played = r.matches.filter(m => m.score || m.won).length;
+      const champ = (lang === "dv" && r.champion.dv) || r.champion.en;
       return `<span class="res-big">${r.year}</span>
           <span class="res-champ">
             <small><svg class="ic" aria-hidden="true"><use href="#i-trophy"/></svg>${t("resChampion")}</small>
-            <b>${lang === "dv" ? r.champion.dv : r.champion.en}</b>
+            <b>${champ ? escH(champ) : t("resTbd")}</b>
           </span>
           ${r.partial ? "" : `<span class="res-totals">
-            <span class="res-total"><b>${r.matches.length}</b><span>${t("resMatches")}</span></span>
+            <span class="res-total"><b>${played}</b><span>${t("resMatches")}</span></span>
             <span class="res-total"><b>${goals}</b><span>${t("resGoals")}</span></span>
           </span>`}`;
     }
@@ -2460,19 +2459,21 @@
       };
       const dayTitle = d => dayStage(d) ? t(STAGE_DAY_KEYS[dayStage(d)]) : t("resDay", d);
       const teamHtml = (name, own, other) => {
-        const logo = TEAM_LOGOS[name];
+        const logo = (window.YP_TEAMS || {})[name];
         const result = own > other ? " win" : own < other ? " lose" : "";
         const initials = name.split(" ").map(w => w[0]).join("").slice(0, 2);
         const badge = logo
-          ? `<span class="m-logo${logo.fit ? " fit" : ""}"><img loading="lazy" decoding="async" src="${logo.src}" alt=""></span>`
+          ? `<span class="m-logo${logo.fit ? " fit" : ""}"><img loading="lazy" decoding="async" src="${escH(logo.logo)}" alt=""></span>`
           : `<span class="m-logo m-initials" aria-hidden="true">${initials}</span>`;
-        return `<span class="m-team${result}">${badge}${name}</span>`;
+        return `<span class="m-team${result}">${badge}${escH(name)}</span>`;
       };
       // Each match slides in a moment after the one before it
       const delay = m => `style="--d:${(.25 + r.matches.indexOf(m) * .06).toFixed(2)}s"`;
       const matchHtml = m => {
         // Level after full time: the shootout decides the winner. No score known: just mark who won.
-        const [a, b] = !m.score ? (m.won === "home" ? [1, 0] : [0, 1])
+        // No score and no winner: not played yet.
+        const upcoming = !m.score && !m.won;
+        const [a, b] = upcoming ? [0, 0] : !m.score ? (m.won === "home" ? [1, 0] : [0, 1])
           : m.score[0] === m.score[1] && m.pens ? m.pens : m.score;
         const stage = m.stage && !dayStage(m.day) ? `<span class="m-stage">${t(STAGE_KEYS[m.stage])}</span>` : "";
         const pens = m.pens ? `<small class="m-pens">${t("resPens", m.pens.join("–"))}</small>` : "";
@@ -2480,15 +2481,15 @@
             <span class="m-meta">${m.no ? t("resMatch", m.no) : ""}${stage}</span>
             <div class="m-line" dir="ltr">
               ${teamHtml(m.home, a, b)}
-              <span class="m-scorebox"><span class="m-score">${m.score ? `${m.score[0]} – ${m.score[1]}` : "?"}</span>${m.score ? pens : `<small class="m-pens">${t("resNoScore")}</small>`}</span>
+              <span class="m-scorebox"><span class="m-score${upcoming ? " vs" : ""}">${m.score ? `${m.score[0]} – ${m.score[1]}` : upcoming ? "VS" : "?"}</span>${m.score ? pens : `<small class="m-pens">${upcoming ? (m.kickoff ? kickoffText(m.kickoff) : t("resUpcoming")) : t("resNoScore")}</small>`}</span>
               ${teamHtml(m.away, b, a)}
             </div>
             ${m.video ? `<div class="m-actions">
-              ${m.goals ? `<button type="button" class="m-play m-hl"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2l2.9 6.6 7.1.6-5.4 4.7 1.6 7L12 17.3 5.8 21l1.6-7L2 9.2l7.1-.6z"/></svg>${t("resHighlights")}</button>` : ""}
+              ${m.goals && m.goals.length ? `<button type="button" class="m-play m-hl"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2l2.9 6.6 7.1.6-5.4 4.7 1.6 7L12 17.3 5.8 21l1.6-7L2 9.2l7.1-.6z"/></svg>${t("resHighlights")}</button>` : ""}
               <button type="button" class="m-play m-watch"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5.5v13l11-6.5z"/></svg>${t("resWatch")}</button>
             </div>
             <div class="m-video" hidden><div class="m-player"></div>
-              ${m.goals ? `<ol class="m-goals">${m.goals.map((g, i) => `<li><button type="button" data-goal="${i}"><b dir="ltr">${g.score}</b> ${g.team}</button></li>`).join("")}</ol>` : ""}
+              ${m.goals && m.goals.length ? `<ol class="m-goals">${m.goals.map((g, i) => `<li><button type="button" data-goal="${i}"><b dir="ltr">${escH(g.score)}</b> ${escH(g.team)}</button></li>`).join("")}</ol>` : ""}
             </div>` : ""}
           </div>`;
       };
@@ -2538,7 +2539,7 @@
       box.hidden = false;
       const slot = document.createElement("div");
       box.querySelector(".m-player").replaceChildren(slot);
-      const clips = highlights ? m.goals.map(g => ({ start: Math.max(0, g.s ?? g.t - CLIP_BEFORE), end: g.t + CLIP_AFTER })) : [null];
+      const clips = highlights && m.goals.length ? m.goals.map(g => ({ start: Math.max(0, g.s ?? g.t - CLIP_BEFORE), end: g.t + CLIP_AFTER })) : [null];
       const w = watching = { video: m.video, box, clips, i: from || 0 };
       await loadYouTube();
       if (watching !== w) return;
@@ -2577,6 +2578,35 @@
 
     wirePop(resPop, () => { stopVideo(); resOpen = null; });
     renderResults();
+
+    // Results saved in the organiser portal (admin.html). If they can't load, the built-in copy above stays.
+    async function loadResults() {
+      if (!USE_SERVER) return;
+      try {
+        const get = path => fetch(CONFIG.supabaseUrl + "/rest/v1/" + path, { headers: { apikey: CONFIG.supabaseKey } })
+          .then(r => r.ok ? r.json() : Promise.reject(r.status));
+        const [seasons, matches] = await Promise.all([
+          get("seasons?select=*&order=year.desc"),
+          get("matches?select=*&order=year.desc,day.asc,no.asc.nullslast,kickoff.asc")
+        ]);
+        const years = seasons.map(se => ({
+          year: se.year,
+          partial: se.partial,
+          champion: { en: se.champion || "", dv: se.champion_dv || "" },
+          matches: matches.filter(m => m.year === se.year).map(m => ({
+            day: m.day, no: m.no, home: m.home, away: m.away, kickoff: m.kickoff,
+            score: m.home_score === null || m.away_score === null ? null : [m.home_score, m.away_score],
+            pens: m.pen_home === null || m.pen_away === null ? null : [m.pen_home, m.pen_away],
+            stage: m.stage || undefined, video: m.video || undefined, goals: m.goals || []
+          }))
+        })).filter(se => se.matches.length);
+        if (!years.length) return;
+        RESULTS = years;
+        if (resOpen && !RESULTS.some(r => r.year === resOpen)) resPop.close();
+        renderResults();
+      } catch (e) {}
+    }
+    loadResults();
 
     // ---------- Scroll animations ----------
     if ("IntersectionObserver" in window && !matchMedia("(prefers-reduced-motion: reduce)").matches) {

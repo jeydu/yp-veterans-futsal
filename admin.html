@@ -18,6 +18,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <script src="config.js"></script>
+  <script src="teams.js"></script>
   <style>
     :root {
       --bg: #f6f2f2;
@@ -104,9 +105,64 @@
     .section-h h2 { font-size: 1.15rem; }
     .section-h span { color: var(--muted); font-size: .85rem; }
 
+    /* Signed in: dark menu on the left, the page on the right */
+    body.app-mode { display: grid; grid-template-columns: 250px minmax(0, 1fr); min-height: 100vh; }
+    body.app-mode main.wrap { width: 100%; max-width: 1180px; padding: 32px 32px 64px; margin: 0; }
+    .side { position: sticky; top: 0; height: 100vh; display: flex; flex-direction: column; overflow-y: auto;
+      padding: calc(18px + env(safe-area-inset-top)) 14px calc(16px + env(safe-area-inset-bottom)); background: #150c0d; color: #e9dcdd; }
+    .side[hidden] { display: none; }
+    .side-brand { display: flex; align-items: center; gap: 11px; padding: 4px 8px 18px; margin-bottom: 6px; border-bottom: 1px solid rgba(255,255,255,.08); color: inherit; text-decoration: none; }
+    .side-brand img { width: 42px; height: 42px; border-radius: 50%; flex-shrink: 0; }
+    .side-brand b { display: block; font: 700 1.05rem/1.1 "Oswald", sans-serif; text-transform: uppercase; letter-spacing: .03em; color: #fff; }
+    .side-brand small { display: block; font-size: .72rem; color: #a8999a; }
+    .side-nav { display: flex; flex-direction: column; gap: 2px; }
+    .side-h { padding: 16px 12px 6px; font-size: .66rem; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; color: #7d6c6e; }
+    .nav-item { display: flex; align-items: center; gap: 11px; padding: 10px 12px; border-radius: 10px; color: #e9dcdd; text-decoration: none; font-size: .9rem; font-weight: 500; white-space: nowrap; transition: background .15s ease, color .15s ease; }
+    .nav-item .ic { font-size: 1.1rem; color: #a8999a; transition: color .15s ease; }
+    .nav-item:hover { background: rgba(255,255,255,.06); color: #fff; }
+    .nav-item.active { background: var(--brand); color: #fff; }
+    .nav-item.active .ic { color: #fff; }
+    .side-foot { display: flex; flex-direction: column; gap: 6px; margin-top: auto; padding-top: 14px; border-top: 1px solid rgba(255,255,255,.08); }
+    .side-user { padding: 4px 12px 6px; font-size: .78rem; color: #a8999a; line-height: 1.4; overflow-wrap: anywhere; }
+    .side-user b { display: block; color: #fff; font-weight: 600; }
+    .side-btn { display: flex; align-items: center; gap: 10px; padding: 9px 12px; border: 0; border-radius: 10px; background: none; color: #e9dcdd; font-size: .88rem; font-weight: 500; text-align: start; }
+    .side-btn:hover { background: rgba(255,255,255,.06); color: #fff; }
+    .side-btn[hidden] { display: none; }
+
+    /* Page title, with the page's main buttons on the right */
+    .ph { display: flex; align-items: flex-end; justify-content: space-between; gap: 16px; flex-wrap: wrap; margin-bottom: 22px; }
+    .ph h1 { font-size: 2rem; line-height: 1.05; }
+    .ph p { color: var(--muted); font-size: .9rem; margin-top: 4px; }
+    .ph-act { display: flex; gap: 8px; flex-wrap: wrap; }
+    .btn { display: inline-flex; align-items: center; justify-content: center; gap: 7px; padding: 10px 16px; border: 1px solid var(--border); border-radius: 10px;
+      background: var(--surface); color: var(--text); font-size: .88rem; font-weight: 600; text-decoration: none; white-space: nowrap; transition: border-color .15s ease, background .15s ease, color .15s ease; }
+    .btn:hover { border-color: var(--brand); color: var(--brand-text); }
+    .btn.primary { background: var(--brand); border-color: var(--brand); color: #fff; }
+    .btn.primary:hover { background: var(--brand-dark); border-color: var(--brand-dark); color: #fff; }
+    .btn.danger { border-color: transparent; background: none; color: var(--brand-text); }
+    .btn.danger:hover { background: var(--red-bg); }
+    .btn:disabled { opacity: .5; cursor: not-allowed; }
+
+    /* Phones and small tablets: the menu becomes a bar along the top */
+    @media (max-width: 860px) {
+      body.app-mode { display: block; }
+      body.app-mode main.wrap { padding: 20px 16px 56px; }
+      .side { position: sticky; z-index: 20; height: auto; flex-direction: row; flex-wrap: wrap; align-items: center; gap: 0 8px; padding: calc(10px + env(safe-area-inset-top)) 12px 0; }
+      .side-brand { padding: 0; margin: 0; border: 0; }
+      .side-brand img { width: 34px; height: 34px; }
+      .side-brand small { display: none; }
+      .side-foot { order: 2; flex-direction: row; margin: 0 0 0 auto; padding: 0; border: 0; }
+      .side-user, .side-btn span { display: none; }
+      .side-nav { order: 3; flex: 1 1 100%; flex-direction: row; gap: 4px; overflow-x: auto; scrollbar-width: none; padding: 10px 0; }
+      .side-nav::-webkit-scrollbar { display: none; }
+      .side-h { display: none; }
+      .nav-item { padding: 8px 12px; font-size: .85rem; }
+      .ph h1 { font-size: 1.6rem; }
+    }
+
     /* Login: "liquid glass" card floating over a moving red-and-gold scene */
     body.login-mode { min-height: 100vh; background: #2a0710; overflow-x: hidden; }
-    body.login-mode header { display: none; }
+    body.login-mode .side { display: none; }
     body.login-mode main.wrap { min-height: 100vh; display: grid; place-items: center; padding: calc(32px + env(safe-area-inset-top)) 16px calc(32px + env(safe-area-inset-bottom)); }
     .glass-scene { position: fixed; inset: 0; z-index: -1; overflow: hidden; display: none;
       background: radial-gradient(ellipse at 50% 120%, #5a0815, transparent 60%), linear-gradient(160deg, #c8102e 0%, #8a0b1f 45%, #2a0710 100%); }
@@ -419,12 +475,114 @@
     }
     .toast.show { transform: translate(-50%, 0); opacity: 1; }
 
-    dialog { border: 0; border-radius: 14px; padding: 0; max-width: min(900px, calc(100vw - 32px)); background: #111; color: #fff; overflow: hidden; }
-    dialog::backdrop { background: rgba(0,0,0,.82); }
-    dialog img { display: block; max-width: 100%; max-height: 80vh; margin: 0 auto; }
-    dialog p { padding: 10px 16px; font-size: .9rem; text-align: center; }
-    dialog button { position: absolute; top: 8px; right: 8px; width: 36px; height: 36px; border-radius: 50%; border: 0; background: rgba(0,0,0,.6); color: #fff; font-size: 1.4rem; }
+    #photo { border: 0; border-radius: 14px; padding: 0; max-width: min(900px, calc(100vw - 32px)); background: #111; color: #fff; overflow: hidden; }
+    #photo::backdrop { background: rgba(0,0,0,.82); }
+    #photo img { display: block; max-width: 100%; max-height: 80vh; margin: 0 auto; }
+    #photo p { padding: 10px 16px; font-size: .9rem; text-align: center; }
+    #photo button { position: absolute; top: 8px; right: 8px; width: 36px; height: 36px; border-radius: 50%; border: 0; background: rgba(0,0,0,.6); color: #fff; font-size: 1.4rem; }
 
+
+    /* ---------- Fixtures & Results ---------- */
+    .fx-bar { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-bottom: 14px; }
+    .fx-season { display: flex; align-items: center; gap: 8px; font-size: .8rem; font-weight: 600; color: var(--muted); }
+    .fx-season select, .sheet select { font: inherit; font-size: .9rem; font-weight: 600; color: var(--text); background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 9px 12px; }
+    .seg { display: flex; gap: 3px; padding: 3px; margin-inline-start: auto; border-radius: 11px; background: var(--surface); border: 1px solid var(--border); }
+    .seg-b { border: 0; background: none; padding: 7px 13px; border-radius: 8px; font-size: .85rem; font-weight: 600; color: var(--muted); }
+    .seg-b em { font-style: normal; opacity: .7; }
+    .seg-b:hover { color: var(--text); }
+    .seg-b.on { background: var(--brand); color: #fff; }
+    .fx-season-card { display: flex; gap: 18px; flex-wrap: wrap; align-items: center; padding: 16px 18px; margin-bottom: 14px; }
+    .fx-sum { display: flex; gap: 22px; }
+    .fx-sum b { display: block; font: 700 1.6rem/1 "Oswald", sans-serif; }
+    .fx-sum span { font-size: .72rem; font-weight: 600; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); }
+    .fx-champ { flex: 1; min-width: 280px; display: flex; flex-wrap: wrap; align-items: flex-end; gap: 10px; padding-inline-start: 18px; border-inline-start: 1px solid var(--border); }
+    .fx-champ label { display: flex; flex-direction: column; gap: 5px; flex: 1; min-width: 150px; font-size: .75rem; font-weight: 600; color: var(--muted); }
+    .fx-champ label .ic { color: var(--gold); }
+    .fx-champ input:not([type=checkbox]), .sheet input:not([type=checkbox]) { font: inherit; font-size: .92rem; color: var(--text); background: var(--surface-2); border: 1.5px solid var(--border); border-radius: 10px; padding: 9px 12px; width: 100%; min-width: 0; }
+    .fx-champ input:focus, .sheet input:focus, .sheet select:focus, .fx-season select:focus { outline: none; border-color: var(--brand); }
+    .fx-champ .fx-check { flex: 1 1 100%; flex-direction: row; align-items: center; gap: 8px; font-weight: 500; color: var(--text); font-size: .85rem; }
+    .fx-check small { color: var(--muted); }
+    .fx-check input { width: 18px; height: 18px; accent-color: var(--brand); }
+
+    .fx-table { overflow: hidden; }
+    .fx-row { display: grid; grid-template-columns: 130px minmax(0, 1fr) 110px 130px 90px; align-items: center; gap: 14px; padding: 12px 18px; border-top: 1px solid var(--border); }
+    .fx-row:hover:not(.fx-hd) { background: var(--surface-2); }
+    .fx-hd { border-top: 0; padding-top: 12px; padding-bottom: 10px; font-size: .72rem; font-weight: 700; text-transform: uppercase; letter-spacing: .07em; color: var(--muted); background: var(--surface-2); }
+    .fx-date { display: flex; flex-direction: column; font-size: .82rem; color: var(--muted); line-height: 1.35; }
+    .fx-date b { color: var(--text); font-weight: 600; }
+    .fx-date small { font-size: .72rem; }
+    .fx-match { display: grid; grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr); align-items: center; gap: 10px; }
+    .fx-team { display: flex; align-items: center; gap: 9px; min-width: 0; font: 500 .95rem "Oswald", sans-serif; text-transform: uppercase; letter-spacing: .02em; color: var(--muted); }
+    .fx-team span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .fx-team.away { justify-content: flex-end; text-align: end; }
+    .fx-team.win { color: var(--text); font-weight: 700; }
+    .tl { width: 30px; height: 30px; border-radius: 50%; flex-shrink: 0; object-fit: cover; background: #fff; border: 1px solid var(--border); }
+    .tl.fit { object-fit: contain; padding: 2px; }
+    .tl-i { display: grid; place-items: center; font: 700 .7rem "Inter", sans-serif; color: #fff; background: #3a2629; border: 0; }
+    .fx-score { min-width: 62px; padding: 4px 8px; border-radius: 6px; text-align: center; background: #150c0d; color: #fff; font: 700 1.05rem "Oswald", sans-serif; font-variant-numeric: tabular-nums; }
+    .fx-score.vs { background: none; color: var(--muted); font-size: .85rem; font-weight: 600; box-shadow: inset 0 0 0 1px var(--border); }
+    .fx-stage { display: flex; flex-direction: column; font-size: .85rem; color: var(--muted); }
+    .fx-stage small { font-size: .72rem; }
+    .fx-status { display: flex; align-items: center; gap: 8px; }
+    .fx-vid { display: inline-flex; align-items: center; gap: 3px; padding: 3px 7px; border-radius: 6px; background: var(--red-bg); color: var(--brand-text); font-size: .72rem; font-weight: 700; }
+    .fx-vid .ic { font-size: .8rem; fill: currentColor; stroke: none; }
+    .fx-act { text-align: end; }
+    .fx-act .btn { padding: 7px 12px; }
+    .fx-empty { display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 40px 20px; text-align: center; color: var(--muted); border-top: 1px solid var(--border); }
+    .fx-empty .ic { font-size: 2rem; margin-bottom: 6px; }
+    .fx-empty b { color: var(--text); font-size: 1.05rem; }
+    .fx-empty.big { border-top: 0; padding: 60px 20px; }
+    @media (max-width: 980px) {
+      .fx-row { grid-template-columns: minmax(0, 1fr) auto; grid-template-areas: "date act" "match match" "stage status"; gap: 8px 12px; padding: 14px 16px; }
+      .fx-hd { display: none; }
+      .fx-date { grid-area: date; flex-direction: row; flex-wrap: wrap; gap: 0 8px; }
+      .fx-match { grid-area: match; }
+      .fx-stage { grid-area: stage; flex-direction: row; gap: 6px; }
+      .fx-status { grid-area: status; justify-content: flex-end; }
+      .fx-act { grid-area: act; }
+      .fx-champ { padding: 14px 0 0; border: 0; border-top: 1px solid var(--border); }
+      .seg { margin-inline-start: 0; flex: 1 1 100%; }
+      .seg-b { flex: 1; }
+    }
+
+    /* Editor that slides in from the right */
+    .sheet { margin: 0 0 0 auto; height: 100%; max-height: none; width: min(560px, 100%); max-width: 100%; padding: 0; border: 0; background: var(--surface); color: var(--text); box-shadow: -20px 0 50px rgba(0,0,0,.25); }
+    .sheet[open] { animation: sheet-in .25s cubic-bezier(.2,.8,.2,1); }
+    .sheet::backdrop { background: rgba(21, 12, 13, .55); }
+    @keyframes sheet-in { from { transform: translateX(40px); opacity: 0; } }
+    .sheet-in { display: flex; flex-direction: column; height: 100%; }
+    .sheet-h { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; padding: calc(20px + env(safe-area-inset-top)) 22px 16px; border-bottom: 1px solid var(--border); }
+    .sheet-h h2 { font-size: 1.4rem; }
+    .sheet-h p { color: var(--muted); font-size: .85rem; }
+    .sheet-b { flex: 1; overflow-y: auto; padding: 8px 22px 20px; }
+    .sheet-f { display: flex; align-items: center; gap: 8px; padding: 14px 22px calc(14px + env(safe-area-inset-bottom)); border-top: 1px solid var(--border); background: var(--surface-2); }
+    .sheet-f .sp { flex: 1; }
+    .fs { border: 0; padding: 16px 0 6px; border-bottom: 1px solid var(--border); display: grid; gap: 12px; }
+    .fs:last-of-type { border-bottom: 0; }
+    .fs legend { padding: 0; margin-bottom: 4px; font: 700 .75rem "Inter", sans-serif; text-transform: uppercase; letter-spacing: .08em; color: var(--muted); }
+    .fs legend small { text-transform: none; letter-spacing: 0; font-weight: 400; }
+    .sheet label { display: flex; flex-direction: column; gap: 5px; min-width: 0; font-size: .8rem; font-weight: 600; color: var(--muted); }
+    .sheet label small { font-weight: 400; }
+    .g2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .g4 { display: grid; grid-template-columns: .7fr .7fr 1.3fr 1fr; gap: 10px; }
+    .hint { font-size: .78rem; color: var(--muted); }
+    .hint.ok { color: var(--green); font-weight: 600; }
+    .hint.bad { color: var(--brand-text); font-weight: 600; }
+    .score-in { display: flex; align-items: flex-end; gap: 10px; }
+    .score-in label { flex: 1; }
+    .score-in label span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .score-in input { text-align: center; font: 700 1.4rem "Oswald", sans-serif !important; }
+    .score-in .dash { padding-bottom: 10px; font-size: 1.3rem; color: var(--muted); }
+    .pens summary { cursor: pointer; font-size: .85rem; font-weight: 600; color: var(--brand-text); }
+    .pens .score-in { margin-top: 10px; }
+    .goals-ed { display: grid; gap: 8px; padding: 14px; border-radius: 12px; background: var(--surface-2); border: 1px solid var(--border); }
+    .goals-ed[hidden] { display: none; }
+    .ge-h b { display: block; font-size: .9rem; }
+    .ge-h span { font-size: .78rem; color: var(--muted); }
+    .ge-row { display: grid; grid-template-columns: minmax(0, 1fr) 110px 36px; gap: 8px; align-items: center; }
+    .ge-row input { text-align: center; }
+    .goals-ed .btn { justify-self: start; }
+    @media (max-width: 560px) { .g4 { grid-template-columns: 1fr 1fr; } .sheet { width: 100%; } }
     @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important; } }
     /* Phones */
     @media (max-width: 640px) {
@@ -485,21 +643,33 @@
     <symbol id="i-shield" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="M9 12l2 2 4-4"/></symbol>
     <symbol id="i-medic" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="3"/><path d="M12 8v8M8 12h8"/></symbol>
     <symbol id="i-calendar" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></symbol>
+    <symbol id="i-external" viewBox="0 0 24 24"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6M15 3h6v6M10 14L21 3"/></symbol>
+    <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
+    <symbol id="i-edit" viewBox="0 0 24 24"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/></symbol>
+    <symbol id="i-play" viewBox="0 0 24 24"><path d="M6 4l14 8-14 8z"/></symbol>
+    <symbol id="i-trophy" viewBox="0 0 24 24"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6M18 9h1.5a2.5 2.5 0 0 0 0-5H18M4 22h16M10 14.7V17c0 .6-.5 1-1 1.2C7.9 18.8 7 20.2 7 22M14 14.7V17c0 .6.5 1 1 1.2 1.1.6 2 2 2 3.8M18 2H6v7a6 6 0 0 0 12 0V2z"/></symbol>
+    <symbol id="i-ball" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 7l4.75 3.45-1.8 5.6h-5.9l-1.8-5.6L12 7z"/></symbol>
   </svg>
 
-  <header>
-    <div class="wrap">
-      <div class="brand">
-        <img src="images/yp-logo.jpg" alt="">
-        <div><h1>Organiser Dashboard</h1><small>YP Veterans Futsal · Team registrations</small></div>
-      </div>
-      <div class="who" id="who" hidden>
-        <button class="ghost-btn install-btn" data-install hidden><svg class="ic" aria-hidden="true"><use href="#i-download"/></svg><span>Install app</span></button>
-        <div class="who-text"><b id="who-email"></b><span class="live" id="updated">Live</span></div>
-        <button class="ghost-btn" id="logout"><svg class="ic" aria-hidden="true"><use href="#i-logout"/></svg>Log out</button>
-      </div>
+  <!-- Menu: shown once signed in. Each link opens a page (#name in the address) -->
+  <aside class="side" id="who" hidden>
+    <a class="side-brand" href="#registrations">
+      <img src="images/veterans-logo.jpg" alt="">
+      <span><b>YP Veterans</b><small>Organiser portal</small></span>
+    </a>
+    <nav class="side-nav" aria-label="Organiser pages">
+      <span class="side-h">Manage</span>
+      <a class="nav-item" href="#registrations" data-page="registrations"><svg class="ic" aria-hidden="true"><use href="#i-clipboard"/></svg><span>Registrations</span></a>
+      <a class="nav-item" href="#fixtures" data-page="fixtures"><svg class="ic" aria-hidden="true"><use href="#i-calendar"/></svg><span>Fixtures &amp; Results</span></a>
+      <span class="side-h">Website</span>
+      <a class="nav-item" href="./" target="_blank" rel="noopener"><svg class="ic" aria-hidden="true"><use href="#i-external"/></svg><span>View website</span></a>
+    </nav>
+    <div class="side-foot">
+      <button class="side-btn install-btn" data-install hidden><svg class="ic" aria-hidden="true"><use href="#i-download"/></svg><span>Install app</span></button>
+      <div class="side-user"><b id="who-email"></b><span class="live" id="updated">Live</span></div>
+      <button class="side-btn" id="logout"><svg class="ic" aria-hidden="true"><use href="#i-logout"/></svg><span>Log out</span></button>
     </div>
-  </header>
+  </aside>
 
   <div class="glass-scene" aria-hidden="true">
     <span class="blob b1"></span><span class="blob b2"></span><span class="blob b3"></span>
@@ -622,6 +792,7 @@
     }
     function showLogin(message = "") {
       who.hidden = true;
+      document.body.classList.remove("app-mode");
       document.body.classList.add("login-mode");
       app.innerHTML = `
         <form class="login" id="login">
@@ -690,8 +861,23 @@
         return;
       }
       signedIn = true;
-      await load();
+      document.body.classList.add("app-mode");
+      route();
     }
+
+    // ---------- Pages ----------
+    // The menu links set #registrations, #fixtures … in the address; each opens its page
+    const PAGES = { registrations: () => load(), fixtures: () => loadFixtures() };
+    let page = "registrations";
+    function route() {
+      const want = location.hash.slice(1);
+      page = PAGES[want] ? want : "registrations";
+      document.querySelectorAll(".nav-item[data-page]").forEach(a => a.classList.toggle("active", a.dataset.page === page));
+      lastSignature = "";
+      PAGES[page]();
+      scrollTo(0, 0);
+    }
+    addEventListener("hashchange", () => { if (signedIn) route(); });
 
     // silent = background check: only redraw when something changed, and never while typing
     async function load(silent = false) {
@@ -699,7 +885,7 @@
         const el = document.activeElement;
         if (el && (el.tagName === "TEXTAREA" || el.tagName === "INPUT")) return;
       } else {
-        app.innerHTML = `<p class="notice">Loading registrations…</p>`;
+        app.innerHTML = `<div class="ph"><div><h1>Team Registrations</h1></div></div><p class="notice">Loading registrations…</p>`;
       }
       const { data, error } = await db
         .from("teams")
@@ -738,8 +924,8 @@
     }
 
     // Check for new registrations every 30 seconds, and when coming back to this tab
-    setInterval(() => { if (signedIn && !document.hidden) load(true); }, 30000);
-    document.addEventListener("visibilitychange", () => { if (signedIn && !document.hidden) load(true); });
+    setInterval(() => { if (signedIn && page === "registrations" && !document.hidden) load(true); }, 30000);
+    document.addEventListener("visibilitychange", () => { if (signedIn && page === "registrations" && !document.hidden) load(true); });
 
     function toast(text) {
       const el = document.createElement("div");
@@ -780,6 +966,7 @@
       const tabNames = { all: "All teams", pending: "Waiting", confirmed: "Confirmed", rejected: "Rejected", issues: "Need attention" };
 
       app.innerHTML = `
+        <div class="ph"><div><h1>Team Registrations</h1><p>Teams that registered on the website. Open or close registration and check every squad.</p></div></div>
         <div class="card reg-control ${open ? "" : "closed"}">
           <div class="rc-top">
             <span class="rc-icon">${icon(open ? "unlock" : "lock")}</span>
@@ -1180,6 +1367,327 @@
       a.href = URL.createObjectURL(blob);
       a.download = "yp-veterans-registrations.csv";
       a.click();
+    }
+
+    // ---------- Fixtures & Results ----------
+    // Seasons (one per year) and their matches. The website's Match Results read these same tables.
+    const TEAMS = window.YP_TEAMS || {};
+    const fx = { seasons: [], matches: [], year: null, tab: "all", error: null };
+    const STAGES = [["", "League"], ["semi", "Semi-final"], ["playoff", "Playoff"], ["final", "Final"]];
+    const isPlayed = m => m.home_score !== null && m.away_score !== null;
+    const teamLogo = name => {
+      const t = TEAMS[name];
+      return t ? `<img class="tl${t.fit ? " fit" : ""}" src="${esc(t.logo)}" alt="">` : `<span class="tl tl-i">${esc(initials(name))}</span>`;
+    };
+    const teamNames = () => [...new Set([...Object.keys(TEAMS), ...fx.matches.flatMap(m => [m.home, m.away])])].sort((a, b) => a.localeCompare(b));
+    // Video time written as 1:02:03, 34:05 or plain seconds
+    const toClock = sec => {
+      if (sec === null || sec === undefined || sec === "") return "";
+      const h = Math.floor(sec / 3600), m = Math.floor(sec / 60) % 60, x = String(sec % 60).padStart(2, "0");
+      return h ? `${h}:${String(m).padStart(2, "0")}:${x}` : `${m}:${x}`;
+    };
+    const fromClock = v => {
+      const parts = String(v).trim().split(":");
+      if (!parts[0] || parts.length > 3 || parts.some(x => !/^\d+$/.test(x))) return null;
+      return parts.reduce((t, x) => t * 60 + Number(x), 0);
+    };
+    const youtubeId = v => {
+      const s = String(v || "").trim();
+      const m = s.match(/(?:v=|youtu\.be\/|embed\/|live\/|shorts\/)([\w-]{11})/) || s.match(/^([\w-]{11})$/);
+      return m ? m[1] : null;
+    };
+    const fmtKick = iso => new Intl.DateTimeFormat("en-GB", { timeZone: "Indian/Maldives", weekday: "short", day: "numeric", month: "short" }).format(new Date(iso));
+    const fmtKickTime = iso => new Intl.DateTimeFormat("en-GB", { timeZone: "Indian/Maldives", hour: "2-digit", minute: "2-digit" }).format(new Date(iso));
+
+    const fixturesHead = `<div class="ph"><div><h1>Fixtures &amp; Results</h1><p>Add matches, enter scores, goals and match videos. The website updates as soon as you save.</p></div>
+      <div class="ph-act"><a class="btn" href="./#results" target="_blank" rel="noopener">${icon("external")} View on website</a>
+      <button class="btn primary" id="fx-add">${icon("plus")} Add match</button></div></div>`;
+
+    async function loadFixtures() {
+      app.innerHTML = fixturesHead + `<p class="notice">Loading matches…</p>`;
+      const [s, m] = await Promise.all([
+        db.from("seasons").select("*").order("year", { ascending: false }),
+        db.from("matches").select("*").order("day").order("no", { nullsFirst: false }).order("kickoff", { nullsFirst: false })
+      ]);
+      fx.error = s.error || m.error || null;
+      if (!fx.error) {
+        fx.seasons = s.data;
+        fx.matches = m.data;
+        if (!fx.seasons.some(x => x.year === fx.year)) fx.year = fx.seasons.length ? fx.seasons[0].year : null;
+      }
+      if (page === "fixtures") renderFixtures();
+    }
+
+    function renderFixtures() {
+      if (fx.error) {
+        const missing = /does not exist|schema cache|42P01/i.test(fx.error.message + " " + fx.error.code);
+        app.innerHTML = fixturesHead + `<div class="card notice">
+          <div class="big-ic">${icon("alert")}</div>
+          <h2>${missing ? "One-time setup needed" : "Couldn't load matches"}</h2>
+          <p>${missing ? "Open Supabase → SQL Editor and run <code>supabase/setup.sql</code>, then <code>supabase/seed-results.sql</code>. Then reload this page."
+                        : esc(fx.error.message)}</p></div>`;
+        return;
+      }
+      const season = fx.seasons.find(x => x.year === fx.year);
+      const all = fx.matches.filter(m => m.year === fx.year);
+      const counts = { all: all.length, fixtures: all.filter(m => !isPlayed(m)).length, results: all.filter(isPlayed).length };
+      const list = all.filter(m => fx.tab === "all" || (fx.tab === "results" ? isPlayed(m) : !isPlayed(m)));
+      const goals = all.filter(isPlayed).reduce((n, m) => n + m.home_score + m.away_score, 0);
+      const tabs = [["fixtures", "Fixtures"], ["results", "Results"], ["all", "All matches"]];
+
+      app.innerHTML = fixturesHead + `
+        <div class="fx-bar">
+          <label class="fx-season"><span>Season</span>
+            <select id="fx-year">${fx.seasons.map(x => `<option value="${x.year}" ${x.year === fx.year ? "selected" : ""}>${x.year}</option>`).join("")}</select>
+          </label>
+          <button class="btn" id="fx-new-season">${icon("plus")} New season</button>
+          ${season ? `<div class="seg" role="tablist">${tabs.map(([k, l]) => `<button class="seg-b ${fx.tab === k ? "on" : ""}" data-tab="${k}" role="tab" aria-selected="${fx.tab === k}">${l} <em>${counts[k]}</em></button>`).join("")}</div>` : ""}
+        </div>
+        ${season ? `
+        <div class="card fx-season-card">
+          <div class="fx-sum">
+            <div><b>${counts.results}</b><span>Played</span></div>
+            <div><b>${counts.fixtures}</b><span>Coming up</span></div>
+            <div><b>${goals}</b><span>Goals</span></div>
+          </div>
+          <form class="fx-champ" id="fx-champ">
+            <label><span class="lbl">${icon("trophy")} Champion</span><input name="champion" maxlength="100" value="${esc(season.champion || "")}" placeholder="Leave empty until the final"></label>
+            <label>In Dhivehi <input name="champion_dv" maxlength="100" dir="rtl" value="${esc(season.champion_dv || "")}" placeholder="Optional"></label>
+            <label class="fx-check" title="Hides the match and goal totals on the website"><input type="checkbox" name="partial" ${season.partial ? "checked" : ""}> Some results of this year are missing</label>
+            <button class="btn" type="submit">${icon("check")} Save season</button>
+          </form>
+        </div>
+        <div class="card fx-table">
+          <div class="fx-row fx-hd"><span>Date</span><span>Match</span><span>Stage</span><span>Status</span><span></span></div>
+          ${list.length ? list.map(fixtureRow).join("") : `<div class="fx-empty">${icon("ball")}<b>${all.length ? "Nothing here" : "No matches yet"}</b><span>${all.length ? "Try another tab." : "Add the first match of " + fx.year + "."}</span></div>`}
+        </div>` : `
+        <div class="card fx-empty big">${icon("calendar")}<b>No seasons yet</b><span>Start with “New season”, then add its matches.</span></div>`}`;
+
+      document.getElementById("fx-add").disabled = !season;
+      document.getElementById("fx-add").onclick = () => editMatch(null);
+      document.getElementById("fx-new-season").onclick = newSeason;
+      const yearSel = document.getElementById("fx-year");
+      if (yearSel) yearSel.onchange = () => { fx.year = Number(yearSel.value); renderFixtures(); };
+      app.querySelectorAll(".seg-b").forEach(b => b.onclick = () => { fx.tab = b.dataset.tab; renderFixtures(); });
+      app.querySelectorAll("[data-edit]").forEach(b => b.onclick = () => editMatch(fx.matches.find(m => m.id === b.dataset.edit)));
+      const champ = document.getElementById("fx-champ");
+      if (champ) champ.onsubmit = e => { e.preventDefault(); saveSeason(season, champ); };
+    }
+
+    function fixtureRow(m) {
+      const played = isPlayed(m);
+      const win = played ? (m.home_score > m.away_score ? "h" : m.home_score < m.away_score ? "a"
+        : m.pen_home !== null && m.pen_away !== null ? (m.pen_home > m.pen_away ? "h" : "a") : "") : "";
+      const stage = (STAGES.find(([k]) => k === (m.stage || "")) || STAGES[0])[1];
+      return `
+        <div class="fx-row">
+          <span class="fx-date">${m.kickoff ? `<b>${fmtKick(m.kickoff)}</b>${fmtKickTime(m.kickoff)}` : `<b>Match day ${m.day}</b>`}${m.no ? `<small>Match ${m.no}</small>` : ""}</span>
+          <span class="fx-match">
+            <span class="fx-team ${win === "h" ? "win" : ""}">${teamLogo(m.home)}<span>${esc(m.home)}</span></span>
+            <span class="fx-score ${played ? "" : "vs"}">${played ? `${m.home_score} – ${m.away_score}` : "v"}</span>
+            <span class="fx-team away ${win === "a" ? "win" : ""}"><span>${esc(m.away)}</span>${teamLogo(m.away)}</span>
+          </span>
+          <span class="fx-stage">${stage}${m.pen_home !== null && m.pen_away !== null ? `<small>${m.pen_home}–${m.pen_away} pens</small>` : ""}</span>
+          <span class="fx-status"><span class="pill ${played ? "confirmed" : "pending"}">${played ? "Played" : "Upcoming"}</span>
+            ${m.video ? `<span class="fx-vid" title="Has a match video${m.goals && m.goals.length ? " and " + m.goals.length + " highlight clips" : ""}">${icon("play")}${m.goals && m.goals.length ? m.goals.length : ""}</span>` : ""}</span>
+          <span class="fx-act"><button class="btn" data-edit="${m.id}">${icon("edit")} Edit</button></span>
+        </div>`;
+    }
+
+    async function newSeason() {
+      const next = fx.seasons.length ? Math.max(...fx.seasons.map(x => x.year)) + 1 : new Date().getFullYear();
+      const v = prompt("Which year is the new season?", next);
+      if (v === null) return;
+      const year = Number(v);
+      if (!Number.isInteger(year) || year < 2000 || year > 2100) return alert("Please enter a year, like " + next);
+      if (fx.seasons.some(x => x.year === year)) { fx.year = year; return renderFixtures(); }
+      const { error } = await db.from("seasons").insert({ year });
+      if (error) return alert("Couldn't add the season: " + error.message);
+      fx.year = year;
+      fx.tab = "all";
+      toast("✓ Season " + year + " added");
+      loadFixtures();
+    }
+
+    async function saveSeason(season, form) {
+      const row = { champion: form.champion.value.trim() || null, champion_dv: form.champion_dv.value.trim() || null, partial: form.partial.checked };
+      const { error } = await db.from("seasons").update(row).eq("year", season.year);
+      if (error) return alert("Couldn't save: " + error.message);
+      Object.assign(season, row);
+      toast("✓ Season " + season.year + " saved");
+    }
+
+    // ---------- Match editor ----------
+    const fxDlg = document.createElement("dialog");
+    fxDlg.className = "sheet";
+    document.body.appendChild(fxDlg);
+    fxDlg.addEventListener("click", e => { if (e.target === fxDlg) fxDlg.close(); });
+
+    function editMatch(m) {
+      const isNew = !m;
+      const all = fx.matches.filter(x => x.year === fx.year);
+      m = m || { day: all.length ? Math.max(...all.map(x => x.day)) : 1, no: all.length ? Math.max(0, ...all.map(x => x.no || 0)) + 1 : 1,
+                 home: "", away: "", home_score: null, away_score: null, pen_home: null, pen_away: null, stage: null, video: null, goals: [], kickoff: null };
+      const kick = toMvInput(m.kickoff);
+      // Goals to edit: when the goal happens in the video. Older clips (found automatically) only have the clip end.
+      const goals = (m.goals || []).map((g, i) => ({ i, team: g.team, at: g.at ?? Math.max(0, (g.t ?? 0) - 10) }));
+      const num = v => v === null || v === undefined ? "" : v;
+
+      fxDlg.innerHTML = `
+        <form class="sheet-in" id="fx-form" novalidate>
+          <div class="sheet-h">
+            <div><h2>${isNew ? "Add match" : "Edit match"}</h2><p>Season ${fx.year}</p></div>
+            <button type="button" class="icon-btn" id="fx-close" aria-label="Close">${icon("x")}</button>
+          </div>
+          <div class="sheet-b">
+            <fieldset class="fs">
+              <legend>Teams</legend>
+              <div class="g2">
+                <label>Home team<input name="home" list="fx-teams" required maxlength="60" value="${esc(m.home)}" autocomplete="off"></label>
+                <label>Away team<input name="away" list="fx-teams" required maxlength="60" value="${esc(m.away)}" autocomplete="off"></label>
+              </div>
+              <datalist id="fx-teams">${teamNames().map(n => `<option value="${esc(n)}">`).join("")}</datalist>
+              <small class="hint">Pick a name from the list so the club logo shows. New names work too.</small>
+            </fieldset>
+            <fieldset class="fs">
+              <legend>When</legend>
+              <div class="g4">
+                <label>Match day<input name="day" type="number" min="1" max="60" required value="${num(m.day)}"></label>
+                <label>Match no.<input name="no" type="number" min="1" max="200" value="${num(m.no)}"></label>
+                <label>Date<input name="date" type="date" value="${kick.slice(0, 10)}"></label>
+                <label>Kick-off (MV)<input name="time" type="time" value="${kick.slice(11, 16)}"></label>
+              </div>
+              <label>Stage<select name="stage">${STAGES.map(([k, l]) => `<option value="${k}" ${(m.stage || "") === k ? "selected" : ""}>${l}</option>`).join("")}</select></label>
+            </fieldset>
+            <fieldset class="fs">
+              <legend>Score <small>leave empty until the match is played</small></legend>
+              <div class="score-in">
+                <label><span id="lbl-home">${esc(m.home || "Home")}</span><input name="home_score" type="number" min="0" max="99" inputmode="numeric" value="${num(m.home_score)}"></label>
+                <span class="dash">–</span>
+                <label><span id="lbl-away">${esc(m.away || "Away")}</span><input name="away_score" type="number" min="0" max="99" inputmode="numeric" value="${num(m.away_score)}"></label>
+              </div>
+              <details class="pens" ${m.pen_home !== null ? "open" : ""}><summary>Penalty shootout</summary>
+                <div class="score-in"><label>Home<input name="pen_home" type="number" min="0" max="99" value="${num(m.pen_home)}"></label><span class="dash">–</span><label>Away<input name="pen_away" type="number" min="0" max="99" value="${num(m.pen_away)}"></label></div>
+              </details>
+            </fieldset>
+            <fieldset class="fs">
+              <legend>Video &amp; highlights</legend>
+              <label>YouTube link of the match<input name="video" placeholder="https://youtube.com/watch?v=…" value="${m.video ? "https://youtu.be/" + esc(m.video) : ""}" autocomplete="off"></label>
+              <small class="hint" id="vid-state"></small>
+              <div class="goals-ed" id="goals-ed">
+                <div class="ge-h"><b>Goals</b><span>Time in the video when the goal is scored. Each becomes a highlight clip.</span></div>
+                <div id="ge-rows"></div>
+                <button type="button" class="btn" id="ge-add">${icon("plus")} Add goal</button>
+                <small class="hint" id="ge-check"></small>
+              </div>
+            </fieldset>
+            <p class="form-error" id="fx-err" role="alert"></p>
+          </div>
+          <div class="sheet-f">
+            ${isNew ? "" : `<button type="button" class="btn danger" id="fx-del">${icon("trash")} Delete</button>`}
+            <span class="sp"></span>
+            <button type="button" class="btn" id="fx-cancel">Cancel</button>
+            <button type="submit" class="btn primary">${icon("check")} ${isNew ? "Add match" : "Save"}</button>
+          </div>
+        </form>`;
+
+      const f = document.getElementById("fx-form");
+      const rows = document.getElementById("ge-rows");
+      const sides = () => [f.home.value.trim() || "Home", f.away.value.trim() || "Away"];
+      const goalRow = g => {
+        const [h, a] = sides();
+        const el = document.createElement("div");
+        el.className = "ge-row";
+        if (g.i !== undefined) el.dataset.i = g.i;
+        el.innerHTML = `<select aria-label="Team"><option value="h">${esc(h)}</option><option value="a">${esc(a)}</option></select>
+          <input aria-label="Time in the video" placeholder="34:05" value="${esc(toClock(g.at))}" inputmode="numeric">
+          <button type="button" class="icon-btn" aria-label="Remove goal">${icon("x")}</button>`;
+        el.querySelector("select").value = g.team === a && g.team !== h ? "a" : "h";
+        el.querySelector("button").onclick = () => { el.remove(); check(); };
+        el.querySelectorAll("select, input").forEach(x => x.oninput = () => check());
+        rows.appendChild(el);
+      };
+      goals.forEach(goalRow);
+
+      // Keep the goal team names and score labels in step with what's typed
+      const check = () => {
+        const [h, a] = sides();
+        document.getElementById("lbl-home").textContent = h;
+        document.getElementById("lbl-away").textContent = a;
+        rows.querySelectorAll("select").forEach(sel => { sel.options[0].text = h; sel.options[1].text = a; });
+        const id = youtubeId(f.video.value);
+        const vs = document.getElementById("vid-state");
+        vs.textContent = !f.video.value.trim() ? "Optional. Add it to show “Full match” and highlights on the website." : id ? "✓ Video found" : "That doesn't look like a YouTube link.";
+        vs.className = "hint" + (f.video.value.trim() && !id ? " bad" : id ? " ok" : "");
+        document.getElementById("goals-ed").hidden = !id;
+        const sel = [...rows.querySelectorAll(".ge-row")];
+        const hg = sel.filter(r => r.querySelector("select").value === "h").length, ag = sel.length - hg;
+        const hs = f.home_score.value, as = f.away_score.value;
+        const ck = document.getElementById("ge-check");
+        ck.textContent = !sel.length ? "" : hs !== "" && as !== "" && (hg !== +hs || ag !== +as)
+          ? `Goals add up to ${hg}–${ag}, but the score is ${hs}–${as}.` : `${hg}–${ag} from the goals listed.`;
+        ck.className = "hint" + (ck.textContent.startsWith("Goals add up") ? " bad" : "");
+      };
+      f.querySelectorAll("input, select").forEach(x => x.addEventListener("input", check));
+      document.getElementById("ge-add").onclick = () => { goalRow({ team: null, at: null }); rows.lastElementChild.querySelector("input").focus(); check(); };
+      check();
+
+      document.getElementById("fx-close").onclick = document.getElementById("fx-cancel").onclick = () => fxDlg.close();
+      const del = document.getElementById("fx-del");
+      if (del) del.onclick = async () => {
+        if (!confirm(`Delete ${m.home} v ${m.away}? This can't be undone.`)) return;
+        const { error } = await db.from("matches").delete().eq("id", m.id);
+        if (error) return alert("Couldn't delete: " + error.message);
+        fxDlg.close();
+        toast("Match deleted");
+        loadFixtures();
+      };
+
+      f.onsubmit = async e => {
+        e.preventDefault();
+        const err = document.getElementById("fx-err");
+        const n = v => v === "" ? null : Number(v);
+        const home = f.home.value.trim(), away = f.away.value.trim();
+        const row = {
+          year: fx.year, day: n(f.day.value), no: n(f.no.value), home, away,
+          kickoff: f.date.value ? fromMvInput(f.date.value + "T" + (f.time.value || "00:00")) : null,
+          home_score: n(f.home_score.value), away_score: n(f.away_score.value),
+          pen_home: n(f.pen_home.value), pen_away: n(f.pen_away.value),
+          stage: f.stage.value || null, video: youtubeId(f.video.value), updated_at: new Date().toISOString()
+        };
+        const problem = !home || !away ? "Enter both teams."
+          : home === away ? "A team can't play itself."
+          : !row.day ? "Enter the match day."
+          : (row.home_score === null) !== (row.away_score === null) ? "Enter both scores, or leave both empty."
+          : (row.pen_home === null) !== (row.pen_away === null) ? "Enter both penalty scores, or leave both empty."
+          : f.video.value.trim() && !row.video ? "The video link isn't a YouTube link." : "";
+        // Goals in time order, each with the score after it (home–away)
+        let gh = 0, ga = 0, badTime = false;
+        const goalsOut = row.video ? [...rows.querySelectorAll(".ge-row")].map(el => {
+          const at = fromClock(el.querySelector("input").value);
+          if (at === null) badTime = true;
+          return { el, at, side: el.querySelector("select").value };
+        }).sort((x, y) => x.at - y.at).map(({ el, at, side }) => {
+          side === "h" ? gh++ : ga++;
+          const team = side === "h" ? home : away, score = `${gh}–${ga}`;
+          const old = el.dataset.i !== undefined ? m.goals[+el.dataset.i] : null;
+          // An untouched clip keeps its original start and end
+          if (old && goals[+el.dataset.i].at === at) return { ...old, team, score };
+          return { at, s: Math.max(0, at - 25), t: at + 5, team, score };
+        }) : [];
+        const msg = problem || (badTime ? "Write each goal's time like 34:05." : "");
+        if (msg) { err.textContent = msg; return; }
+        row.goals = goalsOut;
+        const btn = f.querySelector("[type=submit]");
+        btn.disabled = true;
+        const { error } = isNew ? await db.from("matches").insert(row) : await db.from("matches").update(row).eq("id", m.id);
+        btn.disabled = false;
+        if (error) { err.textContent = "Couldn't save: " + error.message; return; }
+        fxDlg.close();
+        toast(isNew ? "✓ Match added" : "✓ Match saved");
+        loadFixtures();
+      };
+      fxDlg.showModal();
     }
 
     // ---------- App (install on the home screen) ----------
