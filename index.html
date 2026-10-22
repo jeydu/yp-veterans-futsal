@@ -723,6 +723,36 @@
     }
     @keyframes spin { to { transform: rotate(360deg); } }
 
+
+    /* Step by step: only the current step shows; Back / Next under it */
+    .reg-form.wizard .reg-sec { display: none; border-bottom: 0; }
+    .reg-form.wizard .reg-sec.cur { display: block; animation: wz-in .3s ease; }
+    @keyframes wz-in { from { opacity: 0; transform: translateX(12px); } }
+    .rp-step { cursor: pointer; }
+    .rp-step.cur { color: var(--brand-text); }
+    .rp-step.cur .rp-dot { border-color: var(--brand); background: var(--brand); color: #fff; }
+    .wz-nav { position: sticky; bottom: 0; z-index: 2; display: flex; align-items: center; gap: 10px; margin: 18px -32px -40px; padding: 14px 32px calc(14px + env(safe-area-inset-bottom)); background: var(--surface); border-top: 1px solid var(--border); }
+    .wz-of { flex: 1; text-align: center; font-size: .82rem; font-weight: 600; color: var(--muted); }
+    .wz-back, .wz-next { display: inline-flex; align-items: center; gap: 8px; padding: 14px 22px; border-radius: 2px; cursor: pointer; font: 600 1rem "Oswald", sans-serif; text-transform: uppercase; letter-spacing: .08em; }
+    .wz-back { border: 2px solid var(--border); background: transparent; color: var(--text); }
+    .wz-back .ic { transform: scaleX(-1); }
+    .wz-next { margin-inline-start: auto; border: 2px solid var(--brand); background: var(--brand); color: #fff; }
+    .wz-next:hover { background: var(--brand-dark); border-color: var(--brand-dark); }
+    .wz-back[hidden], .wz-next[hidden] { display: none; }
+    :root[dir="rtl"] .wz-next .ic { transform: scaleX(-1); }
+    :root[dir="rtl"] .wz-back .ic { transform: none; }
+    .wz-review { display: grid; gap: 8px; margin-bottom: 18px; }
+    .wz-r { position: relative; display: flex; flex-direction: column; gap: 2px; padding: 12px 70px 12px 14px; background: var(--tint-strong); border-inline-start: 4px solid var(--brand); font-size: .9rem; }
+    .wz-r small { font-size: .7rem; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); }
+    .wz-r b { font-weight: 600; }
+    .wz-pl { line-height: 1.7; }
+    .wz-pl em { display: inline-block; min-width: 26px; font-style: normal; font-weight: 700; color: var(--brand-text); }
+    .wz-r button { position: absolute; top: 10px; inset-inline-end: 10px; padding: 4px 10px; border: 1px solid var(--brand); background: transparent; color: var(--brand-text); cursor: pointer; font-size: .78rem; font-weight: 600; }
+    @media (max-width: 720px) {
+      .wz-nav { margin: 18px -20px -28px; padding-left: 20px; padding-right: 20px; }
+      .wz-back, .wz-next { padding: 13px 16px; }
+      .wz-of { font-size: .75rem; }
+    }
     /* Registration: person cards (officials and players). A card turns green once everything is in */
     .players-count { font-size: .8rem; font-weight: 600; color: var(--brand-text); }
     .people { display: grid; gap: 12px; }
@@ -1331,7 +1361,7 @@
           </div>
         </div>
 
-        <form class="reg-form" id="reg-form" novalidate>
+        <form class="reg-form wizard" id="reg-form" novalidate>
           <!-- Progress: stays at the top while scrolling and fills in as the form is completed -->
           <div class="reg-progress">
             <div class="rp-steps">
@@ -1409,6 +1439,7 @@
                 <p data-i18n="secConfirmSub">Check everything, then send it on WhatsApp</p>
               </div>
             </div>
+            <div class="wz-review" id="wz-review"></div>
             <div class="fields">
               <div class="field full check">
                 <label><input type="checkbox" name="agree" required> <span data-i18n="agree">All our players meet the age rule and we agree to the tournament rules.</span></label>
@@ -1425,6 +1456,12 @@
               <span data-i18n="regError">Sorry, the registration didn't go through. Check your internet and try again, or send it on WhatsApp instead.</span>
               <a id="reg-wa" href="#" target="_blank" rel="noopener" data-i18n="regErrorLink">Send on WhatsApp</a>
             </p>
+          </div>
+          <!-- Step-by-step: Back / Next move between the four steps -->
+          <div class="wz-nav">
+            <button type="button" class="wz-back" id="wz-back"><svg class="ic" aria-hidden="true"><use href="#i-arrow"/></svg><span data-i18n="wzBack">Back</span></button>
+            <span class="wz-of" id="wz-of"></span>
+            <button type="button" class="wz-next" id="wz-next"><span data-i18n="wzNext">Next</span><svg class="ic" aria-hidden="true"><use href="#i-arrow"/></svg></button>
           </div>
         </form>
 
@@ -1722,6 +1759,13 @@
       resGoals: "ގޯލު",
       resDay: n => n + " ވަނަ މެޗު ދުވަސް",
       fxSeason: y => y + " ގެ މުބާރާތް",
+      wzOf: n => "4 ގެ " + n + " ވަނަ ބައި",
+      wzTeam: "ޓީމު",
+      wzOfficials: "އޮފިޝަލުން",
+      wzPlayers: "ކުޅުންތެރިން",
+      wzEdit: "ބަދަލުކުރައްވާ",
+      wzNext: "ކުރިއަށް",
+      wzBack: "ފަހަތަށް",
       fxFt: "ނިމުނީ",
       fxPens: "ޕެނަލްޓީ",
       newsEyebrow: "އެންމެ ފަހުގެ",
@@ -1771,6 +1815,11 @@
       resGoals: "Goals",
       resDay: n => "Match Day " + n,
       fxSeason: y => y + " season",
+      wzOf: n => "Step " + n + " of 4",
+      wzTeam: "Team",
+      wzOfficials: "Officials",
+      wzPlayers: "Players",
+      wzEdit: "Edit",
       fxFt: "FT",
       fxPens: "pens",
       newsTitle: "News",
@@ -2327,9 +2376,78 @@
       if (field && field.classList.contains("invalid") && e.target.checkValidity()) field.classList.remove("invalid");
     });
 
+    // ---------- Step by step ----------
+    // One step on screen at a time. Next checks the step first; the step names at the top go back to earlier steps.
+    const STEPS = ["team", "officials", "players", "confirm"];
+    let step = 0;
+    function stepOk(i, mark) {
+      if (i === 0) {
+        let ok = true;
+        document.querySelectorAll("#sec-team [required]").forEach(el => {
+          const bad = !el.checkValidity() || !el.value.trim();
+          if (mark) el.closest(".field").classList.toggle("invalid", bad);
+          if (bad) ok = false;
+        });
+        return ok;
+      }
+      if (i === 1) {
+        const ok = mark ? checkCards(officialCards()) : officialCards().every(c => cardProgress(c).filled === cardProgress(c).total);
+        if (mark) officialsField.classList.toggle("invalid", !ok);
+        return ok;
+      }
+      if (i === 2) {
+        const rows = playerCards();
+        checkJerseys();
+        const ok = rows.length >= MIN_PLAYERS && (mark ? checkCards(rows) : rows.every(c => cardProgress(c).filled === cardProgress(c).total));
+        if (mark) {
+          playersErr.textContent = rows.length < MIN_PLAYERS ? t("errMinPlayers", MIN_PLAYERS) : t("errPlayerRows");
+          playersField.classList.toggle("invalid", !ok);
+        }
+        return ok;
+      }
+      return true;
+    }
+    function goStep(i, scroll = true) {
+      step = Math.max(0, Math.min(STEPS.length - 1, i));
+      STEPS.forEach((k, n) => {
+        document.getElementById("sec-" + k).classList.toggle("cur", n === step);
+        document.getElementById("rp-" + k).classList.toggle("cur", n === step);
+      });
+      document.getElementById("wz-back").hidden = step === 0;
+      document.getElementById("wz-next").hidden = step === STEPS.length - 1;
+      document.getElementById("wz-of").textContent = t("wzOf", step + 1);
+      if (step === STEPS.length - 1) renderReview();
+      if (scroll) document.querySelector(".reg-progress").scrollIntoView({ block: "start", behavior: "smooth" });
+    }
+    // The last step: a short summary to check before sending
+    function renderReview() {
+      const f = regForm.elements;
+      const esc = v => String(v).replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+      document.getElementById("wz-review").innerHTML = `
+        <div class="wz-r"><small>${t("wzTeam")}</small><b>${esc(f.team.value.trim())}</b><span>${esc(f.island.value.trim())}</span><button type="button" data-go="0">${t("wzEdit")}</button></div>
+        <div class="wz-r"><small>${t("wzOfficials")}</small>${officialCards().map((c, i) => `<span>${t(OFFICIALS[i].title)}: <b>${esc(val(c, ".p-name"))}</b></span>`).join("")}<button type="button" data-go="1">${t("wzEdit")}</button></div>
+        <div class="wz-r"><small>${t("wzPlayers")} · ${playerCards().length}</small><span class="wz-pl">${playerCards().map(c => `<em>${esc(val(c, ".p-jersey"))}</em> ${esc(val(c, ".p-name"))}`).join("<br>")}</span><button type="button" data-go="2">${t("wzEdit")}</button></div>`;
+      document.querySelectorAll("#wz-review [data-go]").forEach(b => b.onclick = () => goStep(+b.dataset.go));
+    }
+    document.getElementById("wz-next").addEventListener("click", () => {
+      if (!stepOk(step, true)) {
+        const first = document.querySelector(`#sec-${STEPS[step]} .field.invalid input, #sec-${STEPS[step]} input.bad, #sec-${STEPS[step]} .ph-tile.bad input`);
+        if (first) { first.focus({ preventScroll: true }); (first.closest(".ph-tile") || first).scrollIntoView({ block: "center", behavior: "smooth" }); }
+        return;
+      }
+      goStep(step + 1);
+    });
+    document.getElementById("wz-back").addEventListener("click", () => goStep(step - 1));
+    // Tap a step name: go back to it, or forward if every step before it is complete
+    STEPS.forEach((k, n) => document.getElementById("rp-" + k).addEventListener("click", () => {
+      if (n <= step || [...Array(n).keys()].every(i => stepOk(i, false))) goStep(n);
+    }));
+    goStep(0, false);
+
     document.getElementById("reg-again").addEventListener("click", () => {
       regForm.reset();
       resetPeople();
+      goStep(0);
       officialsField.classList.remove("invalid");
       playersField.classList.remove("invalid");
       shareFiles = [];
