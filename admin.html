@@ -773,6 +773,51 @@
       .ez-cancel, .ez-cancel + .sp { display: none; }
       #bk-next, #bk-save { flex: 1; padding-left: 8px; padding-right: 8px; }
     }
+
+    /* ---------- Registrations list ---------- */
+    .rg-status { display: flex; align-items: center; gap: 14px; padding: 16px 20px; margin-bottom: 14px; border-inline-start: 5px solid var(--green); }
+    .rg-status.closed { border-inline-start-color: var(--brand); }
+    .rg-st-ic { display: grid; place-items: center; width: 42px; height: 42px; flex-shrink: 0; border-radius: 12px; background: var(--green-bg); color: var(--green); font-size: 1.2rem; }
+    .rg-status.closed .rg-st-ic { background: var(--red-bg); color: var(--brand-text); }
+    .rg-st-txt { flex: 1; min-width: 0; }
+    .rg-st-txt b { display: block; font: 700 1.15rem "Oswald", sans-serif; text-transform: uppercase; letter-spacing: .02em; }
+    .rg-st-txt span { font-size: .85rem; color: var(--muted); }
+    .rg-tiles { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 16px; }
+    .rg-tile { display: grid; grid-template-columns: auto 1fr; grid-template-rows: auto auto; column-gap: 12px; align-items: center; padding: 14px 16px; text-align: start; border: 1px solid var(--border); transition: border-color .15s ease; }
+    .rg-tile:hover, .rg-tile.on { border-color: var(--brand); }
+    .rg-tile .rg-ic { grid-row: span 2; display: grid; place-items: center; width: 40px; height: 40px; border-radius: 12px; background: var(--tint); color: var(--brand-text); font-size: 1.1rem; }
+    .rg-tile.t-pending .rg-ic { background: var(--amber-bg); color: var(--amber); }
+    .rg-tile.t-confirmed .rg-ic { background: var(--green-bg); color: var(--green); }
+    .rg-tile b { font: 700 1.6rem/1 "Oswald", sans-serif; }
+    .rg-tile > span:last-child { font-size: .78rem; color: var(--muted); }
+    .rg-row { display: grid; grid-template-columns: minmax(0, 1.6fr) minmax(0, 1.1fr) 80px 130px 100px 110px; align-items: center; gap: 14px; padding: 12px 18px; border-top: 1px solid var(--border); }
+    .rg-row.tm-hd { border-top: 0; }
+    .rg-row:hover:not(.tm-hd) { background: var(--surface-2); }
+    .rg-team { display: flex; align-items: center; gap: 12px; min-width: 0; }
+    .rg-team > span:last-child { min-width: 0; }
+    .rg-team b { display: block; font: 700 1rem "Oswald", sans-serif; text-transform: uppercase; letter-spacing: .02em; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .rg-team small, .rg-mgr small { display: block; font-size: .78rem; color: var(--muted); }
+    .rg-mgr { font-size: .9rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .avatar.sm { width: 38px; height: 38px; border-radius: 12px; font-size: .9rem; }
+    .rg-pl b { font: 700 1.1rem "Oswald", sans-serif; }
+    .rg-pl small { color: var(--muted); }
+    .rg-pl.bad b { color: var(--brand-text); }
+    .rg-chk { display: inline-flex; align-items: center; gap: 6px; font-size: .82rem; font-weight: 600; color: var(--green); }
+    .rg-chk.bad { color: var(--brand-text); }
+    .rg-sh-t { display: flex; align-items: center; gap: 12px; }
+    .rg-sh-top { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; padding: 14px 0 10px; }
+    .rg-sheet .facts { grid-template-columns: repeat(2, 1fr); }
+    .rg-sheet .players { grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); }
+    .sheet .dl-box { margin: 0; }
+    @media (max-width: 860px) {
+      .rg-tiles { grid-template-columns: 1fr 1fr; }
+      .rg-row { grid-template-columns: minmax(0, 1fr) auto; grid-template-areas: "team act" "chk st"; gap: 8px 12px; padding: 12px 14px; }
+      .rg-row.tm-hd { display: none; }
+      .rg-row > :nth-child(1) { grid-area: team; } .rg-row > :nth-child(2), .rg-row > :nth-child(3) { display: none; }
+      .rg-row > :nth-child(4) { grid-area: chk; } .rg-row > :nth-child(5) { grid-area: st; justify-self: end; } .rg-row > :nth-child(6) { grid-area: act; }
+      .rg-status { flex-wrap: wrap; }
+      .ph-act .btn { flex: 1 1 auto; }
+    }
     @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important; } }
     /* Phones */
     @media (max-width: 640px) {
@@ -1112,7 +1157,7 @@
         const el = document.activeElement;
         if (el && (el.tagName === "TEXTAREA" || el.tagName === "INPUT")) return;
       } else {
-        app.innerHTML = `<div class="ph"><div><h1>Team Registrations</h1></div></div><p class="notice">Loading registrations…</p>`;
+        app.innerHTML = `<div class="ph"><div><h1>Registrations</h1></div></div><p class="notice">Loading registrations…</p>`;
       }
       const { data, error } = await db
         .from("teams")
@@ -1173,8 +1218,6 @@
         rejected: teams.filter(t => t.status === "rejected").length,
         issues: teams.filter(t => t.checks.issues && t.status !== "rejected").length
       };
-      const confirmedPlayers = teams.filter(t => t.status === "confirmed").reduce((n, t) => n + t.players.length, 0);
-      const playerTotal = teams.reduce((n, t) => n + t.players.length, 0);
       const q = query.toLowerCase();
       const sorters = {
         newest: (a, b) => new Date(b.created_at) - new Date(a.created_at),
@@ -1189,99 +1232,41 @@
 
       const deadlinePassed = settings.closes_at && Date.now() >= new Date(settings.closes_at);
       const open = settings.registration_open && !deadlinePassed;
-      const pct = n => counts.all ? (n / counts.all * 100) + "%" : "0";
       const tabNames = { all: "All teams", pending: "Waiting", confirmed: "Confirmed", rejected: "Rejected", issues: "Need attention" };
+      const tile = (f, ic, label) => `<button class="card rg-tile t-${f} ${filter === f ? "on" : ""}" data-filter="${f}"><span class="rg-ic">${icon(ic)}</span><b>${counts[f]}</b><span>${label}</span></button>`;
 
       app.innerHTML = `
-        <div class="ph"><div><h1>Team Registrations</h1><p>Teams that registered on the website. Open or close registration and check every squad.</p></div></div>
-        <div class="card reg-control ${open ? "" : "closed"}">
-          <div class="rc-top">
-            <span class="rc-icon">${icon(open ? "unlock" : "lock")}</span>
-            <div class="rc-text">
-              <h2>Team registration <span class="rc-state">${open ? "OPEN" : "CLOSED"}</span></h2>
-              <p>${open
-                ? (settings.closes_at
-                  ? `<span class="countdown">${icon("clock")} Closes in ${timeLeft(settings.closes_at)}</span> · ${fmtMv(settings.closes_at)}`
-                  : "Teams can register on the website. No closing date set.")
-                : deadlinePassed && settings.registration_open
-                  ? `The closing date (${fmtMv(settings.closes_at)}) has passed. Clear or change it below to reopen.`
-                  : "The website shows a “Registration is closed” message instead of the form."}</p>
-            </div>
-            <label class="switch-wrap">${settings.registration_open ? "On" : "Off"}
-              <button class="switch" id="reg-switch" role="switch" aria-checked="${settings.registration_open}" aria-label="Registration open"></button>
-            </label>
+        <div class="ph"><div><h1>Registrations</h1><p>Teams that registered on the website. Review each squad, then confirm or reject it.</p></div>
+          <div class="ph-act">
+            <button class="btn" id="refresh" title="Check for new registrations">${icon("refresh")} Refresh</button>
+            <button class="btn" id="export" ${counts.all ? "" : "disabled"}>${icon("download")} Export CSV</button>
+            <button class="btn" id="reg-settings">${icon("calendar")} Registration settings</button>
+          </div></div>
+
+        <div class="card rg-status ${open ? "" : "closed"}">
+          <span class="rg-st-ic">${icon(open ? "unlock" : "lock")}</span>
+          <div class="rg-st-txt">
+            <b>Registration is ${open ? "open" : "closed"}</b>
+            <span>${open
+              ? (settings.closes_at ? `Closes in ${timeLeft(settings.closes_at)} · ${fmtMv(settings.closes_at)}` : "Teams can register on the website. No closing date.")
+              : deadlinePassed && settings.registration_open
+                ? `The closing date (${fmtMv(settings.closes_at)}) has passed. Change it in Registration settings to reopen.`
+                : "Hidden on the website. Turn it on when the next edition opens."}</span>
           </div>
-          <div class="rc-body">
-            <div class="rc-msg rc-actions">
-              <label style="flex:1">Message shown to teams while closed
-                <textarea id="closed-msg" rows="2" maxlength="500" placeholder="Optional, e.g. “Registration opens on 1 December”">${esc(settings.closed_message || "")}</textarea>
-              </label>
-              <button class="tool-btn" id="save-msg">Save message</button>
-              <span class="rc-saved" id="msg-saved" hidden>✓ Saved</span>
-            </div>
-            <div class="rc-row">
-              <div class="dl-box">
-                <span class="lbl dl-title">${icon("calendar")} Closing date &amp; time <small>Maldives time</small></span>
-                <div class="dl-step">Quick pick</div>
-                <div class="chips">
-                  ${[[3, "3 days"], [7, "1 week"], [14, "2 weeks"], [30, "1 month"]].map(([d, l]) => `<button type="button" class="chip" data-days="${d}">+ ${l}</button>`).join("")}
-                </div>
-                <div class="dl-step">Or choose a day</div>
-                <div class="dl-inputs">
-                  <input type="date" id="dl-date" value="${dl.date}" min="${mvToday()}" aria-label="Closing day">
-                  <input type="time" id="dl-time" value="${dl.time}" aria-label="Closing time">
-                </div>
-                <div class="chips">
-                  ${[["12:00", "12 noon"], ["18:00", "6 PM"], ["23:59", "11:59 PM"]].map(([v, l]) => `<button type="button" class="chip ${dl.time === v ? "on" : ""}" data-time="${v}">${l}</button>`).join("")}
-                </div>
-                <div class="dl-preview ${dlState().cls}" id="dl-preview">${dlState().html}</div>
-                <div class="rc-actions">
-                  <button class="save-btn" id="save-deadline" ${dlState().canSave ? "" : "disabled"}>${icon("check")} Save closing date</button>
-                  ${settings.closes_at ? `<button class="tool-btn" id="clear-deadline">${icon("x")} Remove deadline</button>` : ""}
-                </div>
-              </div>
-              <div class="dl-box">
-                <label><span class="lbl dl-title">${icon("clipboard")} Checklist for teams</span><small>One item per line · leave empty for the standard list</small>
-                  <textarea id="instructions" rows="7" maxlength="1000" placeholder="10 to 12 players, all aged 35 or older&#10;4 officials: manager, coach, official and medic&#10;A passport-size photo and an ID card photo for everyone&#10;The manager's phone number (on WhatsApp)">${esc(settings.instructions || "")}</textarea>
-                </label>
-                <div class="rc-actions">
-                  <button class="tool-btn" id="save-extra">Save checklist</button>
-                  <span class="rc-saved" id="extra-saved" hidden>✓ Saved</span>
-                </div>
-              </div>
-            </div>
-          </div>
+          <label class="switch-wrap">${settings.registration_open ? "On" : "Off"}
+            <button class="switch" id="reg-switch" role="switch" aria-checked="${settings.registration_open}" aria-label="Registration open"></button>
+          </label>
         </div>
 
-        <div class="stats">
-          <div class="card stat"><span class="stat-ic">${icon("team")}</span><div><b>${counts.all}</b><span>Teams registered</span></div></div>
-          <div class="card stat pending"><span class="stat-ic">${icon("clock")}</span><div><b>${counts.pending}</b><span>Waiting for review</span></div></div>
-          <div class="card stat confirmed"><span class="stat-ic">${icon("check-circle")}</span><div><b>${counts.confirmed}</b><span>Confirmed teams</span></div></div>
-          <div class="card stat"><span class="stat-ic">${icon("users")}</span><div><b>${playerTotal}</b><span>Players · ${confirmedPlayers} confirmed</span></div></div>
-          <div class="card stat issues ${counts.issues ? "" : "none"}"><span class="stat-ic">${icon(counts.issues ? "alert" : "check")}</span><div><b>${counts.issues}</b><span>${counts.issues ? "Teams need attention" : "No problems found"}</span></div></div>
-          ${counts.all ? `
-          <div class="card stat-bar">
-            <div class="bar">
-              <i class="b-confirmed" style="width:${pct(counts.confirmed)}"></i><i class="b-pending" style="width:${pct(counts.pending)}"></i><i class="b-rejected" style="width:${pct(counts.rejected)}"></i>
-            </div>
-            <div class="legend">
-              <span style="--c:var(--green)">Confirmed ${counts.confirmed}</span>
-              <span style="--c:var(--gold)">Waiting ${counts.pending}</span>
-              <span style="--c:var(--brand)">Rejected ${counts.rejected}</span>
-            </div>
-          </div>` : ""}
+        <div class="rg-tiles">
+          ${tile("all", "team", "Teams")}${tile("pending", "clock", "Waiting")}${tile("confirmed", "check-circle", "Confirmed")}${tile("issues", counts.issues ? "alert" : "check", "Need attention")}
         </div>
 
-        <div class="section-h"><h2>Teams</h2><span>Showing ${shown.length} of ${counts.all}</span></div>
         <div class="toolbar">
           <div class="tb-row">
             <div class="tabs">
               ${["all", "pending", "confirmed", "rejected", "issues"].map(f =>
                 `<button class="tab ${filter === f ? "active" : ""}" data-filter="${f}">${tabNames[f]} <em>${counts[f]}</em></button>`).join("")}
-            </div>
-            <div class="tb-actions">
-              <button class="tool-btn" id="refresh" title="Check for new registrations">${icon("refresh")} Refresh</button>
-              <button class="tool-btn" id="export" ${counts.all ? "" : "disabled"}>${icon("download")} Export CSV</button>
             </div>
           </div>
           <div class="tb-row">
@@ -1292,15 +1277,20 @@
             </select>
           </div>
         </div>
-        <div class="teams">
-          ${shown.length ? shown.map(teamCard).join("") : emptyState(counts.all, open)}
-        </div>`;
+        ${shown.length ? `
+        <div class="card tm-table">
+          <div class="rg-row tm-hd"><span>Team</span><span>Manager</span><span>Players</span><span>Checks</span><span>Status</span><span></span></div>
+          ${shown.map(teamRow).join("")}
+        </div>` : `<div class="teams">${emptyState(counts.all, open)}</div>`}`;
 
-      app.querySelectorAll(".tab").forEach(b => b.onclick = () => { filter = b.dataset.filter; render(); });
+      app.querySelectorAll("[data-filter]").forEach(b => b.onclick = () => { filter = filter === b.dataset.filter && b.classList.contains("rg-tile") ? "all" : b.dataset.filter; render(); });
       const search = document.getElementById("search");
       search.oninput = () => { query = search.value; render(); const s = document.getElementById("search"); s.focus(); s.setSelectionRange(s.value.length, s.value.length); };
       document.getElementById("sort").onchange = e => { sortBy = e.target.value; render(); };
       document.getElementById("refresh").onclick = () => load();
+      document.getElementById("export").onclick = exportCsv;
+      document.getElementById("reg-settings").onclick = openRegSettings;
+      document.getElementById("reg-switch").onclick = e => { e.preventDefault(); toggleRegistration(); };
       const clearBtn = document.getElementById("clear-filters");
       if (clearBtn) clearBtn.onclick = () => { filter = "all"; query = ""; render(); };
       const copyBtn = document.getElementById("copy-link");
@@ -1308,20 +1298,134 @@
         try { await navigator.clipboard.writeText(REG_LINK); toast("✓ Link copied: " + REG_LINK); }
         catch (e) { prompt("Copy this link:", REG_LINK); }
       };
-      document.getElementById("reg-switch").onclick = e => { e.preventDefault(); toggleRegistration(); };
-      document.getElementById("save-msg").onclick = saveClosedMessage;
+      app.querySelectorAll("[data-review]").forEach(b => b.onclick = () => openTeam(teams.find(t => t.id === b.dataset.review)));
+      // Keep an open settings panel in step with what was just saved
+      if (fxDlg.open && fxDlg.dataset.sheet === "regset") fillRegSettings();
+    }
+
+    const statusLabel = s => ({ pending: "Waiting", confirmed: "Confirmed", rejected: "Rejected" }[s] || s);
+
+    // One line per team in the list
+    function teamRow(t) {
+      const c = t.checks;
+      return `
+        <div class="rg-row s-${t.status}">
+          <span class="rg-team"><span class="avatar sm" style="--h:${hue(t.team_name)}">${esc(initials(t.team_name))}</span>
+            <span><b>${esc(t.team_name)}</b><small>${esc(t.island)} · ${ago(t.created_at)}</small></span></span>
+          <span class="rg-mgr">${esc(t.manager)}<small>${esc(t.phone)}</small></span>
+          <span class="rg-pl ${c.list[0].ok ? "" : "bad"}"><b>${t.players.length}</b><small> / ${MAX_PLAYERS}</small></span>
+          <span class="rg-chk ${c.issues ? "bad" : ""}">${icon(c.issues ? "alert" : "check-circle")} ${c.issues ? `${c.issues} problem${c.issues === 1 ? "" : "s"}` : "All good"}</span>
+          <span><span class="pill ${t.status}">${statusLabel(t.status)}</span></span>
+          <span class="fx-act"><button class="btn ${t.status === "pending" ? "primary" : ""}" data-review="${t.id}">${icon("eye")} Review</button></span>
+        </div>`;
+    }
+
+    // ---------- Review a team (panel from the right) ----------
+    const photoTag = (path, cls, alt, label) => path
+      ? `<img class="thumb ${cls}" data-path="${esc(path)}" data-label="${esc(label)}" alt="${esc(alt)}">`
+      : `<span class="thumb ${cls}" title="Missing"></span>`;
+    function openTeam(t) {
+      const c = t.checks;
+      const wa = "https://wa.me/" + (t.phone || "").replace(/[^\d]/g, "").replace(/^(?!960)(\d{7})$/, "960$1");
+      const ages = t.players.map(p => p.age);
+      const avgAge = ages.length ? Math.round(ages.reduce((a, b) => a + b, 0) / ages.length) : "—";
+      fxDlg.dataset.sheet = "team";
+      fxDlg.innerHTML = `
+        <div class="sheet-in">
+          <div class="sheet-h">
+            <div class="rg-sh-t"><span class="avatar" style="--h:${hue(t.team_name)}">${esc(initials(t.team_name))}</span>
+              <div><h2>${esc(t.team_name)}</h2><p>${esc(t.island)} · registered ${fmtDate(t.created_at)}</p></div></div>
+            <button type="button" class="icon-btn" id="sh-close" aria-label="Close">${icon("x")}</button>
+          </div>
+          <div class="sheet-b rg-sheet">
+            <div class="rg-sh-top"><span class="pill ${t.status}">${statusLabel(t.status)}</span>
+              <span class="rg-chk ${c.issues ? "bad" : ""}">${icon(c.issues ? "alert" : "check-circle")} ${c.issues ? `${c.issues} problem${c.issues === 1 ? "" : "s"} to check` : "All checks passed"}</span></div>
+            <div class="facts">
+              <div class="fact"><small>Manager</small><b>${esc(t.manager)}</b></div>
+              <div class="fact"><small>Players</small><b>${t.players.length} / ${MAX_PLAYERS}</b></div>
+              <div class="fact"><small>Average age</small><b>${avgAge}</b></div>
+              <div class="fact"><small>Officials</small><b>${t.officials.length} / ${ROLES.length}</b></div>
+            </div>
+            <div class="contact">
+              <a href="tel:${esc(t.phone)}">${icon("phone")} Call ${esc(t.phone)}</a>
+              <a class="wa" href="${wa}" target="_blank" rel="noopener">${icon("chat")} WhatsApp manager</a>
+            </div>
+            ${t.notes ? `<div class="notes">${esc(t.notes)}</div>` : ""}
+            <h4 class="sub-h">Checks</h4>
+            <div class="checks">${c.list.map(k => `<div class="check ${k.ok ? "" : "bad"}">${icon(k.ok ? "check-circle" : "alert")}<div><b>${esc(k.title)}</b><span>${esc(k.detail)}</span></div></div>`).join("")}</div>
+            <h4 class="sub-h">Officials · ${t.officials.length}</h4>
+            <div class="officials">
+              ${t.officials.map(o => { const r = roleInfo(o.role); return `
+                <div class="official"><div><small>${icon(r.icon)} ${esc(r.label)}</small><b>${esc(o.name)}</b>${o.phone ? `<a href="tel:${esc(o.phone)}">${esc(o.phone)}</a>` : ""}</div>
+                  <span class="pics">${photoTag(o.passport_photo_path, "", "Passport-size photo of " + o.name, r.label + " · " + o.name + " · passport-size photo")}${photoTag(o.id_photo_path, "wide", "ID card of " + o.name, r.label + " · " + o.name + " · ID card")}</span></div>`; }).join("")}
+              ${ROLES.filter(r => !t.officials.some(o => o.role === r.role || (r.role === "official" && o.role === "assistant"))).map(r => `
+                <div class="official missing"><div><small>${icon(r.icon)} ${r.label}</small><b>Not given</b></div></div>`).join("")}
+            </div>
+            <h4 class="sub-h">Players · ${t.players.length}</h4>
+            <div class="players">
+              ${t.players.map(p => `
+                <div class="player ${p.age < MIN_AGE ? "bad" : ""}">
+                  <div class="portrait-box"><span class="jersey">${p.jersey_number ?? "–"}</span>${icon("portrait")}
+                    ${p.passport_photo_path ? `<img class="thumb-fill" data-path="${esc(p.passport_photo_path)}" data-label="${esc("No. " + (p.jersey_number ?? "–") + " · " + p.name + " · passport-size photo")}" alt="Passport-size photo of ${esc(p.name)}">` : ""}</div>
+                  <div class="player-info"><b>${esc(p.name)}</b>
+                    <div class="player-row"><span class="age ${p.age < MIN_AGE ? "bad" : ""}">Age ${p.age}</span>
+                      <button class="id-btn" data-path="${esc(p.id_photo_path || "")}" data-label="${esc("No. " + (p.jersey_number ?? "–") + " · " + p.name + " · ID card")}" ${p.id_photo_path ? "" : "disabled"}>${icon("idcard")} ID</button></div></div>
+                </div>`).join("")}
+            </div>
+          </div>
+          <div class="sheet-f">
+            <button type="button" class="btn danger" id="rg-del">${icon("trash")} Delete</button><span class="sp"></span>
+            ${t.status !== "pending" ? `<button type="button" class="btn" data-st="pending">${icon("undo")} Back to waiting</button>` : ""}
+            ${t.status !== "rejected" ? `<button type="button" class="btn" data-st="rejected">${icon("x")} Reject</button>` : ""}
+            ${t.status !== "confirmed" ? `<button type="button" class="btn primary" data-st="confirmed">${icon("check")} Confirm team</button>` : ""}
+          </div>
+        </div>`;
+      fxDlg.dataset.id = t.id;
+      document.getElementById("sh-close").onclick = () => fxDlg.close();
+      fxDlg.querySelectorAll("[data-st]").forEach(b => b.onclick = async () => { await setStatus(t, b.dataset.st); openTeam(t); });
+      document.getElementById("rg-del").onclick = async () => { if (await removeTeam(t)) fxDlg.close(); };
+      if (!fxDlg.open) fxDlg.showModal();
+      loadPhotos(fxDlg.querySelector(".rg-sheet"));
+    }
+
+    // ---------- Registration settings (panel): closing date, message while closed, checklist ----------
+    function openRegSettings() {
+      fxDlg.dataset.sheet = "regset";
+      fillRegSettings();
+      if (!fxDlg.open) fxDlg.showModal();
+    }
+    function fillRegSettings() {
+      fxDlg.innerHTML = `
+        <div class="sheet-in">
+          <div class="sheet-h"><div><h2>Registration settings</h2><p>Closing date and the checklist teams see</p></div>
+            <button type="button" class="icon-btn" id="sh-close" aria-label="Close">${icon("x")}</button></div>
+          <div class="sheet-b">
+            <fieldset class="fs"><legend>Closing date &amp; time <small>Maldives time</small></legend>
+              <div class="dl-box">
+                <div class="dl-step">Quick pick</div>
+                <div class="chips">${[[3, "3 days"], [7, "1 week"], [14, "2 weeks"], [30, "1 month"]].map(([d, l]) => `<button type="button" class="chip" data-days="${d}">+ ${l}</button>`).join("")}</div>
+                <div class="dl-step">Or choose a day</div>
+                <div class="dl-inputs">
+                  <input type="date" id="dl-date" value="${dl.date}" min="${mvToday()}" aria-label="Closing day">
+                  <input type="time" id="dl-time" value="${dl.time}" aria-label="Closing time">
+                </div>
+                <div class="chips">${[["12:00", "12 noon"], ["18:00", "6 PM"], ["23:59", "11:59 PM"]].map(([v, l]) => `<button type="button" class="chip ${dl.time === v ? "on" : ""}" data-time="${v}">${l}</button>`).join("")}</div>
+                <div class="dl-preview ${dlState().cls}" id="dl-preview">${dlState().html}</div>
+                <div class="rc-actions">
+                  <button type="button" class="save-btn" id="save-deadline" ${dlState().canSave ? "" : "disabled"}>${icon("check")} Save closing date</button>
+                  ${settings.closes_at ? `<button type="button" class="btn" id="clear-deadline">${icon("x")} Remove</button>` : ""}
+                </div>
+              </div>
+            </fieldset>
+            <fieldset class="fs"><legend>Checklist for teams <small>one item per line · empty = the standard list</small></legend>
+              <textarea id="instructions" rows="6" maxlength="1000" placeholder="10 to 12 players, all aged 35 or older&#10;4 officials: manager, coach, official and medic&#10;A passport-size photo and an ID card photo for everyone&#10;The manager's phone number (on WhatsApp)">${esc(settings.instructions || "")}</textarea>
+              <div class="rc-actions"><button type="button" class="btn" id="save-extra">${icon("check")} Save checklist</button><span class="rc-saved" id="extra-saved" hidden>✓ Saved</span></div>
+            </fieldset>
+          </div>
+        </div>`;
+      document.getElementById("sh-close").onclick = () => fxDlg.close();
       document.getElementById("save-extra").onclick = saveChecklist;
       wireDeadline();
-      document.getElementById("export").onclick = exportCsv;
-
-      app.querySelectorAll(".team").forEach(card => {
-        const team = teams.find(t => t.id === card.dataset.id);
-        card.querySelector(".team-head").onclick = () => toggle(card, team);
-        card.querySelector(".more-btn").onclick = () => toggle(card, team);
-        if (openIds.has(team.id)) { card.classList.add("open"); card.querySelector(".team-head").setAttribute("aria-expanded", "true"); card.querySelector(".more-btn").firstChild.textContent = "Close "; loadPhotos(card); }
-        card.querySelectorAll("[data-status]").forEach(b => b.onclick = () => setStatus(team, b.dataset.status));
-        card.querySelector(".delete").onclick = () => removeTeam(team);
-      });
     }
 
     const initials = name => name.trim().split(/\s+/).filter(w => /\w/.test(w)).slice(0, 2).map(w => w[0]).join("").toUpperCase() || "?";
@@ -1353,123 +1457,8 @@
         </div>`;
     }
 
-    function teamCard(t) {
-      const wa = "https://wa.me/" + (t.phone || "").replace(/[^\d]/g, "").replace(/^(?!960)(\d{7})$/, "960$1");
-      const c = t.checks;
-      const ages = t.players.map(p => p.age);
-      const avgAge = ages.length ? Math.round(ages.reduce((a, b) => a + b, 0) / ages.length) : "—";
-      const photo = (path, cls, alt, label) => path
-        ? `<img class="thumb ${cls}" data-path="${esc(path)}" data-label="${esc(label)}" alt="${esc(alt)}">`
-        : `<span class="thumb ${cls}" title="Missing"></span>`;
-      const statusLabel = { pending: "Waiting", confirmed: "Confirmed", rejected: "Rejected" }[t.status] || t.status;
-      return `
-        <div class="card team s-${t.status}" data-id="${t.id}">
-          <button class="team-head" aria-expanded="false">
-            <span class="th-band">
-              <span class="avatar" style="--h:${hue(t.team_name)}">${esc(initials(t.team_name))}</span>
-              <span class="team-main">
-                <span class="team-name">${esc(t.team_name)}</span>
-                <span class="team-meta">
-                  <span>${icon("pin")} ${esc(t.island)}</span>
-                  <span title="${esc(fmtDate(t.created_at))}">${icon("clock")} ${ago(t.created_at)}</span>
-                </span>
-              </span>
-              <span class="pill">${statusLabel}</span>
-            </span>
-            <span class="th-stats">
-              <span class="th-stat ${c.list[0].ok ? "" : "bad"}"><b>${t.players.length}<small> / ${MAX_PLAYERS}</small></b><span>Players</span><span class="meter"><i style="width:${Math.min(100, t.players.length / MAX_PLAYERS * 100)}%"></i></span></span>
-              <span class="th-stat ${c.list[2].ok ? "" : "bad"}"><b>${t.officials.length}<small> / ${ROLES.length}</small></b><span>Officials</span><span class="meter"><i style="width:${Math.min(100, t.officials.length / ROLES.length * 100)}%"></i></span></span>
-              <span class="th-stat ${c.list[1].ok ? "" : "bad"}"><b>${avgAge}</b><span>Avg age</span><span class="meter"><i style="width:${c.list[1].ok ? 100 : 50}%"></i></span></span>
-            </span>
-            <span class="th-checks">
-              ${c.list.map(k => `<span class="dot ${k.ok ? "" : "bad"}" title="${esc(k.short + ": " + k.title)}">${icon(k.icon)}</span>`).join("")}
-              <span class="th-verdict ${c.issues ? "bad" : ""}">${c.issues ? `${c.issues} ${c.issues === 1 ? "problem" : "problems"}` : "All checks passed"}</span>
-            </span>
-          </button>
-          <div class="team-foot">
-            <span class="who-mgr"><small>Manager</small>${esc(t.manager)}</span>
-            <a class="icon-btn" href="tel:${esc(t.phone)}" title="Call ${esc(t.phone)}" aria-label="Call manager">${icon("phone")}</a>
-            <a class="icon-btn wa" href="${wa}" target="_blank" rel="noopener" title="WhatsApp" aria-label="WhatsApp manager">${icon("chat")}</a>
-            <button class="more-btn" type="button">Details ${icon("chev")}</button>
-          </div>
-          <div class="team-body">
-            <h4 class="sub-h">Team details</h4>
-            <div class="facts">
-              <div class="fact"><small>Manager</small><b>${esc(t.manager)}</b></div>
-              <div class="fact"><small>Island</small><b>${esc(t.island)}</b></div>
-              <div class="fact"><small>Registered</small><b>${fmtDate(t.created_at)}</b></div>
-              <div class="fact"><small>Average age</small><b>${avgAge}</b></div>
-            </div>
-            <div class="contact">
-              <a href="tel:${esc(t.phone)}">${icon("phone")} ${esc(t.phone)}</a>
-              <a class="wa" href="${wa}" target="_blank" rel="noopener">${icon("chat")} WhatsApp manager</a>
-            </div>
-            ${t.notes ? `<div class="notes">${esc(t.notes)}</div>` : ""}
-
-            <h4 class="sub-h">Checks</h4>
-            <div class="checks">
-              ${c.list.map(k => `<div class="check ${k.ok ? "" : "bad"}">${icon(k.ok ? "check-circle" : "alert")}<div><b>${esc(k.title)}</b><span>${esc(k.detail)}</span></div></div>`).join("")}
-            </div>
-
-            <h4 class="sub-h">Officials · ${t.officials.length}</h4>
-            <div class="officials">
-              ${t.officials.map(o => { const r = roleInfo(o.role); return `
-                <div class="official">
-                  <div>
-                    <small>${icon(r.icon)} ${esc(r.label)}</small>
-                    <b>${esc(o.name)}</b>
-                    ${o.phone ? `<a href="tel:${esc(o.phone)}">${esc(o.phone)}</a>` : ""}
-                  </div>
-                  <span class="pics">
-                    ${photo(o.passport_photo_path, "", "Passport-size photo of " + o.name, r.label + " · " + o.name + " · passport-size photo")}
-                    ${photo(o.id_photo_path, "wide", "ID card of " + o.name, r.label + " · " + o.name + " · ID card")}
-                  </span>
-                </div>`; }).join("")}
-              ${ROLES.filter(r => !t.officials.some(o => o.role === r.role || (r.role === "official" && o.role === "assistant"))).map(r => `
-                <div class="official missing"><div><small>${icon(r.icon)} ${r.label}</small><b>Not given</b></div></div>`).join("")}
-            </div>
-
-            <h4 class="sub-h">Players · ${t.players.length}</h4>
-            <div class="players">
-              ${t.players.map(p => `
-                <div class="player ${p.age < MIN_AGE ? "bad" : ""}">
-                  <div class="portrait-box">
-                    <span class="jersey">${p.jersey_number ?? "–"}</span>
-                    <span class="pos">#${p.position}</span>
-                    ${icon("portrait")}
-                    ${p.passport_photo_path ? `<img class="thumb-fill" data-path="${esc(p.passport_photo_path)}" data-label="${esc("No. " + (p.jersey_number ?? "–") + " · " + p.name + " · passport-size photo")}" alt="Passport-size photo of ${esc(p.name)}">` : ""}
-                  </div>
-                  <div class="player-info">
-                    <b>${esc(p.name)}</b>
-                    <div class="player-row">
-                      <span class="age ${p.age < MIN_AGE ? "bad" : ""}">Age ${p.age}</span>
-                      <button class="id-btn" data-path="${esc(p.id_photo_path || "")}" data-label="${esc("No. " + (p.jersey_number ?? "–") + " · " + p.name + " · ID card")}" ${p.id_photo_path ? "" : "disabled"}>${icon("idcard")} ID</button>
-                    </div>
-                  </div>
-                </div>`).join("")}
-            </div>
-
-            <div class="actions">
-              ${t.status !== "confirmed" ? `<button class="act confirm" data-status="confirmed">${icon("check")} Confirm team</button>` : ""}
-              ${t.status !== "rejected" ? `<button class="act reject" data-status="rejected">${icon("x")} Reject</button>` : ""}
-              ${t.status !== "pending" ? `<button class="act undo" data-status="pending">${icon("undo")} Move back to waiting</button>` : ""}
-              <button class="act delete">${icon("trash")} Delete team</button>
-            </div>
-          </div>
-        </div>`;
-    }
-
     // Every stored photo of a team (passport and ID, officials and players)
     const teamPaths = t => [...t.officials, ...t.players].flatMap(p => [p.passport_photo_path, p.id_photo_path]).filter(Boolean);
-
-    // Open a team and load its photos (private links that expire after an hour)
-    function toggle(card, team) {
-      const isOpen = card.classList.toggle("open");
-      card.querySelector(".team-head").setAttribute("aria-expanded", isOpen);
-      card.querySelector(".more-btn").firstChild.textContent = isOpen ? "Close " : "Details ";
-      if (isOpen) { openIds.add(team.id); loadPhotos(card); card.scrollIntoView({ behavior: "smooth", block: "nearest" }); }
-      else openIds.delete(team.id);
-    }
 
     function showPhoto(url, label) {
       photoDlg.querySelector("img").src = url;
@@ -1508,20 +1497,20 @@
       const dateIn = document.getElementById("dl-date"), timeIn = document.getElementById("dl-time");
       const refresh = () => {
         dateIn.value = dl.date; timeIn.value = dl.time;
-        app.querySelectorAll(".chip[data-time]").forEach(c => c.classList.toggle("on", c.dataset.time === dl.time));
+        document.querySelectorAll(".chip[data-time]").forEach(c => c.classList.toggle("on", c.dataset.time === dl.time));
         const st = dlState(), pv = document.getElementById("dl-preview");
         pv.className = "dl-preview " + st.cls;
         pv.innerHTML = st.html;
         document.getElementById("save-deadline").disabled = !st.canSave;
       };
-      app.querySelectorAll(".chip[data-days]").forEach(c => c.onclick = () => {
+      document.querySelectorAll(".chip[data-days]").forEach(c => c.onclick = () => {
         const d = new Date(mvToday() + "T00:00:00Z");
         d.setUTCDate(d.getUTCDate() + Number(c.dataset.days));
         dl.date = d.toISOString().slice(0, 10);
         dl.time = "23:59";   // end of that day
         refresh();
       });
-      app.querySelectorAll(".chip[data-time]").forEach(c => c.onclick = () => { dl.time = c.dataset.time; refresh(); });
+      document.querySelectorAll(".chip[data-time]").forEach(c => c.onclick = () => { dl.time = c.dataset.time; refresh(); });
       dateIn.oninput = () => { dl.date = dateIn.value; refresh(); };
       timeIn.oninput = () => { dl.time = timeIn.value; refresh(); };
       document.getElementById("save-deadline").onclick = () => saveDeadline(dlIso());
@@ -1568,14 +1557,14 @@
     }
 
     async function removeTeam(team) {
-      if (!confirm(`Delete "${team.team_name}" with its officials, players and photos? This can't be undone.`)) return;
+      if (!confirm(`Delete "${team.team_name}" with its officials, players and photos? This can't be undone.`)) return false;
       const paths = teamPaths(team);
       if (paths.length) await db.storage.from("id-cards").remove(paths);
       const { error } = await db.from("teams").delete().eq("id", team.id);
-      if (error) return alert("Couldn't delete: " + error.message);
+      if (error) { alert("Couldn't delete: " + error.message); return false; }
       teams = teams.filter(t => t.id !== team.id);
-      openIds.delete(team.id);
       render();
+      return true;
     }
 
     function exportCsv() {
