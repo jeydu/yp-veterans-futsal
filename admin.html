@@ -60,9 +60,6 @@
     header { padding-top: env(safe-area-inset-top); }
     main.wrap { padding-left: max(16px, env(safe-area-inset-left)); padding-right: max(16px, env(safe-area-inset-right)); }
     .install-btn[hidden] { display: none; }
-    .login .install-btn { display: inline-flex; align-items: center; gap: 6px; margin: 4px 8px 0; padding: 7px 14px; border-radius: 99px;
-      border: 1px solid rgba(255,255,255,.35); background: rgba(255,255,255,.12); color: #fff; font-size: .85rem; font-weight: 600; }
-    .login .install-btn:hover { background: rgba(255,255,255,.22); }
     @media (max-width: 640px) { header .install-btn span { display: none; } }
     .brand { display: flex; align-items: center; gap: 14px; min-width: 0; }
     .brand img { width: 48px; height: 48px; border-radius: 50%; background: #fff; padding: 3px; border: 2px solid var(--gold); flex-shrink: 0; }
@@ -144,71 +141,34 @@
       .ph h1 { font-size: 1.6rem; }
     }
 
-    /* Login: "liquid glass" card floating over a moving red-and-gold scene */
-    body.login-mode { min-height: 100vh; background: #2a0710; overflow-x: hidden; }
+    /* Login: a simple white card on a light background */
+    body.login-mode { min-height: 100vh; background: var(--bg); }
     body.login-mode .side { display: none; }
-    body.login-mode main.wrap { min-height: 100vh; display: grid; place-items: center; padding: calc(32px + env(safe-area-inset-top)) 16px calc(32px + env(safe-area-inset-bottom)); }
-    .glass-scene { position: fixed; inset: 0; z-index: -1; overflow: hidden; display: none;
-      background: radial-gradient(ellipse at 50% 120%, #5a0815, transparent 60%), linear-gradient(160deg, #c8102e 0%, #8a0b1f 45%, #2a0710 100%); }
-    body.login-mode .glass-scene { display: block; }
-    .blob { position: absolute; border-radius: 50%; filter: blur(60px); opacity: .75; animation: drift 18s ease-in-out infinite alternate; }
-    .blob.b1 { width: 46vmax; height: 46vmax; left: -12vmax; top: -10vmax; background: #ff3b5c; }
-    .blob.b2 { width: 38vmax; height: 38vmax; right: -10vmax; top: 20vh; background: #e3b23c; opacity: .55; animation-duration: 22s; animation-delay: -6s; }
-    .blob.b3 { width: 34vmax; height: 34vmax; left: 20vw; bottom: -16vmax; background: #2f8a3a; opacity: .5; animation-duration: 26s; animation-delay: -12s; }
-    @keyframes drift { 0% { transform: translate(0, 0) scale(1); } 50% { transform: translate(8vw, 6vh) scale(1.12); } 100% { transform: translate(-6vw, 10vh) scale(.95); } }
-    .scene-court { position: absolute; inset: 0; width: 100%; height: 100%; opacity: .12; }
-
-    .login {
-      position: relative; width: 100%; max-width: 420px; padding: 40px 32px 30px; color: #fff; text-align: center;
-      border-radius: 30px; isolation: isolate; overflow: hidden;
-      background: linear-gradient(145deg, rgba(255,255,255,.22), rgba(255,255,255,.06) 55%, rgba(255,255,255,.12));
-      -webkit-backdrop-filter: blur(30px) saturate(180%); backdrop-filter: blur(30px) saturate(180%);
-      border: 1px solid rgba(255,255,255,.32);
-      box-shadow: inset 0 1px 0 rgba(255,255,255,.55), inset 0 -1px 0 rgba(255,255,255,.12), inset 0 0 30px rgba(255,255,255,.06), 0 30px 80px rgba(20, 0, 5, .55);
-      animation: glass-in .8s cubic-bezier(.2,.8,.2,1) both;
-    }
-    /* Light that follows the pointer, plus a fixed glint along the top edge */
-    .login::before { content: ""; position: absolute; inset: 0; z-index: -1; pointer-events: none;
-      background: radial-gradient(420px circle at var(--mx, 30%) var(--my, 0%), rgba(255,255,255,.28), transparent 45%); transition: background .1s; }
-    .login::after { content: ""; position: absolute; left: 12%; right: 12%; top: 0; height: 1px; pointer-events: none;
-      background: linear-gradient(90deg, transparent, rgba(255,255,255,.95), transparent); }
-    @keyframes glass-in { from { opacity: 0; transform: translateY(24px) scale(.96); filter: blur(8px); } }
+    body.login-mode main.wrap { min-height: 100vh; display: grid; place-items: center; padding: calc(24px + env(safe-area-inset-top)) 16px calc(24px + env(safe-area-inset-bottom)); }
+    .glass-scene { display: none; }
+    .login { width: 100%; max-width: 400px; padding: 34px 28px 26px; text-align: center; background: var(--surface); border: 1px solid var(--border); border-top: 5px solid var(--brand); border-radius: 18px; box-shadow: var(--shadow); }
     .login.shake { animation: shake .45s ease; }
     @keyframes shake { 20%, 60% { transform: translateX(-8px); } 40%, 80% { transform: translateX(8px); } }
-    .login-crest { width: 84px; height: 84px; margin: 0 auto 18px; border-radius: 50%; padding: 6px; background: #fff;
-      border: 2px solid var(--gold); box-shadow: 0 0 0 6px rgba(255,255,255,.12), 0 12px 30px rgba(0,0,0,.35); }
-    .login-crest img { width: 100%; height: 100%; object-fit: contain; display: block; border-radius: 50%; }
-    .login h2 { font-size: 1.7rem; margin-bottom: 4px; text-shadow: 0 2px 12px rgba(0,0,0,.25); }
-    .login .lead-txt { color: rgba(255,255,255,.75); font-size: .9rem; margin-bottom: 24px; }
-    .login label { display: block; text-align: start; font-size: .72rem; font-weight: 600; text-transform: uppercase; letter-spacing: .1em; color: rgba(255,255,255,.75); margin: 14px 0 6px 4px; }
+    .login-crest { width: 76px; height: 76px; margin: 0 auto 14px; }
+    .login-crest img { width: 100%; height: 100%; object-fit: cover; display: block; border-radius: 50%; }
+    .login h2 { font-size: 1.6rem; margin-bottom: 2px; }
+    .login .lead-txt { color: var(--muted); font-size: .9rem; margin-bottom: 22px; }
+    .login label { display: block; text-align: start; font-size: .85rem; font-weight: 600; color: var(--text); margin: 14px 0 6px; }
     .field-glass { position: relative; display: flex; align-items: center; }
-    .field-glass > .ic { position: absolute; left: 15px; font-size: 1.05rem; color: rgba(255,255,255,.7); pointer-events: none; }
-    .login input {
-      width: 100%; font: inherit; color: #fff; padding: 13px 44px 13px 44px; border-radius: 16px;
-      background: rgba(255,255,255,.1); border: 1px solid rgba(255,255,255,.22);
-      box-shadow: inset 0 1px 2px rgba(0,0,0,.18), inset 0 -1px 0 rgba(255,255,255,.08);
-      transition: border-color .2s ease, background .2s ease, box-shadow .2s ease;
-    }
-    .login input::placeholder { color: rgba(255,255,255,.45); }
-    .login input:focus { outline: none; background: rgba(255,255,255,.16); border-color: rgba(227, 178, 60, .9); box-shadow: 0 0 0 4px rgba(227, 178, 60, .22), inset 0 1px 2px rgba(0,0,0,.18); }
-    .login input:-webkit-autofill { -webkit-text-fill-color: #fff; transition: background-color 9999s; }
-    .eye { position: absolute; right: 8px; width: 34px; height: 34px; display: grid; place-items: center; border: 0; border-radius: 10px; background: none; color: rgba(255,255,255,.7); font-size: 1.05rem; }
-    .eye:hover { background: rgba(255,255,255,.12); color: #fff; }
-    .primary-btn {
-      position: relative; overflow: hidden; width: 100%; margin-top: 26px; padding: 14px; border: 1px solid rgba(255,255,255,.5); border-radius: 16px;
-      background: linear-gradient(180deg, #f3cf6c, #e3b23c 55%, #c9952a); color: #2a0a0f; font-weight: 700; font-size: 1rem; letter-spacing: .02em;
-      box-shadow: inset 0 1px 0 rgba(255,255,255,.7), 0 10px 26px rgba(227, 178, 60, .35);
-      transition: transform .15s ease, box-shadow .15s ease;
-    }
-    .primary-btn::after { content: ""; position: absolute; top: 0; bottom: 0; width: 40%; left: -60%; transform: skewX(-20deg);
-      background: linear-gradient(90deg, transparent, rgba(255,255,255,.55), transparent); animation: btn-sheen 3.5s ease-in-out 1s infinite; }
-    @keyframes btn-sheen { 0%, 60% { left: -60%; } 100% { left: 130%; } }
-    .primary-btn:hover { transform: translateY(-1px); box-shadow: inset 0 1px 0 rgba(255,255,255,.7), 0 14px 32px rgba(227, 178, 60, .45); }
-    .primary-btn:disabled { opacity: .8; cursor: wait; transform: none; }
-    .login .form-error { min-height: 1.3em; color: #ffd1d8; font-weight: 600; }
-    .back-link { display: inline-flex; align-items: center; gap: 6px; margin-top: 6px; color: rgba(255,255,255,.7); font-size: .85rem; text-decoration: none; }
-    .back-link:hover { color: #fff; }
-    @supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) { .login { background: rgba(70, 8, 20, .88); } }
+    .field-glass > .ic { position: absolute; left: 14px; font-size: 1.1rem; color: var(--muted); pointer-events: none; }
+    .login input { width: 100%; font: inherit; font-size: 16px; color: var(--text); padding: 14px 46px 14px 44px; border-radius: 12px; background: var(--surface-2); border: 1.5px solid var(--border); transition: border-color .15s ease; }
+    .login input::placeholder { color: #a8999a; }
+    .login input:focus { outline: none; border-color: var(--brand); background: #fff; }
+    .eye { position: absolute; right: 6px; width: 38px; height: 38px; display: grid; place-items: center; border: 0; border-radius: 10px; background: none; color: var(--muted); font-size: 1.1rem; }
+    .eye:hover { background: var(--tint); color: var(--brand-text); }
+    .primary-btn { width: 100%; margin-top: 22px; padding: 15px; border: 0; border-radius: 12px; background: var(--brand); color: #fff; font: 700 1.05rem "Oswald", sans-serif; text-transform: uppercase; letter-spacing: .08em; transition: background .15s ease; }
+    .primary-btn:hover { background: var(--brand-dark); }
+    .primary-btn:disabled { opacity: .7; cursor: wait; }
+    .login .form-error { min-height: 1.3em; margin-top: 12px; color: var(--brand-text); font-weight: 600; font-size: .88rem; }
+    .back-link { display: inline-flex; align-items: center; gap: 6px; margin-top: 4px; color: var(--muted); font-size: .85rem; text-decoration: none; }
+    .back-link:hover { color: var(--brand-text); }
+    .login .install-btn { display: inline-flex; align-items: center; gap: 6px; margin: 10px auto 0; padding: 8px 14px; border-radius: 10px; border: 1px solid var(--border); background: var(--surface); color: var(--text); font-size: .85rem; font-weight: 600; }
+    .login .install-btn[hidden] { display: none; }
     .form-error { margin-top: 12px; color: var(--brand-text); font-size: .88rem; }
 
     /* Registration open / closed */
@@ -1097,11 +1057,11 @@
       document.body.classList.add("login-mode");
       app.innerHTML = `
         <form class="login" id="login">
-          <div class="login-crest"><img src="images/yp-logo.jpg" alt="Young Players SC"></div>
+          <div class="login-crest"><img src="images/veterans-logo.jpg" alt="YP Veterans"></div>
           <h2>Organiser Portal</h2>
-          <p class="lead-txt">YP Veterans Futsal · registrations and ID photos</p>
+          <p class="lead-txt">YP Veterans Futsal · sign in to continue</p>
           <label for="email">Email or phone number</label>
-          <div class="field-glass">${icon("user")}<input id="email" type="text" inputmode="email" autocapitalize="off" spellcheck="false" autocomplete="username" placeholder="you@example.com or 7XX XXXX" required></div>
+          <div class="field-glass">${icon("user")}<input id="email" type="text" inputmode="email" autocapitalize="off" spellcheck="false" autocomplete="username" placeholder="Email or 7XX XXXX" required></div>
           <label for="password">Password</label>
           <div class="field-glass">${icon("lock")}<input id="password" type="password" autocomplete="current-password" placeholder="••••••••" required>
             <button type="button" class="eye" id="eye" aria-label="Show password">${icon("eye")}</button></div>
@@ -1111,12 +1071,6 @@
           <button type="button" class="install-btn" data-install hidden>${icon("download")} Install app</button>
         </form>`;
       const form = document.getElementById("login");
-      // The glass catches the light where the pointer is
-      form.onpointermove = e => {
-        const r = form.getBoundingClientRect();
-        form.style.setProperty("--mx", (e.clientX - r.left) + "px");
-        form.style.setProperty("--my", (e.clientY - r.top) + "px");
-      };
       const eye = document.getElementById("eye");
       eye.onclick = () => {
         const shown = form.password.type === "text";
