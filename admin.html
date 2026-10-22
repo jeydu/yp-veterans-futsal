@@ -352,6 +352,7 @@
     .pill.pending { background: var(--amber-bg); color: var(--amber); }
     .pill.confirmed { background: var(--green-bg); color: var(--green); }
     .pill.rejected { background: var(--red-bg); color: var(--brand-text); }
+    .pill.live { background: var(--brand); color: #fff; }
     .th-band .pill { align-self: flex-start; background: var(--st); color: #fff; }
     .team.s-pending .th-band .pill { color: #2a0a0f; }
 
@@ -1718,6 +1719,7 @@
 
     function fixtureRow(m) {
       const played = isPlayed(m);
+      const live = !played && m.kickoff && Date.now() >= Date.parse(m.kickoff) && Date.now() < Date.parse(m.kickoff) + 2 * 3600e3;
       const win = played ? (m.home_score > m.away_score ? "h" : m.home_score < m.away_score ? "a"
         : m.pen_home !== null && m.pen_away !== null ? (m.pen_home > m.pen_away ? "h" : "a") : "") : "";
       const stage = (STAGES.find(([k]) => k === (m.stage || "")) || STAGES[0])[1];
@@ -1730,7 +1732,7 @@
             <span class="fx-team away ${win === "a" ? "win" : ""}"><span>${esc(m.away)}</span>${teamLogo(m.away)}</span>
           </span>
           <span class="fx-stage">${stage}${m.pen_home !== null && m.pen_away !== null ? `<small>${m.pen_home}–${m.pen_away} pens</small>` : ""}</span>
-          <span class="fx-status"><span class="pill ${played ? "confirmed" : "pending"}">${played ? "Played" : "Upcoming"}</span>
+          <span class="fx-status"><span class="pill ${played ? "confirmed" : live ? "live" : "pending"}">${played ? "Played" : live ? "● Live" : "Upcoming"}</span>
             ${m.video ? `<span class="fx-vid" title="Has a match video${m.goals && m.goals.length ? " and " + m.goals.length + " highlight clips" : ""}">${icon("play")}${m.goals && m.goals.length ? m.goals.length : ""}</span>` : ""}</span>
           <span class="fx-act"><button class="btn" data-edit="${m.id}">${icon("edit")} Edit</button></span>
         </div>`;

@@ -455,6 +455,14 @@
     .fxl-i { display: grid; place-items: center; background: var(--brand); border: 0; color: #fff; font: 700 .8rem "Inter", sans-serif; }
     .fx-vs { padding: 4px 9px; border: 2px solid var(--brand); color: var(--brand-text); font: 700 .8rem "Oswald", sans-serif; letter-spacing: .06em; }
     .fx-tag { justify-self: end; font-size: .74rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); text-align: end; }
+    /* A match being played now */
+    .live-tag { display: inline-flex; align-items: center; gap: 6px; padding: 4px 9px; background: #c8102e; color: #fff; font: 700 .8rem "Oswald", sans-serif; letter-spacing: .1em; }
+    .live-tag i { width: 8px; height: 8px; border-radius: 50%; background: #fff; animation: live-dot 1.2s ease-in-out infinite; }
+    @keyframes live-dot { 50% { opacity: .2; } }
+    .fx-m.live { background: #fff5f6; box-shadow: inset 4px 0 0 #c8102e; }
+    .fx-watch { padding: 6px 10px; background: #c8102e; color: #fff; text-decoration: none; font: 600 .78rem "Oswald", sans-serif; letter-spacing: .06em; white-space: nowrap; }
+    .fx-watch:hover { background: #8a0b1f; }
+    .m-scorebox .live-tag { padding: 2px 7px; font-size: .68rem; }
     /* A played match keeps its row, with the full-time score instead of "VS" */
     .fx-score { display: flex; flex-direction: column; align-items: center; min-width: 74px; padding: 5px 10px; background: var(--brand); color: #fff; font: 700 1.25rem/1.1 "Oswald", sans-serif; font-variant-numeric: tabular-nums; }
     .fx-score small { font: 600 .62rem "Inter", sans-serif; letter-spacing: .04em; opacity: .85; }
@@ -1754,6 +1762,8 @@
       wzNext: "ކުރިއަށް",
       wzBack: "ފަހަތަށް",
       fxFt: "ނިމުނީ",
+      fxLive: "ލައިވް",
+      fxWatchLive: "ލައިވް ބައްލަވާ",
       fxPens: "ޕެނަލްޓީ",
       newsEyebrow: "އެންމެ ފަހުގެ",
       newsTitle: "ޚަބަރު",
@@ -1808,6 +1818,8 @@
       wzPlayers: "Players",
       wzEdit: "Edit",
       fxFt: "FT",
+      fxLive: "LIVE",
+      fxWatchLive: "Watch live",
       fxPens: "pens",
       newsTitle: "News",
       galOpen: "Open video",
@@ -2694,6 +2706,9 @@
       { year: 2027, day: 3, no: 5, home: "RBG SC",      away: "RK SC",       kickoff: "2026-11-08T16:00:00Z", stage: "final" }
     ];
 
+    const LIVE_FOR = 2 * 3600e3;
+    const isLive = m => !m.score && !m.won && m.kickoff && Date.now() >= Date.parse(m.kickoff) && Date.now() < Date.parse(m.kickoff) + LIVE_FOR;
+    const liveTag = () => `<span class="live-tag"><i></i>${t("fxLive")}</span>`;
     // Fixtures: every match of the current season, grouped by day. Played ones show their score and stay listed.
     // The current season is the newest one with a match still to play or a kick-off date (older years only have results).
     function renderFixtures() {
@@ -2721,14 +2736,14 @@
             const [a, b] = m.score ? (m.score[0] === m.score[1] && m.pens ? m.pens : m.score) : [0, 0];
             const res = side => !m.score ? "" : (side ? b > a : a > b) ? " win" : (side ? b < a : a < b) ? " lose" : "";
             return `
-            <div class="fx-m${m.score ? " played" : ""}">
-              <span class="fx-time" dir="ltr">${m.score ? t("fxFt") : m.kickoff ? fmt(m.kickoff, { hour: "2-digit", minute: "2-digit", hour12: false }) : "—"}</span>
+            <div class="fx-m${m.score ? " played" : ""}${isLive(m) ? " live" : ""}">
+              <span class="fx-time" dir="ltr">${m.score ? t("fxFt") : isLive(m) ? liveTag() : m.kickoff ? fmt(m.kickoff, { hour: "2-digit", minute: "2-digit", hour12: false }) : "—"}</span>
               <span class="fx-teams" dir="ltr">
                 <span class="fx-t home${res(0)}"><span class="fx-n">${escH(m.home)}</span>${logo(m.home)}</span>
                 ${m.score ? `<span class="fx-score">${m.score[0]} – ${m.score[1]}${m.pens ? `<small>${m.pens[0]}–${m.pens[1]} ${t("fxPens")}</small>` : ""}</span>` : `<span class="fx-vs">VS</span>`}
                 <span class="fx-t${res(1)}">${logo(m.away)}<span class="fx-n">${escH(m.away)}</span></span>
               </span>
-              <span class="fx-tag">${m.stage ? t(STAGE_KEYS[m.stage]) : m.no ? t("resMatch", m.no) : ""}</span>
+              <span class="fx-tag">${isLive(m) && m.video ? `<a class="fx-watch" href="https://www.youtube.com/watch?v=${escH(m.video)}" target="_blank" rel="noopener">${t("fxWatchLive")}</a>` : m.stage ? t(STAGE_KEYS[m.stage]) : m.no ? t("resMatch", m.no) : ""}</span>
             </div>`; }).join("")}
         </div>`).join("");
     }
@@ -2822,7 +2837,7 @@
             <span class="m-meta">${m.no ? t("resMatch", m.no) : ""}${stage}</span>
             <div class="m-line" dir="ltr">
               ${teamHtml(m.home, a, b)}
-              <span class="m-scorebox"><span class="m-score${upcoming ? " vs" : ""}">${m.score ? `${m.score[0]} – ${m.score[1]}` : upcoming ? "VS" : "?"}</span>${m.score ? pens : `<small class="m-pens">${upcoming ? (m.kickoff ? kickoffText(m.kickoff) : t("resUpcoming")) : t("resNoScore")}</small>`}</span>
+              <span class="m-scorebox"><span class="m-score${upcoming ? " vs" : ""}">${m.score ? `${m.score[0]} – ${m.score[1]}` : upcoming ? "VS" : "?"}</span>${m.score ? pens : isLive(m) ? liveTag() : `<small class="m-pens">${upcoming ? (m.kickoff ? kickoffText(m.kickoff) : t("resUpcoming")) : t("resNoScore")}</small>`}</span>
               ${teamHtml(m.away, b, a)}
             </div>
             ${m.video ? `<div class="m-actions">
@@ -2955,6 +2970,7 @@
       } catch (e) {}
     }
     loadResults();
+    setInterval(() => { if (!document.hidden) loadResults(); }, 60000);
 
     // ---------- Visitors (for the organisers' dashboard) ----------
     // One row per page view: a random id kept in this browser and the kind of device. Nothing personal.
