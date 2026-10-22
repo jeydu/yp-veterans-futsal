@@ -2435,10 +2435,19 @@
           </span>`}`;
     }
 
+    // TEST fixtures, only to preview the Fixtures section. Delete this list once real fixtures are added in the organiser portal.
+    const TEST_FIXTURES = [
+      { year: 2027, day: 1, no: 1, home: "RK SC",       away: "BHC",         kickoff: "2026-11-05T15:45:00Z" },
+      { year: 2027, day: 1, no: 2, home: "RBG SC",      away: "Stelco SC",   kickoff: "2026-11-05T16:45:00Z" },
+      { year: 2027, day: 2, no: 3, home: "FT Nakasole", away: "Afiyns SC",   kickoff: "2026-11-06T15:45:00Z" },
+      { year: 2027, day: 2, no: 4, home: "Old Stars",   away: "KK Kandumathi", kickoff: "2026-11-06T16:45:00Z" },
+      { year: 2027, day: 3, no: 5, home: "RBG SC",      away: "RK SC",       kickoff: "2026-11-08T16:00:00Z", stage: "final" }
+    ];
+
     // Fixtures: every match not played yet, grouped by day, soonest first
     function renderFixtures() {
       const sec = document.getElementById("fixtures");
-      const list = RESULTS.flatMap(r => r.matches.filter(m => !m.score && !m.won).map(m => ({ ...m, year: r.year })))
+      const list = RESULTS.flatMap(r => r.matches.filter(m => !m.score && !m.won).map(m => ({ ...m, year: r.year }))).concat(TEST_FIXTURES)
         .sort((a, b) => (a.kickoff ? Date.parse(a.kickoff) : Infinity) - (b.kickoff ? Date.parse(b.kickoff) : Infinity) || a.day - b.day || (a.no || 0) - (b.no || 0));
       sec.hidden = !list.length;
       if (!list.length) return;
