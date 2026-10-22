@@ -1248,7 +1248,8 @@
         <div class="ph"><div><h1>Registrations</h1><p>Teams that registered on the website. Review each squad, then confirm or reject it.</p></div>
           <div class="ph-act">
             <button class="btn" id="refresh" title="Check for new registrations">${icon("refresh")} Refresh</button>
-            <button class="btn" id="export" ${shown.length ? "" : "disabled"} title="Download a ZIP: Excel list + every passport photo and ID card">${icon("download")} Export</button>
+            <button class="btn" id="export-pdf" ${shown.length ? "" : "disabled"} title="A PDF with every team, passport photo and ID card. Opens on any phone.">${icon("download")} Export PDF</button>
+            <button class="btn" id="export" ${shown.length ? "" : "disabled"} title="For computers: Excel list + every photo as a file">${icon("download")} ZIP</button>
             <button class="btn" id="reg-settings">${icon("calendar")} Registration settings</button>
           </div></div>
 
@@ -1313,6 +1314,7 @@
       document.getElementById("sort").onchange = e => { sortBy = e.target.value; render(); };
       document.getElementById("refresh").onclick = () => load();
       document.getElementById("export").onclick = exportZip;
+      document.getElementById("export-pdf").onclick = exportPdf;
       document.getElementById("reg-settings").onclick = openRegSettings;
       document.getElementById("reg-switch").onclick = e => { e.preventDefault(); toggleRegistration(); };
       const clearBtn = document.getElementById("clear-filters");
@@ -1649,6 +1651,142 @@
       return true;
     }
 
+    // ---------- Export as a PDF: easy to open and share on a phone ----------
+    // One A4 page (or more) per team: team details, then a card per person with the passport photo and ID card.
+    // Pages are drawn on a canvas first, so any language (Dhivehi too) shows correctly.
+    async function exportPdf() {
+      const list = shownTeams();
+      if (!list.length) return;
+      const btn = document.getElementById("export-pdf");
+      const label = txt => btn.innerHTML = `${icon("download")} ${txt}`;
+      btn.disabled = true;
+      try {
+        // The page's fonts (waiting at most 2 s for them), then the PDF maker
+        await Promise.race([document.fonts.ready, new Promise(r => setTimeout(r, 2000))]);
+        label("Preparing…");
+        // One small file (no extra downloads), added to the page the first time
+        if (!window.jspdf) await new Promise((ok, fail) => {
+          const sc = document.createElement("script");
+          sc.src = "https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js";
+          sc.onload = ok; sc.onerror = () => fail(new Error("Couldn't load the PDF maker. Check the internet connection."));
+          document.head.appendChild(sc);
+        });
+        const { jsPDF } = window.jspdf;
+        // Load every photo once
+        const paths = [...new Set(list.flatMap(t => [...t.officials, ...t.players].flatMap(x => [x.passport_photo_path, x.id_photo_path])).filter(Boolean))];
+        const urls = new Map();
+        for (let i = 0; i < paths.length; i += 50) {
+          const batch = paths.slice(i, i + 50);
+          const { data } = await db.storage.from("id-cards").createSignedUrls(batch, 600);
+          (data || []).forEach((d, k) => d.signedUrl && urls.set(batch[k], d.signedUrl));
+        }
+        const pics = new Map();
+        let done = 0;
+        const queue = [...urls];
+        const worker = async () => {
+          while (queue.length) {
+            const [path, url] = queue.shift();
+            // A normal image (works on every phone); crossOrigin so it can be drawn into the PDF
+            await new Promise(done => {
+              const im = new Image();
+              im.crossOrigin = "anonymous";
+              const t = setTimeout(done, 20000);
+              im.onload = () => { clearTimeout(t); pics.set(path, im); done(); };
+              im.onerror = () => { clearTimeout(t); done(); };
+              im.src = url;
+            });
+            label(`Photos ${++done} / ${urls.size}`);
+          }
+        };
+        await Promise.all([worker(), worker(), worker(), worker()]);
+        label("Making PDF…");
+
+        const W = 1240, H = 1754, M = 60;            // A4 at 150 dpi
+        const pdf = new jsPDF({ unit: "mm", format: "a4", compress: true });
+        let first = true, cv, g, y;
+        const BRAND = "#c8102e", INK = "#221516", MUTED = "#7a6567", LINE = "#ead9db";
+        const newPage = () => {
+          if (cv) { if (!first) pdf.addPage(); pdf.addImage(cv.toDataURL("image/jpeg", .82), "JPEG", 0, 0, 210, 297); first = false; }
+          cv = document.createElement("canvas"); cv.width = W; cv.height = H;
+          g = cv.getContext("2d"); g.fillStyle = "#fff"; g.fillRect(0, 0, W, H);
+          g.fillStyle = MUTED; g.font = "500 20px Inter, sans-serif"; g.textAlign = "left";
+          g.fillText("YP Veterans Futsal · Registrations · " + new Date().toLocaleDateString("en-GB"), M, H - 30);
+          y = M;
+        };
+        const fit = (txt, max) => { let s = String(txt); while (g.measureText(s).width > max && s.length > 1) s = s.slice(0, -2) + "…"; return s; };
+        const photo = (path, x, yy, w, h, word) => {
+          g.fillStyle = "#f6f0f0"; g.fillRect(x, yy, w, h);
+          const im = pics.get(path);
+          if (im) {
+            const iw = im.naturalWidth || im.width, ih = im.naturalHeight || im.height;
+            const k = Math.max(w / iw, h / ih), sw = w / k, sh = h / k;
+            g.drawImage(im, (iw - sw) / 2, (ih - sh) / 2, sw, sh, x, yy, w, h);
+          } else {
+            g.strokeStyle = BRAND; g.setLineDash([8, 6]); g.lineWidth = 2; g.strokeRect(x + 1, yy + 1, w - 2, h - 2); g.setLineDash([]);
+            g.fillStyle = BRAND; g.font = "600 20px Inter, sans-serif"; g.textAlign = "center";
+            g.fillText(path ? "Not loaded" : "Missing", x + w / 2, yy + h / 2 + 7); g.textAlign = "left";
+          }
+          g.fillStyle = MUTED; g.font = "500 17px Inter, sans-serif"; g.fillText(word, x, yy + h + 22);
+        };
+        const CW = (W - M * 2 - 30) / 2, CH = 330;    // person card: two per row
+        const teamHead = (t, more) => {
+          g.fillStyle = BRAND; g.fillRect(M, y, W - M * 2, 8); y += 8;
+          g.fillStyle = INK; g.font = "700 48px Oswald, sans-serif"; g.textAlign = "left";
+          g.fillText(fit(t.team_name.toUpperCase() + (more ? "  (continued)" : ""), W - M * 2 - 260), M, y + 62);
+          g.font = "700 22px Inter, sans-serif"; g.textAlign = "right";
+          const st = statusLabel(t.status).toUpperCase();
+          g.fillStyle = t.status === "confirmed" ? "#16794a" : t.status === "rejected" ? BRAND : "#a1650f";
+          g.fillText(st, W - M, y + 58); g.textAlign = "left";
+          g.fillStyle = MUTED; g.font = "400 24px Inter, sans-serif";
+          g.fillText(fit(`${t.island} · Manager ${t.manager} · ${t.phone} · ${t.players.length} players · registered ${fmtDate(t.created_at)}`, W - M * 2), M, y + 100);
+          y += 130;
+          const probs = t.checks.list.filter(k => !k.ok).map(k => k.title);
+          if (probs.length && !more) {
+            g.fillStyle = "#fde7ea"; g.fillRect(M, y, W - M * 2, 50);
+            g.fillStyle = BRAND; g.font = "600 22px Inter, sans-serif"; g.fillText(fit("⚠ " + probs.join(" · "), W - M * 2 - 30), M + 16, y + 33);
+            y += 70;
+          }
+        };
+        const card = (x, yy, p) => {
+          g.strokeStyle = p.bad ? BRAND : LINE; g.lineWidth = p.bad ? 3 : 2; g.strokeRect(x, yy, CW, CH - 20);
+          g.font = "700 24px Oswald, sans-serif";
+          const bw = Math.max(60, g.measureText(p.badge).width + 24);
+          g.fillStyle = BRAND; g.fillRect(x + 16, yy + 16, bw, 44);
+          g.fillStyle = "#fff"; g.textAlign = "center"; g.fillText(p.badge, x + 16 + bw / 2, yy + 47); g.textAlign = "left";
+          g.fillStyle = INK; g.font = "600 26px Inter, sans-serif"; g.fillText(fit(p.name, CW - bw - 50), x + bw + 30, yy + 38);
+          g.fillStyle = p.bad ? BRAND : MUTED; g.font = "500 20px Inter, sans-serif"; g.fillText(fit(p.sub, CW - bw - 50), x + bw + 30, yy + 62);
+          photo(p.pass, x + 16, yy + 76, 150, 190, "Passport photo");
+          photo(p.id, x + 182, yy + 76, CW - 198, 190, "ID card");
+        };
+        list.forEach(t => {
+          newPage();
+          teamHead(t, false);
+          const people = [
+            ...t.officials.map(o => ({ badge: ({ manager: "MGR", coach: "COACH", official: "OFF", assistant: "OFF", medic: "MED" })[o.role] || "OFF", name: o.name, sub: roleInfo(o.role).label + (o.phone ? " · " + o.phone : ""), pass: o.passport_photo_path, id: o.id_photo_path })),
+            ...t.players.map(x => ({ badge: String(x.jersey_number ?? "–"), name: x.name, sub: `Player · Age ${x.age}` + (x.age < MIN_AGE ? " (under " + MIN_AGE + ")" : ""), bad: x.age < MIN_AGE, pass: x.passport_photo_path, id: x.id_photo_path }))
+          ];
+          for (let i = 0; i < people.length; i += 2) {
+            if (y + CH > H - 70) { newPage(); teamHead(t, true); }
+            card(M, y, people[i]);
+            if (people[i + 1]) card(M + CW + 30, y, people[i + 1]);
+            y += CH;
+          }
+        });
+        newPage();   // adds the last page drawn
+        const name = `yp-veterans-registrations-${new Date().toISOString().slice(0, 10)}.pdf`;
+        const blob = pdf.output("blob");
+        const a = document.createElement("a");
+        a.href = URL.createObjectURL(blob); a.download = name; a.click();
+        setTimeout(() => URL.revokeObjectURL(a.href), 60000);
+        toast(`✓ PDF ready: ${list.length} team${list.length === 1 ? "" : "s"}`);
+      } catch (e) {
+        alert("Couldn't make the PDF: " + e.message);
+      } finally {
+        btn.disabled = false;
+        label("Export PDF");
+      }
+    }
+
     // ---------- Export: a ZIP with an Excel-ready list and every team's photos ----------
     // Exports the teams shown now (the tab, search and sort you picked).
     // registrations.csv  one row per person, with "View" links to the photos (they work once the ZIP is unzipped)
@@ -1722,7 +1860,7 @@
         alert("Couldn't export: " + e.message);
       } finally {
         btn.disabled = false;
-        label("Export");
+        label("ZIP");
       }
     }
 
