@@ -3199,7 +3199,8 @@
             <button type="button" class="icon-btn" id="sh-close" aria-label="Close">${icon("x")}</button></div>
           <div class="sheet-b">
             ${canLive ? `<div class="sc-golive"><div><b>Scoring as it happens?</b><small>Kick off and tap Goal for each goal. The website shows the live score.</small></div>
-              <button type="button" class="btn primary" id="sc-live">${icon("play")} Kick off</button></div>` : ""}
+              <button type="button" class="btn primary" id="sc-live">${icon("play")} Kick off</button></div>`
+              : !("live" in m) && !start ? `<div class="sc-golive"><div><b>Live scoring is off</b><small>Run section 13 of supabase/setup.sql in Supabase to turn it on. Saving here saves the final result.</small></div></div>` : ""}
             <div class="sc-board">
               ${[["h", m.home], ["a", m.away]].map(([k, name]) => `
                 <div class="sc-side">
