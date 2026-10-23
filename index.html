@@ -3215,6 +3215,11 @@
           get("seasons?select=*&order=year.desc"),
           get("matches?select=*&order=year.desc,day.asc,no.asc.nullslast,kickoff.asc")
         ]);
+        // A match nobody marked Full time stops being live four hours after kick-off: its score is then the result
+        const STALE = 4 * 3600e3;
+        matches.forEach(m => {
+          if (m.live && Date.now() - Date.parse(m.kickoff || m.live_since) > STALE) m.live = null;
+        });
         const years = seasons.map(se => ({
           year: se.year,
           partial: se.partial,
