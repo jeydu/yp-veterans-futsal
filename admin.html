@@ -570,6 +570,8 @@
     .logo-btns { display: grid; gap: 10px; }
     .file-btn { cursor: pointer; justify-self: start; flex-direction: row !important; color: var(--text) !important; }
     .sheet .fx-check { flex-direction: row; align-items: center; gap: 8px; font-weight: 500; color: var(--text); }
+    .sheet .ft-check { flex-wrap: wrap; row-gap: 2px; margin-top: 14px; padding: 12px; border-radius: 12px; background: var(--tint); font-size: .92rem; }
+    .ft-check small { flex-basis: 100%; padding-inline-start: 26px; font-size: .8rem; }
     .pl-rows { display: grid; gap: 6px; }
     .pl-row { display: grid; grid-template-columns: 70px minmax(0, 1fr) 36px; gap: 6px; align-items: center; }
     .pl-no { text-align: center; }
@@ -1983,6 +1985,8 @@
     const STAGES = [["", "Group stage"], ["semi", "Semi-final"], ["playoff", "Playoff"], ["final", "Final"]];
     // A match on the live scoreboard has the score so far, not a result
     const isPlayed = m => m.home_score !== null && m.away_score !== null && !m.live;
+    // Kicked off less than two hours ago, or kicks off later
+    const inPlay = m => !!m.kickoff && Date.now() < Date.parse(m.kickoff) + 2 * 3600e3;
     const teamLogo = name => {
       const t = TEAMS[name];
       return t ? `<img class="tl${t.fit ? " fit" : ""}" src="${esc(t.logo)}" alt="">` : `<span class="tl tl-i">${esc(initials(name))}</span>`;
@@ -2307,6 +2311,7 @@
               <details class="pens" ${m.pen_home !== null ? "open" : ""}><summary>Penalty shootout</summary>
                 <div class="score-in"><label>Home<input name="pen_home" type="number" min="0" max="99" value="${num(m.pen_home)}"></label><span class="dash">–</span><label>Away<input name="pen_away" type="number" min="0" max="99" value="${num(m.pen_away)}"></label></div>
               </details>
+              ${"live" in m ? `<label class="fx-check ft-check"><input type="checkbox" name="ft" ${m.live || inPlay(m) ? "" : "checked"}><b>Full time: the match is over</b><small>Leave unticked while it's being played. The website shows the score as LIVE.</small></label>` : ""}
             </fieldset>
             <fieldset class="fs">
               <legend>Video &amp; highlights</legend>
@@ -2430,13 +2435,19 @@
         const msg = problem || (badTime ? "Write each goal's time like 34:05." : "");
         if (msg) { err.textContent = msg; return; }
         row.goals = goalsOut;
+        // A score saved before Full time is ticked stays live; the clock counts from kick-off when it has started
+        if ("live" in m) {
+          const over = f.ft.checked || row.home_score === null;
+          row.live = over ? null : m.live || "1h";
+          row.live_since = over ? null : m.live_since || (inPlay(m) && Date.now() >= Date.parse(m.kickoff) ? m.kickoff : new Date().toISOString());
+        }
         const btn = f.querySelector("[type=submit]");
         btn.disabled = true;
         const { error } = isNew ? await db.from("matches").insert(row) : await db.from("matches").update(row).eq("id", m.id);
         btn.disabled = false;
         if (error) { err.textContent = "Couldn't save: " + error.message; return; }
         fxDlg.close();
-        toast(isNew ? "✓ Match added" : "✓ Match saved");
+        toast(isNew ? "✓ Match added" : row.live ? "✓ Saved · LIVE on the website" : "✓ Match saved");
         loadFixtures();
       };
       fxDlg.showModal();
