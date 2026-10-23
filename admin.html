@@ -866,6 +866,7 @@
     .sc-golive { display: flex; align-items: center; gap: 12px; margin-top: 14px; padding: 14px; border-radius: 14px; background: var(--tint); border: 1px solid var(--brand); }
     .sc-golive div { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
     .sc-golive small { color: var(--muted); font-size: .8rem; }
+    #fx-form .sc-golive { margin-bottom: 16px; }
     /* Live scoreboard: both teams side by side with a big score and a big Goal button each */
     .lv-dot { display: inline-block; width: 10px; height: 10px; margin-inline-end: 8px; border-radius: 50%; background: var(--brand); vertical-align: .1em; animation: lv-blink 1.2s ease-in-out infinite; }
     .lv-dot.ht { background: var(--amber); animation: none; }
@@ -2275,6 +2276,8 @@
             <button type="button" class="icon-btn" id="fx-close" aria-label="Close">${icon("x")}</button>
           </div>
           <div class="sheet-b">
+            ${!isNew && "live" in m && isPlayed(m) ? `<div class="sc-golive"><div><b>Still being played?</b><small>Saved as the result too early? Put it back on the live scoreboard, keeping ${m.home_score} – ${m.away_score}.</small></div>
+              <button type="button" class="btn primary" id="fx-relive">${icon("play")} Back to live</button></div>` : ""}
             <fieldset class="fs">
               <legend>Teams</legend>
               <div class="g2">
@@ -2327,6 +2330,20 @@
         </form>`;
 
       const f = document.getElementById("fx-form");
+      const relive = document.getElementById("fx-relive");
+      if (relive) relive.onclick = async () => {
+        if (!confirm(`Put ${m.home} ${m.home_score} – ${m.away_score} ${m.away} back to live?\n\nThe website will show it as LIVE until you tap Full time.`)) return;
+        // The clock counts from kick-off when that was in the last two hours
+        const since = m.kickoff && Date.now() - Date.parse(m.kickoff) < 2 * 3600e3 ? m.kickoff : new Date().toISOString();
+        const row = { live: "1h", live_since: since, updated_at: new Date().toISOString() };
+        relive.disabled = true;
+        const { error } = await db.from("matches").update(row).eq("id", m.id);
+        relive.disabled = false;
+        if (error) { document.getElementById("fx-err").textContent = "Couldn't go live: " + error.message; return; }
+        toast(`● ${m.home} v ${m.away} is live again`);
+        loadFixtures();
+        liveBoard({ ...m, ...row });
+      };
       const rows = document.getElementById("ge-rows");
       const sides = () => [f.home.value.trim() || "Home", f.away.value.trim() || "Away"];
       const goalRow = g => {
