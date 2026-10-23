@@ -3183,7 +3183,8 @@
       document.getElementById("sh-close").onclick = () => fxDlg.close();
       fxDlg.querySelectorAll("[data-qs]").forEach(b => b.onclick = () => {
         const m = data.find(x => x.id === b.dataset.qs);
-        m.live ? liveBoard(m) : scoreMatch(m);
+        // A match that has kicked off goes straight onto the live scoreboard, so its score stays live until Full time
+        m.live ? liveBoard(m) : "live" in m && isLiveM(m) ? kickOff(m, true) : scoreMatch(m);
       });
     }
 
@@ -3260,12 +3261,12 @@
     const HALVES = { "1h": "1st half", ht: "Half time", "2h": "2nd half" };
     let liveTimer = null;
 
-    async function kickOff(m) {
-      if (!confirm(`Kick off ${m.home} v ${m.away}?\n\nThe website will show it as LIVE, starting at 0 – 0.`)) return;
+    async function kickOff(m, quiet) {
+      if (!quiet && !confirm(`Kick off ${m.home} v ${m.away}?\n\nThe website will show it as LIVE, starting at 0 – 0.`)) return;
       const now = new Date().toISOString();
-      const row = { live: "1h", live_since: now, home_score: 0, away_score: 0, pen_home: null, pen_away: null, updated_at: now };
+      const row = { live: "1h", live_since: quiet && m.kickoff ? m.kickoff : now, home_score: 0, away_score: 0, pen_home: null, pen_away: null, updated_at: now };
       const { error } = await db.from("matches").update(row).eq("id", m.id);
-      if (error) { document.getElementById("sc-err").textContent = "Couldn't kick off: " + error.message; return; }
+      if (error) { const el = document.getElementById("sc-err"); el ? el.textContent = "Couldn't kick off: " + error.message : toast("Couldn't kick off: " + error.message); return; }
       toast(`● ${m.home} v ${m.away} is live`);
       liveBoard({ ...m, ...row });
     }
