@@ -2104,7 +2104,7 @@
             <span class="fx-team away ${win === "a" ? "win" : ""}"><span>${esc(m.away)}</span>${teamLogo(m.away)}</span>
           </span>
           <span class="fx-stage">${stage}${m.pen_home !== null && m.pen_away !== null ? `<small>${m.pen_home}–${m.pen_away} pens</small>` : ""}</span>
-          <span class="fx-status"><span class="pill ${played ? "confirmed" : live ? "live" : "pending"}">${played ? "Played" : m.live === "ht" ? "● Half time" : live ? "● Live" : "Upcoming"}</span>
+          <span class="fx-status"><span class="pill ${played ? "confirmed" : live ? "live" : "pending"}">${played ? "Full-time" : m.live === "ht" ? "● Half time" : live ? "● Live" : "Upcoming"}</span>
             ${m.video ? `<span class="fx-vid" title="Has a match video${m.goals && m.goals.length ? " and " + m.goals.length + " highlight clips" : ""}">${icon("play")}${m.goals && m.goals.length ? m.goals.length : ""}</span>` : ""}</span>
           <span class="fx-act"><button class="btn" data-edit="${m.id}">${icon("edit")} Edit</button></span>
         </div>`;
