@@ -1858,6 +1858,7 @@
       wzBack: "ފަހަތަށް",
       fxFt: "ނިމުނީ",
       fxLive: "ލައިވް",
+      fxHt: "ހާފްޓައިމް",
       fxWatchLive: "ލައިވް ބައްލަވާ",
       fxPens: "ޕެނަލްޓީ",
       newsEyebrow: "އެންމެ ފަހުގެ",
@@ -1927,6 +1928,7 @@
       wzEdit: "Edit",
       fxFt: "FT",
       fxLive: "LIVE",
+      fxHt: "HT",
       fxWatchLive: "Watch live",
       fxPens: "pens",
       newsTitle: "News",
@@ -2830,8 +2832,10 @@
     ];
 
     const LIVE_FOR = 2 * 3600e3;
-    const isLive = m => !m.score && !m.won && m.kickoff && Date.now() >= Date.parse(m.kickoff) && Date.now() < Date.parse(m.kickoff) + LIVE_FOR;
-    const liveTag = () => `<span class="live-tag"><i></i>${t("fxLive")}</span>`;
+    // Live: an organiser is scoring it on the live scoreboard (liveScore is the score so far),
+    // or it kicked off less than two hours ago and has no score yet
+    const isLive = m => !!m.liveScore || (!m.score && !m.won && m.kickoff && Date.now() >= Date.parse(m.kickoff) && Date.now() < Date.parse(m.kickoff) + LIVE_FOR);
+    const liveTag = m => `<span class="live-tag"><i></i>${t(m && m.live === "ht" ? "fxHt" : "fxLive")}</span>`;
     // Fixtures: every match of the current season, grouped by day. Played ones show their score and stay listed.
     // The current season is the newest one with a match still to play or a kick-off date (older years only have results).
     function renderFixtures() {
@@ -2857,10 +2861,10 @@
             const res = side => !m.score ? "" : (side ? b > a : a > b) ? " win" : (side ? b < a : a < b) ? " lose" : "";
             return `
             <div class="fx-m${m.score ? " played" : ""}${isLive(m) ? " live" : ""}">
-              <span class="fx-time" dir="ltr">${m.score ? t("fxFt") : isLive(m) ? liveTag() : m.kickoff ? fmt(m.kickoff, { hour: "2-digit", minute: "2-digit", hour12: false }) : "—"}</span>
+              <span class="fx-time" dir="ltr">${m.score ? t("fxFt") : isLive(m) ? liveTag(m) : m.kickoff ? fmt(m.kickoff, { hour: "2-digit", minute: "2-digit", hour12: false }) : "—"}</span>
               <span class="fx-teams" dir="ltr">
                 <button type="button" class="fx-t home tl${res(0)}" data-team="${escH(m.home)}"><span class="fx-n">${escH(m.home)}</span>${teamLogo(m.home)}</button>
-                ${m.score ? `<span class="fx-score">${m.score[0]} – ${m.score[1]}${m.pens ? `<small>${m.pens[0]}–${m.pens[1]} ${t("fxPens")}</small>` : ""}</span>` : `<span class="fx-vs">VS</span>`}
+                ${m.score ? `<span class="fx-score">${m.score[0]} – ${m.score[1]}${m.pens ? `<small>${m.pens[0]}–${m.pens[1]} ${t("fxPens")}</small>` : ""}</span>` : m.liveScore ? `<span class="fx-score">${m.liveScore[0]} – ${m.liveScore[1]}</span>` : `<span class="fx-vs">VS</span>`}
                 <button type="button" class="fx-t tl${res(1)}" data-team="${escH(m.away)}">${teamLogo(m.away)}<span class="fx-n">${escH(m.away)}</span></button>
               </span>
               <span class="fx-tag">${isLive(m) && m.video ? `<a class="fx-watch" href="https://www.youtube.com/watch?v=${escH(m.video)}" target="_blank" rel="noopener">${t("fxWatchLive")}</a>` : m.stage ? t(STAGE_KEYS[m.stage]) : m.no ? t("resMatch", m.no) : ""}${calOk(m) ? calBtn("fx:" + list.indexOf(m)) : ""}</span>
@@ -2958,7 +2962,7 @@
             <span class="m-meta">${m.no ? t("resMatch", m.no) : ""}${stage}</span>
             <div class="m-line" dir="ltr">
               ${teamHtml(m.home, a, b)}
-              <span class="m-scorebox"><span class="m-score${upcoming ? " vs" : ""}">${m.score ? `${m.score[0]} – ${m.score[1]}` : upcoming ? "VS" : "?"}</span>${m.score ? pens : isLive(m) ? liveTag() : `<small class="m-pens">${upcoming ? (m.kickoff ? kickoffText(m.kickoff) : t("resUpcoming")) : t("resNoScore")}</small>`}</span>
+              <span class="m-scorebox"><span class="m-score${upcoming && !m.liveScore ? " vs" : ""}">${m.score ? `${m.score[0]} – ${m.score[1]}` : m.liveScore ? `${m.liveScore[0]} – ${m.liveScore[1]}` : upcoming ? "VS" : "?"}</span>${m.score ? pens : isLive(m) ? liveTag(m) : `<small class="m-pens">${upcoming ? (m.kickoff ? kickoffText(m.kickoff) : t("resUpcoming")) : t("resNoScore")}</small>`}</span>
               ${teamHtml(m.away, b, a)}
             </div>
             ${m.video ? `<div class="m-actions">
@@ -2987,7 +2991,7 @@
     const SITE = "https://ypveterans.com/";
     const MATCH_LEN = 3600e3;
     const calLists = {};   // the matches behind each set of calendar buttons: fx (Fixtures), tm (the open team page)
-    const calOk = m => !m.score && !m.won && m.kickoff && Date.parse(m.kickoff) > Date.now();
+    const calOk = m => !m.score && !m.won && !m.liveScore && m.kickoff && Date.parse(m.kickoff) > Date.now();
     const calBtn = key => `<button type="button" class="fx-cal" data-cal="${key}"><svg class="ic" aria-hidden="true"><use href="#i-calendar"/></svg>${t("calAdd")}</button>`;
     const calTime = ms => new Date(ms).toISOString().replace(/[-:]|\.\d{3}/g, "");
     const calTitle = m => `${m.home} vs ${m.away} · YP Veterans Futsal`;
@@ -3105,9 +3109,9 @@
       const comingUp = d.next.length ? `<div class="tm-sec">
           <h3>${t("resUpcoming")}${d.next.filter(calOk).length > 1 ? calBtn("tm:all") : ""}</h3>
           ${d.next.map((m, i) => `<div class="tm-m">
-            <span class="tm-when">${isLive(m) ? liveTag() : m.kickoff ? escH(kickoffText(m.kickoff)) : t("resUpcoming")}</span>
+            <span class="tm-when">${isLive(m) ? liveTag(m) : m.kickoff ? escH(kickoffText(m.kickoff)) : t("resUpcoming")}</span>
             ${opp(m, m.year)}
-            <span>${calOk(m) ? calBtn("tm:" + i) : ""}</span>
+            ${m.liveScore ? `<span class="tm-sc" dir="ltr">${flip(m.liveScore, m.home === name).join(" – ")}</span>` : `<span>${calOk(m) ? calBtn("tm:" + i) : ""}</span>`}
           </div>`).join("")}
         </div>` : "";
       const squad = (squads[name] || []).filter(p => p && p.name)
@@ -3287,8 +3291,11 @@
           champion: { en: se.champion || "", dv: se.champion_dv || "" },
           matches: matches.filter(m => m.year === se.year).map(m => ({
             day: m.day, no: m.no, home: m.home, away: m.away, kickoff: m.kickoff,
-            score: m.home_score === null || m.away_score === null ? null : [m.home_score, m.away_score],
-            pens: m.pen_home === null || m.pen_away === null ? null : [m.pen_home, m.pen_away],
+            // A live match's scores are the score so far, so it isn't played yet
+            score: m.live || m.home_score === null || m.away_score === null ? null : [m.home_score, m.away_score],
+            liveScore: m.live && m.home_score !== null && m.away_score !== null ? [m.home_score, m.away_score] : null,
+            live: m.live || null,
+            pens: m.live || m.pen_home === null || m.pen_away === null ? null : [m.pen_home, m.pen_away],
             stage: m.stage || undefined, video: m.video || undefined, goals: m.goals || []
           }))
         })).filter(se => se.matches.length);
@@ -3299,8 +3306,10 @@
         renderResults();
       } catch (e) {}
     }
-    loadResults();
-    setInterval(() => { if (!document.hidden) loadResults(); }, 60000);
+    // Every minute, or every 15 seconds while a match is being scored live
+    const nextLoad = () => setTimeout(() => document.hidden ? nextLoad() : loadResults().finally(nextLoad),
+      RESULTS.some(r => r.matches.some(m => m.live)) ? 15000 : 60000);
+    loadResults().finally(nextLoad);
 
     // ---------- Visitors (for the organisers' dashboard) ----------
     // One row per page view: a random id kept in this browser and the kind of device. Nothing personal.

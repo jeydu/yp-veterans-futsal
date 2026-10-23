@@ -627,3 +627,11 @@ create policy "editors add media" on storage.objects for insert to authenticated
 drop policy if exists "editors remove media" on storage.objects;
 create policy "editors remove media" on storage.objects for delete to authenticated
   using (bucket_id = 'media' and (public.has_perm('news') or public.has_perm('gallery') or public.has_perm('sponsors') or public.has_perm('settings')));
+
+
+-- 13. Live scores (organiser portal → Enter a score → Kick off) ---------------------------------
+-- While a match is being played: '1h' first half, 'ht' half time, '2h' second half, and the scores
+-- are the score so far. Empty once it's over (or never went live): the scores are the final result.
+alter table public.matches add column if not exists live text check (live in ('1h', 'ht', '2h'));
+-- When the current half (or half time) started; the scoreboard's clock counts from here
+alter table public.matches add column if not exists live_since timestamptz;

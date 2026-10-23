@@ -862,6 +862,40 @@
     .sc-pens { margin-top: 18px; padding: 14px; border-radius: 14px; background: var(--amber-bg); }
     .sc-pens[hidden] { display: none; }
     .sc-save { padding: 13px 22px; font-size: 1rem; }
+    /* Kick off: start scoring a match live */
+    .sc-golive { display: flex; align-items: center; gap: 12px; margin-top: 14px; padding: 14px; border-radius: 14px; background: var(--tint); border: 1px solid var(--brand); }
+    .sc-golive div { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+    .sc-golive small { color: var(--muted); font-size: .8rem; }
+    /* Live scoreboard: both teams side by side with a big score and a big Goal button each */
+    .lv-dot { display: inline-block; width: 10px; height: 10px; margin-inline-end: 8px; border-radius: 50%; background: var(--brand); vertical-align: .1em; animation: lv-blink 1.2s ease-in-out infinite; }
+    .lv-dot.ht { background: var(--amber); animation: none; }
+    @keyframes lv-blink { 50% { opacity: .25; } }
+    #lv-clock { font-variant-numeric: tabular-nums; color: var(--text); }
+    .lv-board { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 16px; }
+    .lv-side { display: flex; flex-direction: column; align-items: center; gap: 12px; min-width: 0; padding: 18px 10px 14px; border: 1px solid var(--border); border-radius: 16px; background: var(--surface-2); text-align: center; }
+    .lv-side .tl { width: 60px; height: 60px; }
+    .lv-side b { max-width: 100%; font: 700 1.05rem/1.2 "Oswald", sans-serif; text-transform: uppercase; overflow-wrap: anywhere; }
+    .lv-score { font: 700 4.5rem/1 "Oswald", sans-serif; font-variant-numeric: tabular-nums; }
+    .lv-score.bump { animation: lv-bump .35s ease; }
+    @keyframes lv-bump { 40% { transform: scale(1.25); color: var(--brand-text); } }
+    .lv-goal { width: 100%; min-height: 64px; border: 0; border-radius: 14px; background: var(--brand); color: #fff; font: 700 1.2rem "Oswald", sans-serif; letter-spacing: .06em; text-transform: uppercase; }
+    .lv-goal:active { transform: scale(.97); }
+    .lv-undo { padding: 8px 16px; border: 1.5px solid var(--border); border-radius: 99px; background: var(--surface); color: var(--muted); font-weight: 700; }
+    .lv-undo:disabled { opacity: .4; }
+    .lv-note { margin-top: 14px; font-size: .82rem; color: var(--muted); text-align: center; }
+    .lv-saving { color: var(--muted); font-size: .8rem; }
+    .lv-ft { padding: 13px 20px; font-size: 1rem; }
+    /* Home: a match being scored live */
+    .d-livem { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 16px; width: 100%; margin-bottom: 18px; padding: 16px 18px; text-align: start; border: 2px solid var(--brand); background: var(--tint); color: var(--text); font: inherit; }
+    .d-livem small { font-weight: 700; text-transform: uppercase; letter-spacing: .06em; color: var(--brand-text); }
+    .d-livem .dm { flex: 1; min-width: 220px; }
+    .d-livem .btn { pointer-events: none; }
+    @media (max-width: 860px) {
+      /* Scoreboard footer: three equal buttons across the phone */
+      .lv-foot { gap: 6px; padding-left: 12px; padding-right: 12px; }
+      .lv-foot .sp { display: none; }
+      .lv-foot .btn { flex: 1; justify-content: center; padding: 12px 6px; font-size: .88rem; }
+    }
     /* Menu sheet */
     .more-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; padding-top: 12px; }
     .more-it { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; min-height: 96px; padding: 12px; border: 1px solid var(--border); border-radius: 16px; background: var(--surface); color: var(--text); text-decoration: none; font-weight: 600; font-size: .9rem; text-align: center; }
@@ -1946,7 +1980,8 @@
     const TEAMS = window.YP_TEAMS || {};
     const fx = { seasons: [], matches: [], year: null, tab: "all", error: null };
     const STAGES = [["", "Group stage"], ["semi", "Semi-final"], ["playoff", "Playoff"], ["final", "Final"]];
-    const isPlayed = m => m.home_score !== null && m.away_score !== null;
+    // A match on the live scoreboard has the score so far, not a result
+    const isPlayed = m => m.home_score !== null && m.away_score !== null && !m.live;
     const teamLogo = name => {
       const t = TEAMS[name];
       return t ? `<img class="tl${t.fit ? " fit" : ""}" src="${esc(t.logo)}" alt="">` : `<span class="tl tl-i">${esc(initials(name))}</span>`;
@@ -2051,7 +2086,7 @@
 
     function fixtureRow(m) {
       const played = isPlayed(m);
-      const live = !played && m.kickoff && Date.now() >= Date.parse(m.kickoff) && Date.now() < Date.parse(m.kickoff) + 2 * 3600e3;
+      const live = m.live || (!played && m.kickoff && Date.now() >= Date.parse(m.kickoff) && Date.now() < Date.parse(m.kickoff) + 2 * 3600e3);
       const win = played ? (m.home_score > m.away_score ? "h" : m.home_score < m.away_score ? "a"
         : m.pen_home !== null && m.pen_away !== null ? (m.pen_home > m.pen_away ? "h" : "a") : "") : "";
       const stage = (STAGES.find(([k]) => k === (m.stage || "")) || STAGES[0])[1];
@@ -2060,11 +2095,11 @@
           <span class="fx-date">${m.kickoff ? `<b>${fmtKick(m.kickoff)}</b>${fmtKickTime(m.kickoff)}` : `<b>Match day ${m.day}</b>`}${m.no ? `<small>Match ${m.no}</small>` : ""}</span>
           <span class="fx-match">
             <span class="fx-team ${win === "h" ? "win" : ""}">${teamLogo(m.home)}<span>${esc(m.home)}</span></span>
-            <span class="fx-score ${played ? "" : "vs"}">${played ? `${m.home_score} – ${m.away_score}` : "v"}</span>
+            <span class="fx-score ${played || m.live ? "" : "vs"}">${played || m.live ? `${m.home_score} – ${m.away_score}` : "v"}</span>
             <span class="fx-team away ${win === "a" ? "win" : ""}"><span>${esc(m.away)}</span>${teamLogo(m.away)}</span>
           </span>
           <span class="fx-stage">${stage}${m.pen_home !== null && m.pen_away !== null ? `<small>${m.pen_home}–${m.pen_away} pens</small>` : ""}</span>
-          <span class="fx-status"><span class="pill ${played ? "confirmed" : live ? "live" : "pending"}">${played ? "Played" : live ? "● Live" : "Upcoming"}</span>
+          <span class="fx-status"><span class="pill ${played ? "confirmed" : live ? "live" : "pending"}">${played ? "Played" : m.live === "ht" ? "● Half time" : live ? "● Live" : "Upcoming"}</span>
             ${m.video ? `<span class="fx-vid" title="Has a match video${m.goals && m.goals.length ? " and " + m.goals.length + " highlight clips" : ""}">${icon("play")}${m.goals && m.goals.length ? m.goals.length : ""}</span>` : ""}</span>
           <span class="fx-act"><button class="btn" data-edit="${m.id}">${icon("edit")} Edit</button></span>
         </div>`;
@@ -2640,7 +2675,7 @@
       const [st, tm, mt, se] = await Promise.all([
         db.rpc("visit_stats"),
         can("registrations") ? db.from("teams").select("status") : Promise.resolve({ data: null }),
-        db.from("matches").select("year,home,away,home_score,away_score,kickoff,day,no").order("year", { ascending: false }).order("day", { ascending: false }).order("no", { ascending: false, nullsFirst: false }).limit(200),
+        db.from("matches").select("*").order("year", { ascending: false }).order("day", { ascending: false }).order("no", { ascending: false, nullsFirst: false }).limit(200),
         db.from("settings").select("registration_open, closes_at").eq("id", 1).single()
       ]);
       if (page !== "dashboard") return;
@@ -2653,12 +2688,16 @@
       const teamsList = tm.data || [];
       const ms = mt.data || [];
       const next = ms.filter(m => m.home_score === null && m.kickoff && new Date(m.kickoff) > Date.now()).sort((a, b) => new Date(a.kickoff) - new Date(b.kickoff))[0];
-      const last = ms.find(m => m.home_score !== null);
+      const last = ms.find(m => m.home_score !== null && !m.live);
+      const lives = ms.filter(m => m.live);
       const regOpen = se.data && se.data.registration_open && !(se.data.closes_at && Date.now() >= new Date(se.data.closes_at));
       const matchLine = m => `<span class="dm"><span>${teamLogo(m.home)}${esc(m.home)}</span><b>${m.home_score !== null ? m.home_score + " – " + m.away_score : "v"}</b><span>${esc(m.away)}${teamLogo(m.away)}</span></span>`;
 
       app.innerHTML = pageHead(`Welcome back${me.name ? ", " + esc(me.name.split(" ")[0]) : ""}`, "Signed in as " + esc(me.role),
         `<span class="btn static">${icon("calendar")} ${today}</span><a class="btn" href="./" target="_blank" rel="noopener">${icon("external")} View website</a>`) + `
+        ${lives.map(m => `<button type="button" class="card d-livem" data-live="${m.id}">
+          <small><span class="lv-dot ${m.live === "ht" ? "ht" : ""}"></span>${HALVES[m.live]}${m.no ? " · Match " + m.no : ""}</small>
+          ${matchLine(m)}<span class="btn primary">${icon("ball")} Open scoreboard</span></button>`).join("")}
         ${quickActions(teamsList.filter(t => t.status === "pending").length)}
         <div class="dash">
           ${s ? `
@@ -2684,6 +2723,7 @@
             ${last ? `<small>Latest result · ${last.year}</small>${matchLine(last)}` : ""}
           </div>
         </div>`;
+      app.querySelectorAll("[data-live]").forEach(b => b.onclick = () => liveBoard(lives.find(m => m.id === b.dataset.live)));
       app.querySelectorAll("[data-qa]").forEach(b => b.onclick = () => b.dataset.qa === "score" ? quickScore() : (location.hash = "#fixtures", setTimeout(() => bulkFixtures(), 400)));
       clearTimeout(dashTimer);
       dashTimer = setTimeout(() => { if (page === "dashboard" && !document.hidden) loadDashboard(); }, 30000);
@@ -3111,11 +3151,16 @@
         <button type="button" class="icon-btn" id="sh-close" aria-label="Close">${icon("x")}</button></div></div>`;
       document.getElementById("sh-close").onclick = () => fxDlg.close();
       if (!fxDlg.open) fxDlg.showModal();
-      const { data, error } = await db.from("matches").select("*").is("home_score", null).order("kickoff", { nullsFirst: false }).limit(200);
-      if (error) { fxDlg.querySelector(".sheet-h p").textContent = "Couldn't load matches: " + error.message; return; }
+      const [res, liveRes] = await Promise.all([
+        db.from("matches").select("*").is("home_score", null).order("kickoff", { nullsFirst: false }).limit(200),
+        // Fails until the live columns are added by supabase/setup.sql; then there are just no live matches
+        db.from("matches").select("*").not("live", "is", null)
+      ]);
+      if (res.error) { fxDlg.querySelector(".sheet-h p").textContent = "Couldn't load matches: " + res.error.message; return; }
+      const data = [...(liveRes.data || []), ...res.data];
       const now = Date.now(), DAY = 864e5;
       const when = m => m.kickoff ? Date.parse(m.kickoff) : null;
-      const isLiveM = m => when(m) && now >= when(m) && now < when(m) + 2 * 3600e3;
+      const isLiveM = m => m.live || (when(m) && now >= when(m) && now < when(m) + 2 * 3600e3);
       const groups = [
         ["Live now", data.filter(isLiveM)],
         ["Today and earlier, waiting for a score", data.filter(m => !isLiveM(m) && when(m) && when(m) < now)],
@@ -3123,8 +3168,8 @@
         ["No date", data.filter(m => !when(m))]
       ].filter(([, l]) => l.length);
       const row = m => `<button type="button" class="qs-m ${isLiveM(m) ? "qs-live" : ""}" data-qs="${m.id}">
-          <span class="qs-when">${isLiveM(m) ? `<b class="live-b">● LIVE</b>` : m.kickoff ? `${fmtKick(m.kickoff)} · ${fmtKickTime(m.kickoff)}` : "Match day " + m.day}</span>
-          <span class="qs-teams"><span>${teamLogo(m.home)}${esc(m.home)}</span><em>v</em><span>${esc(m.away)}${teamLogo(m.away)}</span></span>
+          <span class="qs-when">${m.live ? `<b class="live-b">● ${HALVES[m.live].toUpperCase()}</b>` : isLiveM(m) ? `<b class="live-b">● LIVE</b>` : m.kickoff ? `${fmtKick(m.kickoff)} · ${fmtKickTime(m.kickoff)}` : "Match day " + m.day}</span>
+          <span class="qs-teams"><span>${teamLogo(m.home)}${esc(m.home)}</span><em>${m.live ? `${m.home_score} – ${m.away_score}` : "v"}</em><span>${esc(m.away)}${teamLogo(m.away)}</span></span>
           ${icon("chev")}</button>`;
       fxDlg.innerHTML = `
         <div class="sheet-in">
@@ -3136,17 +3181,25 @@
           </div>
         </div>`;
       document.getElementById("sh-close").onclick = () => fxDlg.close();
-      fxDlg.querySelectorAll("[data-qs]").forEach(b => b.onclick = () => scoreMatch(data.find(m => m.id === b.dataset.qs)));
+      fxDlg.querySelectorAll("[data-qs]").forEach(b => b.onclick = () => {
+        const m = data.find(x => x.id === b.dataset.qs);
+        m.live ? liveBoard(m) : scoreMatch(m);
+      });
     }
 
-    function scoreMatch(m) {
-      const s = { h: 0, a: 0, ph: 0, pa: 0 };
+    // `start`: the score so far, when full time comes from the live scoreboard
+    function scoreMatch(m, start) {
+      const s = { h: start ? start.h : 0, a: start ? start.a : 0, ph: 0, pa: 0 };
+      const canLive = "live" in m && !m.live && !start;
+      fxDlg.dataset.sheet = "score";
       const knockout = !!m.stage;
       fxDlg.innerHTML = `
         <div class="sheet-in">
           <div class="sheet-h"><div><h2>Score</h2><p>${m.kickoff ? fmtKick(m.kickoff) + " · " + fmtKickTime(m.kickoff) : "Match day " + m.day}${m.no ? " · Match " + m.no : ""}</p></div>
             <button type="button" class="icon-btn" id="sh-close" aria-label="Close">${icon("x")}</button></div>
           <div class="sheet-b">
+            ${canLive ? `<div class="sc-golive"><div><b>Scoring as it happens?</b><small>Kick off and tap Goal for each goal. The website shows the live score.</small></div>
+              <button type="button" class="btn primary" id="sc-live">${icon("play")} Kick off</button></div>` : ""}
             <div class="sc-board">
               ${[["h", m.home], ["a", m.away]].map(([k, name]) => `
                 <div class="sc-side">
@@ -3181,13 +3234,15 @@
       };
       fxDlg.querySelectorAll(".sc-btn").forEach(b => b.onclick = () => { s[b.dataset.k] = Math.max(0, Math.min(99, s[b.dataset.k] + Number(b.dataset.d))); draw(); });
       document.getElementById("sh-close").onclick = () => fxDlg.close();
-      document.getElementById("sc-back").onclick = quickScore;
+      document.getElementById("sc-back").onclick = start ? () => liveBoard(m) : quickScore;
+      if (canLive) document.getElementById("sc-live").onclick = () => kickOff(m);
       document.getElementById("sc-save").onclick = async () => {
         const pens = knockout && s.h === s.a && (s.ph || s.pa);
         if (pens && s.ph === s.pa) { document.getElementById("sc-err").textContent = "A shootout can't end level."; return; }
         if (!confirm(`Save ${m.home} ${s.h} – ${s.a} ${m.away}${pens ? ` (${s.ph}–${s.pa} on penalties)` : ""}?`)) return;
         const btn = document.getElementById("sc-save"); btn.disabled = true;
-        const { error } = await db.from("matches").update({ home_score: s.h, away_score: s.a, pen_home: pens ? s.ph : null, pen_away: pens ? s.pa : null, updated_at: new Date().toISOString() }).eq("id", m.id);
+        const { error } = await db.from("matches").update({ home_score: s.h, away_score: s.a, pen_home: pens ? s.ph : null, pen_away: pens ? s.pa : null,
+          ...("live" in m ? { live: null, live_since: null } : {}), updated_at: new Date().toISOString() }).eq("id", m.id);
         btn.disabled = false;
         if (error) { document.getElementById("sc-err").textContent = "Couldn't save: " + error.message; return; }
         toast(`✓ ${m.home} ${s.h} – ${s.a} ${m.away} saved`);
@@ -3196,6 +3251,120 @@
         quickScore();
       };
       draw();
+    }
+
+    // ---------- Live scoreboard ----------
+    // Score a match as it happens: each tap saves at once and the website shows it within 15 seconds.
+    // The clock counts from the start of the current half. Another organiser's taps show up every 10 seconds.
+    const HALVES = { "1h": "1st half", ht: "Half time", "2h": "2nd half" };
+    let liveTimer = null;
+
+    async function kickOff(m) {
+      if (!confirm(`Kick off ${m.home} v ${m.away}?\n\nThe website will show it as LIVE, starting at 0 – 0.`)) return;
+      const now = new Date().toISOString();
+      const row = { live: "1h", live_since: now, home_score: 0, away_score: 0, pen_home: null, pen_away: null, updated_at: now };
+      const { error } = await db.from("matches").update(row).eq("id", m.id);
+      if (error) { document.getElementById("sc-err").textContent = "Couldn't kick off: " + error.message; return; }
+      toast(`● ${m.home} v ${m.away} is live`);
+      liveBoard({ ...m, ...row });
+    }
+
+    function liveBoard(m) {
+      fxDlg.dataset.sheet = "live";
+      if (!fxDlg.open) fxDlg.showModal();
+      let saving = 0, chain = Promise.resolve();
+      const clock = () => {
+        if (!m.live_since) return "–";
+        const sec = Math.max(0, Math.floor((Date.now() - Date.parse(m.live_since)) / 1000));
+        return `${Math.floor(sec / 60)}:${String(sec % 60).padStart(2, "0")}`;
+      };
+      const refresh = () => { if (page === "fixtures") loadFixtures(); if (page === "dashboard") loadDashboard(); };
+      // Saves run one after another so fast taps land in order; a failed one reloads the real score
+      const save = (patch, done) => {
+        saving++;
+        drawSaving();
+        chain = chain.then(async () => {
+          const { error } = await db.from("matches").update({ ...patch, updated_at: new Date().toISOString() }).eq("id", m.id);
+          saving--;
+          drawSaving();
+          if (error) {
+            document.getElementById("lv-err").textContent = "Couldn't save: " + error.message + ". Showing the saved score.";
+            await reload(true);
+          } else if (done) done();
+        });
+      };
+      const reload = async force => {
+        if (saving && !force) return;
+        const { data } = await db.from("matches").select("*").eq("id", m.id).single();
+        if (!data || fxDlg.dataset.sheet !== "live") return;
+        const changed = ["home_score", "away_score", "live", "live_since"].some(k => data[k] !== m[k]);
+        m = data;
+        if (!m.live) { toast(`${m.home} ${m.home_score} – ${m.away_score} ${m.away}: full time`); quickScore(); return; }
+        if (changed || force) draw();
+      };
+      const drawSaving = () => { const el = document.getElementById("lv-saving"); if (el) el.textContent = saving ? "Saving…" : "✓ Saved"; };
+      const draw = () => {
+        fxDlg.innerHTML = `
+          <div class="sheet-in">
+            <div class="sheet-h"><div><h2><span class="lv-dot ${m.live === "ht" ? "ht" : ""}"></span>${m.live === "ht" ? "Half time" : "Live"}</h2>
+              <p>${HALVES[m.live]} · <b id="lv-clock">${clock()}</b>${m.no ? " · Match " + m.no : ""} · <span class="lv-saving" id="lv-saving">✓ Saved</span></p></div>
+              <button type="button" class="icon-btn" id="sh-close" aria-label="Close">${icon("x")}</button></div>
+            <div class="sheet-b">
+              <div class="lv-board">
+                ${[["h", "home_score", m.home], ["a", "away_score", m.away]].map(([k, col, name]) => `
+                  <div class="lv-side">
+                    ${teamLogo(name)}<b>${esc(name)}</b>
+                    <output class="lv-score" id="lv-${k}">${m[col]}</output>
+                    <button type="button" class="lv-goal" data-k="${k}">+ Goal</button>
+                    <button type="button" class="lv-undo" data-k="${k}" ${m[col] ? "" : "disabled"} aria-label="Take a goal off ${esc(name)}">−1</button>
+                  </div>`).join("")}
+              </div>
+              <p class="lv-note">Each tap saves straight away. The website shows the score within 15 seconds.</p>
+              <p class="form-error" id="lv-err" role="alert"></p>
+            </div>
+            <div class="sheet-f lv-foot">
+              <button type="button" class="btn" id="lv-back">${icon("undo")} Matches</button><span class="sp"></span>
+              ${m.live === "2h" ? "" : `<button type="button" class="btn" id="lv-half">${icon("clock")} ${m.live === "1h" ? "Half time" : "Start 2nd half"}</button>`}
+              <button type="button" class="btn primary lv-ft" id="lv-ft">${icon("check")} Full time</button>
+            </div>
+          </div>`;
+        document.getElementById("sh-close").onclick = () => { fxDlg.close(); refresh(); };
+        document.getElementById("lv-back").onclick = () => { quickScore(); refresh(); };
+        fxDlg.querySelectorAll(".lv-goal, .lv-undo").forEach(b => b.onclick = () => {
+          const col = b.dataset.k === "h" ? "home_score" : "away_score";
+          const n = Math.max(0, Math.min(99, m[col] + (b.classList.contains("lv-goal") ? 1 : -1)));
+          if (n === m[col]) return;
+          if (navigator.vibrate) navigator.vibrate(40);
+          m[col] = n;
+          const out = document.getElementById("lv-" + b.dataset.k);
+          out.textContent = n;
+          out.classList.remove("bump"); void out.offsetWidth; out.classList.add("bump");
+          b.parentElement.querySelector(".lv-undo").disabled = !n;
+          save({ [col]: n });
+        });
+        const half = document.getElementById("lv-half");
+        if (half) half.onclick = () => {
+          m.live = m.live === "1h" ? "ht" : "2h";
+          m.live_since = new Date().toISOString();
+          save({ live: m.live, live_since: m.live_since });
+          draw();
+        };
+        document.getElementById("lv-ft").onclick = () => {
+          // A level knockout match goes to the score sheet for the shootout
+          if (m.stage && m.home_score === m.away_score) { scoreMatch(m, { h: m.home_score, a: m.away_score }); return; }
+          if (!confirm(`Full time: ${m.home} ${m.home_score} – ${m.away_score} ${m.away}?\n\nThis saves it as the result.`)) return;
+          save({ live: null, live_since: null }, () => { toast(`✓ ${m.home} ${m.home_score} – ${m.away_score} ${m.away} saved`); refresh(); quickScore(); });
+        };
+      };
+      draw();
+      clearInterval(liveTimer);
+      let ticks = 0;
+      liveTimer = setInterval(() => {
+        const el = document.getElementById("lv-clock");
+        if (!fxDlg.open || fxDlg.dataset.sheet !== "live" || !el) { clearInterval(liveTimer); return; }
+        el.textContent = clock();
+        if (++ticks % 10 === 0 && !document.hidden) reload();
+      }, 1000);
     }
 
     // ---------- Phones: bottom menu ----------
