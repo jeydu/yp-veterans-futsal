@@ -479,21 +479,7 @@
       .fx-n, .fx-t.home .fx-n { font-size: .9rem; white-space: normal; text-align: center; }
       .fxl { width: 44px; height: 44px; }
     }
-    .fx-tag { display: flex; flex-direction: column; align-items: flex-end; gap: 6px; }
 
-    /* Add to calendar: a small outlined button on each match still to come, and a big one for all of them */
-    .fx-cal {
-      display: inline-flex; align-items: center; gap: 5px; padding: 5px 8px; cursor: pointer; white-space: nowrap;
-      border: 1.5px solid #c8102e; background: #fff; color: #c8102e;
-      font: 600 .7rem "Inter", sans-serif; letter-spacing: .02em; text-transform: none;
-    }
-    .fx-cal:hover { background: #c8102e; color: #fff; }
-    .cal-all {
-      display: inline-flex; align-items: center; gap: 8px; margin-top: 14px; padding: 10px 16px; border: 0; cursor: pointer;
-      background: #c8102e; color: #fff; font: 600 .85rem "Oswald", sans-serif; letter-spacing: .06em; text-transform: uppercase;
-    }
-    .cal-all:hover { background: #8a0b1f; }
-    .cal-all[hidden] { display: none; }
 
     /* A team name or logo that opens that team's page */
     :where(.tl) { background: none; border: 0; padding: 0; margin: 0; color: inherit; font: inherit; text-align: inherit; cursor: pointer; }
@@ -1281,9 +1267,6 @@
     <div class="wrap">
       <span class="eyebrow"><svg class="ic" aria-hidden="true"><use href="#i-calendar"/></svg><span id="fx-season"></span></span>
       <h2 data-i18n="fxTitle">Fixtures</h2>
-      <button type="button" class="cal-all" id="fx-cal-all" data-cal="fx:all" hidden>
-        <svg class="ic" aria-hidden="true"><use href="#i-calendar"/></svg><span data-i18n="calAll">Add all matches to calendar</span>
-      </button>
       <div class="fx-list" id="fx-list"></div>
     </div>
   </section>
@@ -1885,8 +1868,6 @@
       resWatch: "މުޅި މެޗު",
       resHighlights: "ހައިލައިޓްސް",
       stageFinal: "ފައިނަލް",
-      calAdd: "ކެލެންޑަރަށް",
-      calAll: "ހުރިހާ މެޗެއް ކެލެންޑަރަށް",
       teamsEyebrow: "ކްލަބުތައް",
       teamsTitle: "ޓީމުތައް",
       teamsLead: "ޓީމެއްގެ ހުރިހާ މެޗެއް، ނަތީޖާ އަދި ކުޅުންތެރިން ބައްލަވަން އެ ޓީމަކަށް ފިތާލައްވާ.",
@@ -1954,7 +1935,6 @@
       uploading: "Sending…",
       submitServerLabel: "Submit registration",
       closedOn: d => "Closed on " + d,
-      calAdd: "Add to calendar",
       tmTitles: ys => "Champions " + ys.join(", "),
       tmSeasons: n => n === 1 ? "1 tournament" : n + " tournaments",
       tmPlayed: "Played", tmWon: "Won", tmDrawn: "Drawn", tmLost: "Lost", tmScored: "Scored",
@@ -2848,8 +2828,6 @@
       document.getElementById("fx-season").textContent = t("fxSeason", season ? season.year : list[0].year);
       const fmt = (iso, o) => new Intl.DateTimeFormat(lang === "dv" ? "dv" : "en-GB", { timeZone: "Indian/Maldives", ...o }).format(new Date(iso));
       const dayOf = m => m.kickoff ? fmt(m.kickoff, { weekday: "long", day: "numeric", month: "long" }) : m.year + " · " + t("resDay", m.day);
-      calLists.fx = list;
-      document.getElementById("fx-cal-all").hidden = list.filter(calOk).length < 2;
       const groups = [];
       list.forEach(m => { const d = dayOf(m); (groups.at(-1) && groups.at(-1).d === d ? groups.at(-1).ms : (groups.push({ d, ms: [] }), groups.at(-1).ms)).push(m); });
       document.getElementById("fx-list").innerHTML = groups.map(g => `
@@ -2867,7 +2845,7 @@
                 ${m.score ? `<span class="fx-score">${m.score[0]} – ${m.score[1]}${m.pens ? `<small>${m.pens[0]}–${m.pens[1]} ${t("fxPens")}</small>` : ""}</span>` : m.liveScore ? `<span class="fx-score">${m.liveScore[0]} – ${m.liveScore[1]}</span>` : `<span class="fx-vs">VS</span>`}
                 <button type="button" class="fx-t tl${res(1)}" data-team="${escH(m.away)}">${teamLogo(m.away)}<span class="fx-n">${escH(m.away)}</span></button>
               </span>
-              <span class="fx-tag">${isLive(m) && m.video ? `<a class="fx-watch" href="https://www.youtube.com/watch?v=${escH(m.video)}" target="_blank" rel="noopener">${t("fxWatchLive")}</a>` : m.stage ? t(STAGE_KEYS[m.stage]) : m.no ? t("resMatch", m.no) : ""}${calOk(m) ? calBtn("fx:" + list.indexOf(m)) : ""}</span>
+              <span class="fx-tag">${isLive(m) && m.video ? `<a class="fx-watch" href="https://www.youtube.com/watch?v=${escH(m.video)}" target="_blank" rel="noopener">${t("fxWatchLive")}</a>` : m.stage ? t(STAGE_KEYS[m.stage]) : m.no ? t("resMatch", m.no) : ""}</span>
             </div>`; }).join("")}
         </div>`).join("");
     }
@@ -2985,47 +2963,7 @@
         </div>`;
     }
 
-    // ---------- Add to calendar ----------
-    // One match on an Android phone: Google Calendar (opens the Calendar app). Otherwise a calendar file,
-    // which iPhones and computers add straight to their calendar. Each match gets a reminder an hour before.
     const SITE = "https://ypveterans.com/";
-    const MATCH_LEN = 3600e3;
-    const calLists = {};   // the matches behind each set of calendar buttons: fx (Fixtures), tm (the open team page)
-    const calOk = m => !m.score && !m.won && !m.liveScore && m.kickoff && Date.parse(m.kickoff) > Date.now();
-    const calBtn = key => `<button type="button" class="fx-cal" data-cal="${key}"><svg class="ic" aria-hidden="true"><use href="#i-calendar"/></svg>${t("calAdd")}</button>`;
-    const calTime = ms => new Date(ms).toISOString().replace(/[-:]|\.\d{3}/g, "");
-    const calTitle = m => `${m.home} vs ${m.away} · YP Veterans Futsal`;
-    const calNote = m => [m.stage ? t(STAGE_KEYS[m.stage]) : m.no ? t("resMatch", m.no) : "", SITE].filter(Boolean).join("\n");
-    function addToCalendar(ms) {
-      if (!ms.length) return;
-      if (ms.length === 1 && /android/i.test(navigator.userAgent)) {
-        const m = ms[0], at = Date.parse(m.kickoff);
-        open("https://calendar.google.com/calendar/render?" + new URLSearchParams({
-          action: "TEMPLATE", text: calTitle(m), dates: calTime(at) + "/" + calTime(at + MATCH_LEN), details: calNote(m), ctz: "Indian/Maldives"
-        }), "_blank", "noopener");
-        return;
-      }
-      const esc = v => String(v).replace(/[\\;,]/g, c => "\\" + c).replace(/\n/g, "\\n");
-      const now = calTime(Date.now());
-      const lines = ["BEGIN:VCALENDAR", "VERSION:2.0", "PRODID:-//YP Veterans Futsal//EN", "CALSCALE:GREGORIAN", "METHOD:PUBLISH",
-        ...ms.flatMap(m => {
-          const at = Date.parse(m.kickoff);
-          return ["BEGIN:VEVENT",
-            "UID:" + [m.year, m.day, m.no || 0, m.home, m.away].join("-").replace(/[^\w-]/g, "") + "@ypveterans.com",
-            "DTSTAMP:" + now, "DTSTART:" + calTime(at), "DTEND:" + calTime(at + MATCH_LEN),
-            "SUMMARY:" + esc(calTitle(m)), "DESCRIPTION:" + esc(calNote(m)), "URL:" + SITE,
-            "BEGIN:VALARM", "ACTION:DISPLAY", "DESCRIPTION:" + esc(calTitle(m)), "TRIGGER:-PT1H", "END:VALARM",
-            "END:VEVENT"];
-        }),
-        "END:VCALENDAR"];
-      const a = document.createElement("a");
-      a.href = URL.createObjectURL(new Blob([lines.join("\r\n") + "\r\n"], { type: "text/calendar;charset=utf-8" }));
-      a.download = ms.length === 1 ? `${ms[0].home} vs ${ms[0].away}.ics` : "YP Veterans Futsal.ics";
-      document.body.appendChild(a);
-      a.click();
-      a.remove();
-      setTimeout(() => URL.revokeObjectURL(a.href), 10000);
-    }
 
     // ---------- Teams ----------
     // Every club in the fixtures and results gets a card; its page is a popup with its record, titles,
@@ -3105,13 +3043,12 @@
             <span class="tm-sc" dir="ltr">${m.score ? flip(m.score, home).join(" – ") : "?"}${pens}</span>
           </div>`;
       };
-      calLists.tm = d.next;
       const comingUp = d.next.length ? `<div class="tm-sec">
-          <h3>${t("resUpcoming")}${d.next.filter(calOk).length > 1 ? calBtn("tm:all") : ""}</h3>
-          ${d.next.map((m, i) => `<div class="tm-m">
+          <h3>${t("resUpcoming")}</h3>
+          ${d.next.map(m => `<div class="tm-m">
             <span class="tm-when">${isLive(m) ? liveTag(m) : m.kickoff ? escH(kickoffText(m.kickoff)) : t("resUpcoming")}</span>
             ${opp(m, m.year)}
-            ${m.liveScore ? `<span class="tm-sc" dir="ltr">${flip(m.liveScore, m.home === name).join(" – ")}</span>` : `<span>${calOk(m) ? calBtn("tm:" + i) : ""}</span>`}
+            ${m.liveScore ? `<span class="tm-sc" dir="ltr">${flip(m.liveScore, m.home === name).join(" – ")}</span>` : "<span></span>"}
           </div>`).join("")}
         </div>` : "";
       const squad = (squads[name] || []).filter(p => p && p.name)
@@ -3178,15 +3115,8 @@
       } catch (err) {}
     });
 
-    // Team names, logos and calendar buttons anywhere on the page
+    // Team names and logos anywhere on the page
     document.addEventListener("click", e => {
-      const cal = e.target.closest("[data-cal]");
-      if (cal) {
-        const [key, i] = cal.dataset.cal.split(":");
-        const ms = calLists[key] || [];
-        addToCalendar(i === "all" ? ms.filter(calOk) : ms[+i] ? [ms[+i]] : []);
-        return;
-      }
       const team = e.target.closest("[data-team]");
       if (team) openTeam(team.dataset.team, team);
     });
