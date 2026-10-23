@@ -402,9 +402,9 @@
     /* Hairlines between days (the card clips the outer ones), so a half-empty last row stays clean */
     .res-days { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); padding-top: 10px; }
     .res-day { padding: 16px 18px 8px; box-shadow: 1px 1px 0 var(--border); }
-    .res-day h3 { position: relative; font-size: .8rem; letter-spacing: .1em; color: #c8102e; padding-bottom: 8px; }
-    .res-day h3::after { content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 2px; background: #c8102e; transform-origin: left; }
-    :root[dir="rtl"] .res-day h3::after { transform-origin: right; }
+    .res-day h3, .tm-sec h3 { position: relative; font-size: .8rem; letter-spacing: .1em; color: #c8102e; padding-bottom: 8px; }
+    .res-day h3::after, .tm-sec h3::after { content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 2px; background: #c8102e; transform-origin: left; }
+    :root[dir="rtl"] .res-day h3::after, :root[dir="rtl"] .tm-sec h3::after { transform-origin: right; }
     /* Matches are rows in a results table, split by hairlines */
     .match { padding: 10px 0 12px; border-radius: 4px; }
     .match + .match { border-top: 1px solid var(--border); }
@@ -478,6 +478,85 @@
       .fx-t.home { flex-direction: column-reverse; }
       .fx-n, .fx-t.home .fx-n { font-size: .9rem; white-space: normal; text-align: center; }
       .fxl { width: 44px; height: 44px; }
+    }
+    .fx-tag { display: flex; flex-direction: column; align-items: flex-end; gap: 6px; }
+
+    /* Add to calendar: a small outlined button on each match still to come, and a big one for all of them */
+    .fx-cal {
+      display: inline-flex; align-items: center; gap: 5px; padding: 5px 8px; cursor: pointer; white-space: nowrap;
+      border: 1.5px solid #c8102e; background: #fff; color: #c8102e;
+      font: 600 .7rem "Inter", sans-serif; letter-spacing: .02em; text-transform: none;
+    }
+    .fx-cal:hover { background: #c8102e; color: #fff; }
+    .cal-all {
+      display: inline-flex; align-items: center; gap: 8px; margin-top: 14px; padding: 10px 16px; border: 0; cursor: pointer;
+      background: #c8102e; color: #fff; font: 600 .85rem "Oswald", sans-serif; letter-spacing: .06em; text-transform: uppercase;
+    }
+    .cal-all:hover { background: #8a0b1f; }
+    .cal-all[hidden] { display: none; }
+
+    /* A team name or logo that opens that team's page */
+    :where(.tl) { background: none; border: 0; padding: 0; margin: 0; color: inherit; font: inherit; text-align: inherit; cursor: pointer; }
+    .tl:hover .fxl, .tl:hover .m-logo { transform: scale(1.08); }
+    .tl .fxl { transition: transform .25s ease; }
+    .tl:focus-visible { outline: 2px solid #c8102e; outline-offset: 3px; }
+
+    /* Teams: a card per club */
+    #teams { padding-top: 0; }
+    .tm-strip {
+      display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 12px; margin-top: 18px;
+      --surface: #fff; --text: #221516; --muted: #7a6567; --border: #f1dadd; --brand-text: #c8102e; color-scheme: light;
+    }
+    .tm-card {
+      display: flex; flex-direction: column; align-items: center; gap: 8px; padding: 18px 10px 14px; text-align: center;
+      background: #fff; color: var(--text); border: 1px solid var(--border); border-top: 4px solid var(--brand);
+      box-shadow: 0 6px 18px rgba(60, 10, 20, .06); transition: transform .2s ease, box-shadow .2s ease;
+    }
+    .tm-card:hover { transform: translateY(-3px); box-shadow: 0 10px 24px rgba(60, 10, 20, .12); }
+    .tm-card .fxl { width: 64px; height: 64px; }
+    .tm-card .fxl-i { font-size: 1.1rem; }
+    .tm-card b { font: 700 1rem/1.2 "Oswald", sans-serif; text-transform: uppercase; letter-spacing: .02em; }
+    .tm-card small { display: inline-flex; align-items: center; gap: 6px; font-size: .74rem; color: var(--muted); }
+    .tm-cups { display: inline-flex; align-items: center; gap: 3px; color: #c8102e; font-weight: 700; }
+
+    /* Team page (a popup like the results): the record up top, then matches coming up, the squad and every result */
+    .res-top .fxl { width: 64px; height: 64px; border: 2px solid #fff; }
+    .res-btn {
+      flex-shrink: 0; width: 36px; height: 36px; border-radius: 50%; border: 2px solid #fff; cursor: pointer;
+      display: flex; align-items: center; justify-content: center; font-size: 1rem;
+      background: transparent; color: #fff; transition: background .2s ease, color .2s ease;
+    }
+    .res-btn:hover, .res-btn.done { background: #fff; color: #c8102e; }
+    .tm-body { padding: 18px 22px 6px; }
+    .tm-sec { margin-bottom: 20px; }
+    .tm-sec h3 { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+    .tm-years { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 0 28px; }
+    .res-pop[open] .tm-sec { animation: res-rise .5s cubic-bezier(.2,.8,.2,1) .3s backwards; }
+    .tm-m { display: grid; grid-template-columns: 78px minmax(0, 1fr) auto; align-items: center; gap: 12px; padding: 10px 0; }
+    .tm-m + .tm-m { border-top: 1px solid var(--border); }
+    .tm-r { justify-self: start; min-width: 30px; padding: 3px 8px; text-align: center; color: #fff; font: 700 .8rem "Oswald", sans-serif; letter-spacing: .06em; text-transform: uppercase; }
+    .tm-r.w { background: #17803d; }
+    .tm-r.d { background: #8a7a7c; }
+    .tm-r.l { background: #c8102e; }
+    .tm-when { font-size: .78rem; font-weight: 600; line-height: 1.3; color: #c8102e; }
+    .tm-opp { display: flex; align-items: center; gap: 10px; min-width: 0; }
+    .tm-opp .fxl { width: 38px; height: 38px; }
+    .tm-on { display: flex; flex-direction: column; min-width: 0; }
+    .tm-on b { font: 700 .95rem "Oswald", sans-serif; text-transform: uppercase; letter-spacing: .02em; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .tm-on small { font-size: .66rem; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+    .tm-sc { display: flex; flex-direction: column; align-items: center; min-width: 64px; padding: 4px 10px; background: #c8102e; color: #fff; font: 700 1.1rem/1.1 "Oswald", sans-serif; font-variant-numeric: tabular-nums; }
+    .tm-sc small { font: 600 .6rem "Inter", sans-serif; opacity: .85; }
+    .tm-squad { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 8px; padding-top: 12px; }
+    .tm-pl { display: flex; align-items: center; gap: 10px; padding: 8px 10px; border: 1px solid var(--border); font-size: .9rem; font-weight: 600; }
+    .tm-pl b { min-width: 26px; text-align: center; color: #c8102e; font: 700 1.05rem "Oswald", sans-serif; }
+    @media (max-width: 720px) {
+      .tm-strip { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .tm-body { padding: 14px 14px 4px; }
+      .tm-years { grid-template-columns: 1fr; }
+      .tm-m { grid-template-columns: 64px minmax(0, 1fr) auto; gap: 10px; }
+      .res-top .fxl { width: 52px; height: 52px; }
+      .tm-totals .res-total { padding: 0 4px; }
+      .tm-totals .res-total span { letter-spacing: .02em; }
     }
 
     /* News: photo slider of featured stories, then story cards */
@@ -1202,7 +1281,20 @@
     <div class="wrap">
       <span class="eyebrow"><svg class="ic" aria-hidden="true"><use href="#i-calendar"/></svg><span id="fx-season"></span></span>
       <h2 data-i18n="fxTitle">Fixtures</h2>
+      <button type="button" class="cal-all" id="fx-cal-all" data-cal="fx:all" hidden>
+        <svg class="ic" aria-hidden="true"><use href="#i-calendar"/></svg><span data-i18n="calAll">Add all matches to calendar</span>
+      </button>
       <div class="fx-list" id="fx-list"></div>
+    </div>
+  </section>
+
+  <!-- TEAMS: a card per club from the fixtures and results; each opens that team's page (a popup with its own link, #team=Name) -->
+  <section id="teams" hidden>
+    <div class="wrap">
+      <span class="eyebrow"><svg class="ic" aria-hidden="true"><use href="#i-users"/></svg><span data-i18n="teamsEyebrow">Clubs</span></span>
+      <h2 data-i18n="teamsTitle">Teams</h2>
+      <p class="lead" data-i18n="teamsLead">Tap a team to see every match it has played, its record and its squad.</p>
+      <div class="tm-strip" id="tm-strip"></div>
     </div>
   </section>
 
@@ -1317,6 +1409,9 @@
   <!-- Popup with all the results of one year -->
   <dialog id="res-pop" class="res-pop" aria-labelledby="res-pop-title">
     <div class="res-card" id="res-card"></div>
+  </dialog>
+  <dialog id="team-pop" class="res-pop" aria-labelledby="team-pop-name">
+    <div class="res-card" id="team-card"></div>
   </dialog>
 
   <!-- TEAM REGISTRATION — sends the details to the organiser on WhatsApp (number set in the script at the bottom) -->
@@ -1788,7 +1883,20 @@
       resTbd: "އަދި ނުނިމޭ",
       resWatch: "މުޅި މެޗު",
       resHighlights: "ހައިލައިޓްސް",
-      stageFinal: "ފައިނަލް"
+      stageFinal: "ފައިނަލް",
+      calAdd: "ކެލެންޑަރަށް",
+      calAll: "ހުރިހާ މެޗެއް ކެލެންޑަރަށް",
+      teamsEyebrow: "ކްލަބުތައް",
+      teamsTitle: "ޓީމުތައް",
+      teamsLead: "ޓީމެއްގެ ހުރިހާ މެޗެއް، ނަތީޖާ އަދި ކުޅުންތެރިން ބައްލަވަން އެ ޓީމަކަށް ފިތާލައްވާ.",
+      tmTitles: ys => ys.join("، ") + " ގެ ޗެމްޕިއަން",
+      tmSeasons: n => n + " މުބާރާތް",
+      tmPlayed: "ކުޅުނު", tmWon: "މޮޅު", tmDrawn: "އެއްވަރު", tmLost: "ބަލި", tmScored: "ޖެހި ގޯލު",
+      tmW: "މޮޅު", tmD: "އެއްވަރު", tmL: "ބަލި",
+      tmResults: "ނަތީޖާ",
+      tmCard: r => r.p + " މެޗު · " + r.w + " މޮޅު",
+      tmShare: "ޓީމު ޝެއާ ކުރައްވާ",
+      tmCopied: "ލިންކް ކޮޕީ ކުރެވިއްޖެ"
     };
     const EN = {
       players: n => n + " players",
@@ -1843,7 +1951,16 @@
       preparing: n => "Uploading photos… " + n,
       uploading: "Sending…",
       submitServerLabel: "Submit registration",
-      closedOn: d => "Closed on " + d
+      closedOn: d => "Closed on " + d,
+      calAdd: "Add to calendar",
+      tmTitles: ys => "Champions " + ys.join(", "),
+      tmSeasons: n => n === 1 ? "1 tournament" : n + " tournaments",
+      tmPlayed: "Played", tmWon: "Won", tmDrawn: "Drawn", tmLost: "Lost", tmScored: "Scored",
+      tmW: "W", tmD: "D", tmL: "L",
+      tmResults: "Results",
+      tmCard: r => r.p + " played · " + r.w + " won",
+      tmShare: "Share team",
+      tmCopied: "Link copied"
     };
 
     let lang = "en";
@@ -2678,6 +2795,12 @@
     const escH = v => String(v ?? "").replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
     const kickoffText = iso => new Intl.DateTimeFormat(lang === "dv" ? "dv" : "en-GB",
       { timeZone: "Indian/Maldives", weekday: "short", day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" }).format(new Date(iso));
+    // A club's round logo, or its initials when it has none
+    const teamLogo = name => {
+      const l = (window.YP_TEAMS || {})[name];
+      return l ? `<span class="fxl${l.fit ? " fit" : ""}"><img loading="lazy" decoding="async" src="${escH(l.logo)}" alt=""></span>`
+               : `<span class="fxl fxl-i" aria-hidden="true">${escH(name.split(" ").map(w => w[0]).join("").slice(0, 2))}</span>`;
+    };
 
     // Year, champion and totals: the face of a year card, and the top of the popup
     function resSummary(r) {
@@ -2721,11 +2844,8 @@
       document.getElementById("fx-season").textContent = t("fxSeason", season ? season.year : list[0].year);
       const fmt = (iso, o) => new Intl.DateTimeFormat(lang === "dv" ? "dv" : "en-GB", { timeZone: "Indian/Maldives", ...o }).format(new Date(iso));
       const dayOf = m => m.kickoff ? fmt(m.kickoff, { weekday: "long", day: "numeric", month: "long" }) : m.year + " · " + t("resDay", m.day);
-      const logo = name => {
-        const l = (window.YP_TEAMS || {})[name];
-        return l ? `<span class="fxl${l.fit ? " fit" : ""}"><img loading="lazy" decoding="async" src="${escH(l.logo)}" alt=""></span>`
-                 : `<span class="fxl fxl-i" aria-hidden="true">${escH(name.split(" ").map(w => w[0]).join("").slice(0, 2))}</span>`;
-      };
+      calLists.fx = list;
+      document.getElementById("fx-cal-all").hidden = list.filter(calOk).length < 2;
       const groups = [];
       list.forEach(m => { const d = dayOf(m); (groups.at(-1) && groups.at(-1).d === d ? groups.at(-1).ms : (groups.push({ d, ms: [] }), groups.at(-1).ms)).push(m); });
       document.getElementById("fx-list").innerHTML = groups.map(g => `
@@ -2739,11 +2859,11 @@
             <div class="fx-m${m.score ? " played" : ""}${isLive(m) ? " live" : ""}">
               <span class="fx-time" dir="ltr">${m.score ? t("fxFt") : isLive(m) ? liveTag() : m.kickoff ? fmt(m.kickoff, { hour: "2-digit", minute: "2-digit", hour12: false }) : "—"}</span>
               <span class="fx-teams" dir="ltr">
-                <span class="fx-t home${res(0)}"><span class="fx-n">${escH(m.home)}</span>${logo(m.home)}</span>
+                <button type="button" class="fx-t home tl${res(0)}" data-team="${escH(m.home)}"><span class="fx-n">${escH(m.home)}</span>${teamLogo(m.home)}</button>
                 ${m.score ? `<span class="fx-score">${m.score[0]} – ${m.score[1]}${m.pens ? `<small>${m.pens[0]}–${m.pens[1]} ${t("fxPens")}</small>` : ""}</span>` : `<span class="fx-vs">VS</span>`}
-                <span class="fx-t${res(1)}">${logo(m.away)}<span class="fx-n">${escH(m.away)}</span></span>
+                <button type="button" class="fx-t tl${res(1)}" data-team="${escH(m.away)}">${teamLogo(m.away)}<span class="fx-n">${escH(m.away)}</span></button>
               </span>
-              <span class="fx-tag">${isLive(m) && m.video ? `<a class="fx-watch" href="https://www.youtube.com/watch?v=${escH(m.video)}" target="_blank" rel="noopener">${t("fxWatchLive")}</a>` : m.stage ? t(STAGE_KEYS[m.stage]) : m.no ? t("resMatch", m.no) : ""}</span>
+              <span class="fx-tag">${isLive(m) && m.video ? `<a class="fx-watch" href="https://www.youtube.com/watch?v=${escH(m.video)}" target="_blank" rel="noopener">${t("fxWatchLive")}</a>` : m.stage ? t(STAGE_KEYS[m.stage]) : m.no ? t("resMatch", m.no) : ""}${calOk(m) ? calBtn("fx:" + list.indexOf(m)) : ""}</span>
             </div>`; }).join("")}
         </div>`).join("");
     }
@@ -2755,6 +2875,7 @@
         `<button type="button" class="res-year" aria-label="${t("resPopTitle", r.year)}"><span class="res-big">${r.year}</span></button>`).join("");
       list.querySelectorAll(".res-year").forEach((b, i) => b.addEventListener("click", () => openResults(RESULTS[i].year, b)));
       if (resOpen) fillResults();
+      renderTeams();
     }
 
     function openResults(year, card) {
@@ -2821,7 +2942,7 @@
         const badge = logo
           ? `<span class="m-logo${logo.fit ? " fit" : ""}"><img loading="lazy" decoding="async" src="${escH(logo.logo)}" alt=""></span>`
           : `<span class="m-logo m-initials" aria-hidden="true">${initials}</span>`;
-        return `<span class="m-team${result}">${badge}${escH(name)}</span>`;
+        return `<button type="button" class="m-team tl${result}" data-team="${escH(name)}">${badge}${escH(name)}</button>`;
       };
       // Each match slides in a moment after the one before it
       const delay = m => `style="--d:${(.25 + r.matches.indexOf(m) * .06).toFixed(2)}s"`;
@@ -2859,6 +2980,212 @@
           ${days.map(d => `<div class="res-day${dayStage(d) ? " " + dayStage(d) : ""}"><h3 ${delay(r.matches.find(m => m.day === d))}>${dayTitle(d)}</h3>${r.matches.filter(m => m.day === d).map(matchHtml).join("")}</div>`).join("")}
         </div>`;
     }
+
+    // ---------- Add to calendar ----------
+    // One match on an Android phone: Google Calendar (opens the Calendar app). Otherwise a calendar file,
+    // which iPhones and computers add straight to their calendar. Each match gets a reminder an hour before.
+    const SITE = "https://ypveterans.com/";
+    const MATCH_LEN = 3600e3;
+    const calLists = {};   // the matches behind each set of calendar buttons: fx (Fixtures), tm (the open team page)
+    const calOk = m => !m.score && !m.won && m.kickoff && Date.parse(m.kickoff) > Date.now();
+    const calBtn = key => `<button type="button" class="fx-cal" data-cal="${key}"><svg class="ic" aria-hidden="true"><use href="#i-calendar"/></svg>${t("calAdd")}</button>`;
+    const calTime = ms => new Date(ms).toISOString().replace(/[-:]|\.\d{3}/g, "");
+    const calTitle = m => `${m.home} vs ${m.away} · YP Veterans Futsal`;
+    const calNote = m => [m.stage ? t(STAGE_KEYS[m.stage]) : m.no ? t("resMatch", m.no) : "", SITE].filter(Boolean).join("\n");
+    function addToCalendar(ms) {
+      if (!ms.length) return;
+      if (ms.length === 1 && /android/i.test(navigator.userAgent)) {
+        const m = ms[0], at = Date.parse(m.kickoff);
+        open("https://calendar.google.com/calendar/render?" + new URLSearchParams({
+          action: "TEMPLATE", text: calTitle(m), dates: calTime(at) + "/" + calTime(at + MATCH_LEN), details: calNote(m), ctz: "Indian/Maldives"
+        }), "_blank", "noopener");
+        return;
+      }
+      const esc = v => String(v).replace(/[\\;,]/g, c => "\\" + c).replace(/\n/g, "\\n");
+      const now = calTime(Date.now());
+      const lines = ["BEGIN:VCALENDAR", "VERSION:2.0", "PRODID:-//YP Veterans Futsal//EN", "CALSCALE:GREGORIAN", "METHOD:PUBLISH",
+        ...ms.flatMap(m => {
+          const at = Date.parse(m.kickoff);
+          return ["BEGIN:VEVENT",
+            "UID:" + [m.year, m.day, m.no || 0, m.home, m.away].join("-").replace(/[^\w-]/g, "") + "@ypveterans.com",
+            "DTSTAMP:" + now, "DTSTART:" + calTime(at), "DTEND:" + calTime(at + MATCH_LEN),
+            "SUMMARY:" + esc(calTitle(m)), "DESCRIPTION:" + esc(calNote(m)), "URL:" + SITE,
+            "BEGIN:VALARM", "ACTION:DISPLAY", "DESCRIPTION:" + esc(calTitle(m)), "TRIGGER:-PT1H", "END:VALARM",
+            "END:VEVENT"];
+        }),
+        "END:VCALENDAR"];
+      const a = document.createElement("a");
+      a.href = URL.createObjectURL(new Blob([lines.join("\r\n") + "\r\n"], { type: "text/calendar;charset=utf-8" }));
+      a.download = ms.length === 1 ? `${ms[0].home} vs ${ms[0].away}.ics` : "YP Veterans Futsal.ics";
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      setTimeout(() => URL.revokeObjectURL(a.href), 10000);
+    }
+
+    // ---------- Teams ----------
+    // Every club in the fixtures and results gets a card; its page is a popup with its record, titles,
+    // matches coming up, squad (from the organiser portal, Teams & Players) and every result by year.
+    const teamPop = document.getElementById("team-pop");
+    const squads = {};    // club name → [{ name, no }]
+    let teamOpen = null;  // the team shown in the popup
+    // A link like ypveterans.com/#team=RK%20SC opens that team's page once its matches are known
+    let teamFromLink = (location.hash.match(/^#team=(.+)$/) || [])[1];
+
+    // "w", "d" or "l" for `name`, or null while not played. Level after full time: the shootout decides.
+    function outcome(m, name) {
+      if (!m.score && !m.won) return null;
+      const [a, b] = !m.score ? (m.won === "home" ? [1, 0] : [0, 1]) : m.score[0] === m.score[1] && m.pens ? m.pens : m.score;
+      const [own, other] = m.home === name ? [a, b] : [b, a];
+      return own > other ? "w" : own < other ? "l" : "d";
+    }
+
+    function teamData(name) {
+      const plays = m => m.home === name || m.away === name;
+      const years = RESULTS.map(r => {
+        const final = r.matches.find(m => m.stage === "final");
+        return { year: r.year, champ: !!final && plays(final) && outcome(final, name) === "w", ms: r.matches.filter(plays) };
+      }).filter(y => y.ms.length);
+      const rec = { p: 0, w: 0, d: 0, l: 0, gf: 0 };
+      years.forEach(y => y.ms.forEach(m => {
+        const o = outcome(m, name);
+        if (!o) return;
+        rec.p++;
+        rec[o]++;
+        if (m.score) rec.gf += m.score[m.home === name ? 0 : 1];
+      }));
+      const next = years.flatMap(y => y.ms.filter(m => !m.score && !m.won).map(m => ({ ...m, year: y.year })))
+        .sort((a, b) => (a.kickoff ? Date.parse(a.kickoff) : Infinity) - (b.kickoff ? Date.parse(b.kickoff) : Infinity));
+      return { years, rec, next, titles: years.filter(y => y.champ).map(y => y.year) };
+    }
+
+    // Newest season's clubs first, then by name
+    function renderTeams() {
+      const last = {};
+      RESULTS.forEach(r => r.matches.forEach(m => [m.home, m.away].forEach(n => { last[n] = Math.max(last[n] || 0, r.year); })));
+      const names = Object.keys(last).sort((a, b) => last[b] - last[a] || a.localeCompare(b));
+      document.getElementById("teams").hidden = !names.length;
+      document.getElementById("tm-strip").innerHTML = names.map(n => {
+        const d = teamData(n);
+        return `<button type="button" class="tm-card tl" data-team="${escH(n)}">
+            ${teamLogo(n)}<b>${escH(n)}</b>
+            <small>${d.titles.length ? `<span class="tm-cups"><svg class="ic" aria-hidden="true"><use href="#i-trophy"/></svg>${d.titles.length}</span>` : ""}${t("tmCard", d.rec)}</small>
+          </button>`;
+      }).join("");
+      if (teamOpen) fillTeam();
+      if (teamFromLink) {
+        let n = null;
+        try { n = decodeURIComponent(teamFromLink); } catch (e) { teamFromLink = null; }
+        if (n && names.includes(n)) {
+          teamFromLink = null;
+          openTeam(n, document.getElementById("teams"));
+        }
+      }
+    }
+
+    function fillTeam() {
+      const name = teamOpen, d = teamData(name);
+      // The other team, with the stage or match number under its name; tapping it opens that team's page
+      const opp = (m, year) => {
+        const o = m.home === name ? m.away : m.home;
+        const meta = [year, m.stage ? t(STAGE_KEYS[m.stage]) : m.no ? t("resMatch", m.no) : ""].filter(Boolean).join(" · ");
+        return `<button type="button" class="tm-opp tl" data-team="${escH(o)}">${teamLogo(o)}<span class="tm-on"><b>${escH(o)}</b><small>${escH(meta)}</small></span></button>`;
+      };
+      const flip = (pair, home) => home ? pair : [pair[1], pair[0]];
+      const played = m => {
+        const o = outcome(m, name), home = m.home === name;
+        const pens = m.pens ? `<small>${t("resPens", flip(m.pens, home).join("–"))}</small>` : "";
+        return `<div class="tm-m">
+            <span class="tm-r ${o}">${t("tm" + o.toUpperCase())}</span>
+            ${opp(m)}
+            <span class="tm-sc" dir="ltr">${m.score ? flip(m.score, home).join(" – ") : "?"}${pens}</span>
+          </div>`;
+      };
+      calLists.tm = d.next;
+      const comingUp = d.next.length ? `<div class="tm-sec">
+          <h3>${t("resUpcoming")}${d.next.filter(calOk).length > 1 ? calBtn("tm:all") : ""}</h3>
+          ${d.next.map((m, i) => `<div class="tm-m">
+            <span class="tm-when">${isLive(m) ? liveTag() : m.kickoff ? escH(kickoffText(m.kickoff)) : t("resUpcoming")}</span>
+            ${opp(m, m.year)}
+            <span>${calOk(m) ? calBtn("tm:" + i) : ""}</span>
+          </div>`).join("")}
+        </div>` : "";
+      const squad = (squads[name] || []).filter(p => p && p.name)
+        .sort((a, b) => (a.no ?? 999) - (b.no ?? 999) || a.name.localeCompare(b.name));
+      const total = (n, key) => `<span class="res-total"><b>${n}</b><span>${t(key)}</span></span>`;
+      document.getElementById("team-card").innerHTML = `
+        <div class="res-top">
+          <h2 class="res-pop-title">${t("wzTeam")}</h2>
+          <button type="button" class="res-btn tm-share" aria-label="${t("tmShare")}" title="${t("tmShare")}">
+            <svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="m8.6 13.5 6.8 4M15.4 6.5l-6.8 4"/></svg>
+          </button>
+          <button type="button" class="res-close" aria-label="${t("close")}"><svg class="ic" aria-hidden="true"><use href="#i-x"/></svg></button>
+          <span class="res-top-row">
+            ${teamLogo(name)}
+            <span class="res-champ">
+              <small>${d.titles.length ? `<svg class="ic" aria-hidden="true"><use href="#i-trophy"/></svg>${t("tmTitles", d.titles)}` : t("tmSeasons", d.years.length)}</small>
+              <b id="team-pop-name">${escH(name)}</b>
+            </span>
+            <span class="res-totals tm-totals">
+              ${total(d.rec.p, "tmPlayed")}${total(d.rec.w, "tmWon")}${total(d.rec.d, "tmDrawn")}${total(d.rec.l, "tmLost")}${total(d.rec.gf, "tmScored")}
+            </span>
+          </span>
+        </div>
+        <div class="tm-body">
+          ${comingUp}
+          ${squad.length ? `<div class="tm-sec"><h3>${t("wzPlayers")}</h3>
+            <div class="tm-squad">${squad.map(p => `<span class="tm-pl"><b>${p.no ?? ""}</b>${escH(p.name)}</span>`).join("")}</div>
+          </div>` : ""}
+          <div class="tm-years">
+            ${d.years.filter(y => y.ms.some(m => m.score || m.won)).map(y => `<div class="tm-sec">
+              <h3>${y.year} ${t("tmResults")}${y.champ ? `<span class="m-stage">${t("resChampion")}</span>` : ""}</h3>
+              ${y.ms.filter(m => m.score || m.won).map(played).join("")}
+            </div>`).join("")}
+          </div>
+        </div>`;
+    }
+
+    function openTeam(name, from) {
+      if (!teamData(name).years.length) return;
+      teamOpen = name;
+      fillTeam();
+      if (teamPop.open && !teamPop.classList.contains("closing")) teamPop.scrollTop = 0;
+      else openPop(teamPop, from);
+      history.replaceState(null, "", "#team=" + encodeURIComponent(name));
+    }
+
+    wirePop(teamPop, () => {
+      teamOpen = null;
+      if (location.hash.startsWith("#team=")) history.replaceState(null, "", location.pathname + location.search);
+    });
+    // Share the team's link: the phone's share sheet, or copy it
+    teamPop.addEventListener("click", async e => {
+      const btn = e.target.closest(".tm-share");
+      if (!btn) return;
+      const url = SITE + "#team=" + encodeURIComponent(teamOpen);
+      try {
+        if (navigator.share) await navigator.share({ title: teamOpen + " · YP Veterans Futsal", url });
+        else {
+          await navigator.clipboard.writeText(url);
+          btn.classList.add("done");
+          btn.setAttribute("aria-label", t("tmCopied"));
+          btn.title = t("tmCopied");
+        }
+      } catch (err) {}
+    });
+
+    // Team names, logos and calendar buttons anywhere on the page
+    document.addEventListener("click", e => {
+      const cal = e.target.closest("[data-cal]");
+      if (cal) {
+        const [key, i] = cal.dataset.cal.split(":");
+        const ms = calLists[key] || [];
+        addToCalendar(i === "all" ? ms.filter(calOk) : ms[+i] ? [ms[+i]] : []);
+        return;
+      }
+      const team = e.target.closest("[data-team]");
+      if (team) openTeam(team.dataset.team, team);
+    });
 
     // ---------- Match videos and highlights ----------
     // Videos play from Ahoo Live's YouTube streams inside the popup (nothing is copied or re-uploaded).
@@ -2942,8 +3269,11 @@
         const get = path => fetch(CONFIG.supabaseUrl + "/rest/v1/" + path, { headers: { apikey: CONFIG.supabaseKey } })
           .then(r => r.ok ? r.json() : Promise.reject(r.status));
         // Club logos saved in the organiser portal (Teams & Players) replace the built-in ones
-        get("clubs?select=name,logo,logo_fit").then(list => {
-          list.forEach(c => { if (c.logo) window.YP_TEAMS[c.name] = { logo: c.logo, fit: c.logo_fit }; });
+        get("clubs?select=name,logo,logo_fit,players").then(list => {
+          list.forEach(c => {
+            if (c.logo) window.YP_TEAMS[c.name] = { logo: c.logo, fit: c.logo_fit };
+            squads[c.name] = c.players || [];
+          });
           renderResults();
           if (resOpen) fillResults();
         }).catch(() => {});
