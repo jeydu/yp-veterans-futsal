@@ -642,6 +642,31 @@
     a.sp-logo:hover { border-color: var(--brand); }
     .sp-level.main .sp-logo { width: 260px; height: 150px; }
     .sp-level.main .sp-logo img { max-height: 100px; }
+    /* Sponsor strip under the hero: every logo glides past in a loop, like the boards round a pitch.
+       The list is repeated so the loop is seamless; hovering pauses it. */
+    .sp-strip { padding: 18px 0 20px; background: #fff; border-bottom: 1px solid var(--border); overflow: hidden; }
+    .sp-strip[hidden] { display: none; }
+    .sps-label { display: block; margin-bottom: 12px; text-align: center; font-size: .7rem; font-weight: 700; letter-spacing: .18em; text-transform: uppercase; color: var(--muted); }
+    .sps-view { overflow: hidden; -webkit-mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent); mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent); }
+    .sps-track { display: flex; gap: 14px; width: max-content; animation: sps-run var(--dur, 30s) linear infinite; }
+    .sps-view:hover .sps-track { animation-play-state: paused; }
+    @keyframes sps-run { to { transform: translateX(-50%); } }
+    .sps-it { flex-shrink: 0; display: flex; align-items: center; justify-content: center; width: 160px; height: 76px; padding: 10px 14px; background: #fff; border: 1px solid #f1dadd; color: #221516; text-decoration: none; font: 600 .8rem "Inter", sans-serif; text-align: center; transition: border-color .15s ease; }
+    .sps-it img { max-width: 100%; max-height: 56px; object-fit: contain; }
+    a.sps-it:hover { border-color: var(--brand); }
+    .sps-it.ad { flex-direction: column; gap: 2px; border: 2px dashed #e7b9c1; background: #fdf5f6; color: #c8102e; }
+    .sps-it.ad b { font: 700 .9rem "Oswald", sans-serif; letter-spacing: .04em; text-transform: uppercase; }
+    .sps-it.ad small { font-size: .68rem; color: #7a6567; }
+    @media (prefers-reduced-motion: reduce) {
+      .sps-view { overflow-x: auto; -webkit-mask-image: none; mask-image: none; }
+      .sps-track { animation: none !important; }
+    }
+    @media (max-width: 720px) {
+      .sps-it { width: 130px; height: 64px; }
+      .sps-it img { max-height: 46px; }
+      .sps-it.ad b { font-size: .74rem; }
+      .sps-it.ad small { font-size: .62rem; }
+    }
     .sp-become { display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap; margin-top: 28px; padding: 20px 22px; background: var(--ink); color: #fff; border-inline-start: 6px solid var(--brand); }
     .sp-become b { font: 700 1.3rem "Oswald", sans-serif; text-transform: uppercase; }
     .sp-become p { color: #c9b9bb; font-size: .92rem; }
@@ -1279,6 +1304,12 @@
   </header>
 
   <!-- LATEST CHAMPIONS — put your photos in the "images" folder with these exact names -->
+  <!-- SPONSOR STRIP: every sponsor's logo in a moving loop, from the organiser portal (Sponsors); hidden until there is one -->
+  <section class="sp-strip" id="sp-strip" hidden>
+    <span class="sps-label" data-i18n="spsLabel">Proudly supported by</span>
+    <div class="sps-view" dir="ltr"><div class="sps-track" id="sps-track"></div></div>
+  </section>
+
   <section id="champions">
     <div class="wrap">
       <div class="champ-head">
@@ -1966,6 +1997,8 @@
       spBecome: "ސްޕޮންސަރެއް ކަމުގައި ވެލައްވާ",
       spBecomeText: "ވެޓެރަން ފުޓްސަލަށް އެހީވެދެއްވާ.",
       spContact: "ގުޅުއްވާ",
+      spsLabel: "އެހީތެރިވެދެއްވާ ފަރާތްތައް",
+      spsAd: "ތިޔަ ލޯގޯ މިތާ",
       lvl0: "މައި ސްޕޮންސަރު", lvl1: "ގޯލްޑް ސްޕޮންސަރުން", lvl2: "ސިލްވަރ ސްޕޮންސަރުން", lvl3: "ޕާޓްނަރުން", lvl4: "މީޑިއާ ޕާޓްނަރުން",
       fxTitle: "ފިކްސްޗަރސް",
       resMatch: n => "މެޗު " + n,
@@ -2065,6 +2098,8 @@
       tmCard: r => r.p + " played · " + r.w + " won",
       tmShare: "Share team",
       tblSeason: y => y + " group stage",
+      spsAd: "Your logo here",
+      spBecome: "Become a sponsor",
       tblTeam: "Team", tblForm: "Form",
       tblQ: "Through to the knockouts",
       tblLive: "Moves with live scores during matches",
@@ -3627,7 +3662,28 @@
       }).join("");
     }
 
-    function renderMedia() { renderNews(); renderGallery(); renderSponsors(); }
+    // The strip: all sponsors, main ones first, then a "Your logo here" card that opens WhatsApp.
+    // Repeated until one copy is wider than a big screen, then doubled so the loop has no seam.
+    function renderSponsorStrip() {
+      const strip = document.getElementById("sp-strip");
+      strip.hidden = !sponsors.length;
+      if (!sponsors.length) return;
+      const tile = s => {
+        const inner = s.logo ? `<img loading="lazy" decoding="async" src="${escH(s.logo)}" alt="${escH(s.name || "")}">` : escH(s.name || "");
+        return s.website ? `<a class="sps-it" href="${escH(/^https?:/i.test(s.website) ? s.website : "https://" + s.website)}" target="_blank" rel="noopener">${inner}</a>`
+                         : `<span class="sps-it">${inner}</span>`;
+      };
+      const ad = `<a class="sps-it ad" href="https://wa.me/${escH(CONFIG.whatsapp)}" target="_blank" rel="noopener"><b>${t("spsAd")}</b><small>${t("spBecome")}</small></a>`;
+      const one = [...sponsors].sort((a, b) => LEVELS.indexOf(a.level) - LEVELS.indexOf(b.level)).map(tile).concat(ad);
+      let half = [];
+      while (half.length < 12) half = half.concat(one);
+      const track = document.getElementById("sps-track");
+      track.innerHTML = half.concat(half).join("");
+      // About 2.5 seconds per logo, so the speed stays the same however many there are
+      track.style.setProperty("--dur", half.length * 2.5 + "s");
+    }
+
+    function renderMedia() { renderNews(); renderGallery(); renderSponsors(); renderSponsorStrip(); }
 
     // Logos chosen in the organiser portal (Site Settings)
     function applyLogos(l) {
