@@ -955,9 +955,67 @@
       .team-foot { padding: 12px 14px; }
       .section-h { margin-top: 22px; }
     }
+
+    /* Loading screen: the logo inside a spinning ring and a ball bouncing under it, on the club red.
+       It lifts away once the login or the first page is shown (the same as the website's). */
+    .loader {
+      position: fixed; inset: 0; z-index: 1000; display: grid; place-items: center;
+      background: radial-gradient(circle at 50% 40%, #c8102e 0%, #8a0b1f 60%, #4a0611 100%); color: #fff;
+      transition: opacity .5s ease, visibility .5s ease;
+    }
+    .loader::after {
+      content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 10px;
+      background: repeating-linear-gradient(-45deg, #c8102e 0 6px, #fff 6px 12px); opacity: .9;
+    }
+    .ld-in { display: flex; flex-direction: column; align-items: center; gap: 18px; transition: transform .5s cubic-bezier(.5,0,.2,1); }
+    .ld-crest { position: relative; width: 120px; height: 120px; display: grid; place-items: center; }
+    .ld-crest img { width: 96px; height: 96px; border-radius: 50%; object-fit: cover; box-shadow: 0 10px 30px rgba(0,0,0,.35); animation: ld-pop .6s cubic-bezier(.3,1.5,.5,1) backwards; }
+    .ld-ring { position: absolute; inset: 0; border-radius: 50%; border: 3px solid rgba(255,255,255,.18); border-top-color: #fff; border-right-color: #ffd34d; animation: ld-spin 1s linear infinite; }
+    .ld-pitch { position: relative; width: 120px; height: 56px; }
+    .ld-ball { position: absolute; left: 50%; top: 0; width: 28px; height: 28px; margin-left: -14px; color: #fff; stroke-width: 1.8; animation: ld-bounce .7s cubic-bezier(.5,0,.5,1) infinite alternate; }
+    .ld-ball svg { width: 100%; height: 100%; animation: ld-roll 1.4s linear infinite; }
+    .ld-shadow { position: absolute; left: 50%; bottom: 0; width: 30px; height: 6px; margin-left: -15px; border-radius: 50%; background: rgba(0,0,0,.35); animation: ld-shade .7s cubic-bezier(.5,0,.5,1) infinite alternate; }
+    .ld-name { font: 700 1.5rem/1 "Oswald", sans-serif; letter-spacing: .14em; text-transform: uppercase; }
+    .ld-name small { display: block; margin-top: 6px; font: 600 .72rem "Inter", sans-serif; letter-spacing: .3em; color: #ffe1e6; text-align: center; }
+    @keyframes ld-spin { to { transform: rotate(360deg); } }
+    @keyframes ld-pop { from { opacity: 0; transform: scale(.6); } }
+    @keyframes ld-bounce { from { transform: translateY(0) scaleY(1.05); } to { transform: translateY(26px) scaleY(.9); } }
+    @keyframes ld-roll { to { transform: rotate(360deg); } }
+    @keyframes ld-shade { from { transform: scaleX(.55); opacity: .35; } to { transform: scaleX(1.1); opacity: .8; } }
+    .loader.done { opacity: 0; visibility: hidden; }
+    .loader.done .ld-in { transform: scale(1.15); }
+    html.ld-on { overflow: hidden; }
   </style>
 </head>
 <body>
+  <!-- Loading screen, lifted once the portal shows the login or the first page (at most 6 s) -->
+  <div class="loader" id="loader" aria-hidden="true">
+    <div class="ld-in">
+      <div class="ld-crest"><span class="ld-ring"></span><img src="images/veterans-logo.jpg" alt=""></div>
+      <div class="ld-pitch">
+        <span class="ld-shadow"></span>
+        <span class="ld-ball"><svg class="ic" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 7l4.75 3.45-1.8 5.6h-5.9l-1.8-5.6L12 7zM12 7V2M16.75 10.45l4.75-1.5M14.95 16.05l2.95 4M9.05 16.05l-2.95 4M7.25 10.45L2.5 8.95"/></svg></span>
+      </div>
+      <div class="ld-name">YP Veterans<small>Organiser Portal</small></div>
+    </div>
+  </div>
+  <script>
+    // Shown for at least 0.8 s so the animation reads; the portal calls ypReady() when it has something to show
+    (function () {
+      const el = document.getElementById("loader"), t0 = Date.now();
+      document.documentElement.classList.add("ld-on");
+      let gone = false;
+      const hide = () => {
+        if (gone) return;
+        gone = true;
+        el.classList.add("done");
+        document.documentElement.classList.remove("ld-on");
+        setTimeout(() => el.remove(), 600);
+      };
+      window.ypReady = () => setTimeout(hide, Math.max(0, 800 - (Date.now() - t0)));
+      setTimeout(hide, 6000);
+    })();
+  </script>
   <svg width="0" height="0" style="position:absolute" aria-hidden="true">
     <symbol id="i-users" viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></symbol>
     <symbol id="i-team" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></symbol>
@@ -3463,7 +3521,7 @@
     new MutationObserver(showInstall).observe(app, { childList: true });
     showInstall();
 
-    start();
+    start().finally(() => window.ypReady());
   </script>
 </body>
 </html>
