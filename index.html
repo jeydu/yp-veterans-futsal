@@ -3052,9 +3052,10 @@
     function renderResults() {
       renderFixtures();
       const list = document.getElementById("res-list");
-      list.innerHTML = RESULTS.map(r =>
+      const played = RESULTS.filter(r => r.matches.length);
+      list.innerHTML = played.map(r =>
         `<button type="button" class="res-year" aria-label="${t("resPopTitle", r.year)}"><span class="res-big">${r.year}</span></button>`).join("");
-      list.querySelectorAll(".res-year").forEach((b, i) => b.addEventListener("click", () => openResults(RESULTS[i].year, b)));
+      list.querySelectorAll(".res-year").forEach((b, i) => b.addEventListener("click", () => openResults(played[i].year, b)));
       if (resOpen) fillResults();
       renderTeams();
       renderTable();
@@ -3329,16 +3330,19 @@
     // Teams already in a knockout match of that season are marked as through.
     let tblYear = null;   // the season picked with the buttons above the table (null: the current one)
     let tblYears = true;  // season buttons on or off (organiser portal → Fixtures & Results → League table)
-    let tblShown = true;  // the whole League table section on or off (same place)
-    // A season has a table when it has group-stage matches or teams added in the portal, and isn't hidden there
-    const hasTable = r => !r.partial && !(r.league || {}).hidden && (r.matches.some(m => !m.stage) || ((r.league || {}).add || []).length);
+    // A season has a table when it has group-stage matches or teams added in the portal
+    const hasTable = r => !r.partial && (r.matches.some(m => !m.stage) || ((r.league || {}).add || []).length);
+    const tableOff = r => !!(r.league || {}).hidden;
+    // The table shown is the current season's (or the latest one's). Switched off in the portal, the table disappears;
+    // it never swaps to another year. Other switched-on years can be picked with the season buttons.
     function renderTable() {
       const sec = document.getElementById("table");
-      const years = tblShown ? RESULTS.filter(hasTable) : [];
-      sec.hidden = !years.length;
-      if (!years.length) return;
       const cur = currentSeason();
-      const season = (tblYears && years.find(r => r.year === tblYear)) || (cur && years.includes(cur) ? cur : years[0]);
+      const main = cur && hasTable(cur) ? cur : RESULTS.find(hasTable);
+      sec.hidden = !main || tableOff(main);
+      if (sec.hidden) return;
+      const years = RESULTS.filter(r => hasTable(r) && !tableOff(r));
+      const season = (tblYears && years.find(r => r.year === tblYear)) || main;
       const cfg = season.league || {};
       const list = YP_LEAGUE.table(season.matches.map(m => ({ ...m, score: m.score || m.liveScore, live: !!m.liveScore })), cfg);
       const through = new Set(season.matches.filter(m => m.stage).flatMap(m => [m.home, m.away]));
@@ -3555,7 +3559,7 @@
             pens: m.live || m.pen_home === null || m.pen_away === null ? null : [m.pen_home, m.pen_away],
             stage: m.stage || undefined, video: m.video || undefined, goals: m.goals || []
           }))
-        })).filter(se => se.matches.length);
+        })).filter(se => se.matches.length || (se.league.add || []).length);
         if (!years.length) return;
         RESULTS = years;
         fromDatabase = true;
@@ -3725,10 +3729,9 @@
       try { localStorage.setItem("yp-logos", JSON.stringify(l)); } catch (e) {}
     }).catch(() => {});
     // The season buttons switch, asked on its own so the logos above still load before it's set up
-    if (USE_SERVER) api("settings?select=table_years,table_shown&id=eq.1").then(([st]) => {
+    if (USE_SERVER) api("settings?select=table_years&id=eq.1").then(([st]) => {
       if (!st) return;
       tblYears = st.table_years !== false;
-      tblShown = st.table_shown !== false;
       renderTable();
     }).catch(() => {});
     async function loadMedia() {

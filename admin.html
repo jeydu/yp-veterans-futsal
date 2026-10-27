@@ -902,6 +902,7 @@
     .lg-yrs { display: flex; flex-direction: column; gap: 8px; padding: 12px 18px; border-bottom: 1px solid var(--border); background: var(--surface-2); }
     .lg-yrs > b { font-size: .78rem; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); }
     .lg-yrs .lg-yr { justify-content: space-between; }
+    .lg-yh { margin-top: -4px; font-size: .78rem; color: var(--muted); }
     .lg-yr span { font: 700 1.05rem "Oswald", sans-serif; color: var(--text); }
     .lg-yr small { font: 400 .72rem "Inter", sans-serif; color: var(--muted); }
     .lg-r { display: grid; grid-template-columns: 26px minmax(0, 1fr) repeat(4, 28px) 40px 36px 18px; align-items: center; gap: 4px; width: 100%; min-height: 52px; padding: 6px 14px; border: 0; border-top: 1px solid var(--border); background: var(--surface); color: var(--text); text-align: center; font: inherit; font-variant-numeric: tabular-nums; }
@@ -2135,10 +2136,9 @@
         loadClubs(),
         db.from("matches").select("*").order("day").order("no", { nullsFirst: false }).order("kickoff", { nullsFirst: false }),
         // Season buttons switch; fails until setup.sql section 14 has run, and the switch then stays hidden
-        db.from("settings").select("table_years, table_shown").eq("id", 1).single()
+        db.from("settings").select("table_years").eq("id", 1).single()
       ]);
       fx.tableYears = st.error || !st.data ? undefined : st.data.table_years;
-      fx.tableShown = st.error || !st.data ? undefined : st.data.table_shown;
       fx.error = s.error || m.error || null;
       if (!fx.error) {
         fx.seasons = s.data;
@@ -2272,12 +2272,12 @@
           <div class="lg-h">
             <div><h2>League table</h2><span>Worked out from the group-stage results. Tap a team to change its numbers or take it out.</span></div>
             <div class="lg-sw">
-              ${fx.tableShown === undefined ? "" : `<label class="switch-wrap"><span>League table on website <small>(the whole table, every season)</small></span><button type="button" class="switch" data-gset="table_shown" role="switch" aria-checked="${fx.tableShown}" aria-label="Show the league table on the website"></button></label>`}
               ${fx.tableYears === undefined ? "" : `<label class="switch-wrap"><span>Season buttons <small>(2026, 2025 … on the website, all seasons)</small></span><button type="button" class="switch" data-gset="table_years" role="switch" aria-checked="${fx.tableYears}" aria-label="Show season buttons above the website table"></button></label>`}
             </div>
           </div>
           <div class="lg-yrs">
             <b>Each season on the website</b>
+            <small class="lg-yh">Off: that season's league table disappears from the website.</small>
             ${fx.seasons.map(se => { const has = fx.matches.some(m => m.year === se.year && !m.stage) || ((se.league || {}).add || []).length; return `
               <label class="switch-wrap lg-yr"><span>${se.year}${has ? "" : " <small>(no table yet)</small>"}</span>
                 <button type="button" class="switch" data-yr="${se.year}" role="switch" aria-checked="${!(se.league || {}).hidden}" aria-label="Show the ${se.year} table on the website"></button></label>`; }).join("")}
@@ -2325,7 +2325,7 @@
         await saveLeague(se, c, on ? `✓ ${se.year} table is on the website` : `${se.year} table is off the website`);
       });
       // Site-wide switches: the whole table, and the season buttons
-      const GSET = { table_shown: ["tableShown", "League table"], table_years: ["tableYears", "Season buttons"] };
+      const GSET = { table_years: ["tableYears", "Season buttons"] };
       app.querySelectorAll("[data-gset]").forEach(sw => sw.onclick = async () => {
         const col = sw.dataset.gset, [key, label] = GSET[col], on = sw.getAttribute("aria-checked") !== "true";
         sw.disabled = true;
