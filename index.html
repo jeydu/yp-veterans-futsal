@@ -627,7 +627,9 @@
     .gal-count { font-size: .8rem; font-weight: 600; color: #ffe1e6; }
     .gal-view { position: relative; display: flex; align-items: center; justify-content: center; min-height: 50vh; background: #0b0606; }
     .gal-stage { width: 100%; display: flex; justify-content: center; }
-    .gal-stage img, .gal-stage video { max-width: 100%; max-height: 74vh; display: block; }
+    /* Every photo and video opens in the same frame, whatever its shape (it fits inside without cropping) */
+    .gal-stage { aspect-ratio: 4 / 3; max-height: 74vh; align-items: center; }
+    .gal-stage img, .gal-stage video { width: 100%; height: 100%; object-fit: contain; display: block; }
     .gal-stage iframe { width: 100%; aspect-ratio: 16 / 9; border: 0; display: block; }
     .gal-ext { margin: 60px auto; padding: 12px 22px; background: var(--brand); color: #fff; text-decoration: none; font-weight: 600; }
     .gal-nav { position: absolute; z-index: 2; top: 50%; transform: translateY(-50%); width: 44px; height: 44px; display: grid; place-items: center; border: 0; cursor: pointer; background: rgba(0,0,0,.55); color: #fff; }
