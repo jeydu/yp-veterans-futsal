@@ -899,6 +899,11 @@
     .lg-sw .switch-wrap { justify-content: flex-end; text-align: end; }
     .lg-sw .switch-wrap span { display: flex; flex-direction: column; }
     .lg-sw small { font-weight: 400; font-size: .72rem; }
+    .lg-yrs { display: flex; flex-direction: column; gap: 8px; padding: 12px 18px; border-bottom: 1px solid var(--border); background: var(--surface-2); }
+    .lg-yrs > b { font-size: .78rem; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); }
+    .lg-yrs .lg-yr { justify-content: space-between; }
+    .lg-yr span { font: 700 1.05rem "Oswald", sans-serif; color: var(--text); }
+    .lg-yr small { font: 400 .72rem "Inter", sans-serif; color: var(--muted); }
     .lg-r { display: grid; grid-template-columns: 26px minmax(0, 1fr) repeat(4, 28px) 40px 36px 18px; align-items: center; gap: 4px; width: 100%; min-height: 52px; padding: 6px 14px; border: 0; border-top: 1px solid var(--border); background: var(--surface); color: var(--text); text-align: center; font: inherit; font-variant-numeric: tabular-nums; }
     button.lg-r:hover { background: var(--surface-2); }
     .lg-r > .ic { transform: rotate(-90deg); color: var(--muted); }
@@ -2268,9 +2273,14 @@
             <div><h2>League table</h2><span>Worked out from the group-stage results. Tap a team to change its numbers or take it out.</span></div>
             <div class="lg-sw">
               ${fx.tableShown === undefined ? "" : `<label class="switch-wrap"><span>League table on website <small>(the whole table, every season)</small></span><button type="button" class="switch" data-gset="table_shown" role="switch" aria-checked="${fx.tableShown}" aria-label="Show the league table on the website"></button></label>`}
-              <label class="switch-wrap"><span>${season.year} table <small>(this season only)</small></span><button type="button" class="switch" id="lg-show" role="switch" aria-checked="${!cfg.hidden}" aria-label="Show the ${season.year} table on the website"></button></label>
               ${fx.tableYears === undefined ? "" : `<label class="switch-wrap"><span>Season buttons <small>(2026, 2025 … on the website, all seasons)</small></span><button type="button" class="switch" data-gset="table_years" role="switch" aria-checked="${fx.tableYears}" aria-label="Show season buttons above the website table"></button></label>`}
             </div>
+          </div>
+          <div class="lg-yrs">
+            <b>Each season on the website</b>
+            ${fx.seasons.map(se => { const has = fx.matches.some(m => m.year === se.year && !m.stage) || ((se.league || {}).add || []).length; return `
+              <label class="switch-wrap lg-yr"><span>${se.year}${has ? "" : " <small>(no table yet)</small>"}</span>
+                <button type="button" class="switch" data-yr="${se.year}" role="switch" aria-checked="${!(se.league || {}).hidden}" aria-label="Show the ${se.year} table on the website"></button></label>`; }).join("")}
           </div>
           ${rows.length ? `<div class="lg-rows">
             <div class="lg-r lg-hd"><span>#</span><span>Team</span><span>P</span><span>W</span><span>D</span><span>L</span><span>GD</span><span>Pts</span><span></span></div>
@@ -2306,13 +2316,14 @@
     function wireLeague(season, all) {
       if (!("league" in season)) return;
       const cfg = () => JSON.parse(JSON.stringify(season.league || {}));
-      const show = document.getElementById("lg-show");
-      show.onclick = async () => {
-        const c = cfg(), on = show.getAttribute("aria-checked") !== "true";
+      // One switch per season: off takes that season's table off the website
+      app.querySelectorAll("[data-yr]").forEach(sw => sw.onclick = async () => {
+        const se = fx.seasons.find(x => x.year === +sw.dataset.yr);
+        const c = JSON.parse(JSON.stringify(se.league || {})), on = sw.getAttribute("aria-checked") !== "true";
         c.hidden = !on;
-        show.disabled = true;
-        await saveLeague(season, c, on ? `✓ ${season.year} table is on the website` : `${season.year} table is hidden on the website`);
-      };
+        sw.disabled = true;
+        await saveLeague(se, c, on ? `✓ ${se.year} table is on the website` : `${se.year} table is off the website`);
+      });
       // Site-wide switches: the whole table, and the season buttons
       const GSET = { table_shown: ["tableShown", "League table"], table_years: ["tableYears", "Season buttons"] };
       app.querySelectorAll("[data-gset]").forEach(sw => sw.onclick = async () => {
