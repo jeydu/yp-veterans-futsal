@@ -77,7 +77,8 @@
     :root[lang="dv"] .ls-opt[data-l="dv"] { background: var(--brand); color: #fff; }
 
     /* Dhivehi: Thaana font, no capitals or letter spacing, room for vowel marks */
-    :root[lang="dv"] body *:not(.ls-opt) { font-family: "Faruma", "Noto Sans Thaana", "Inter", sans-serif; letter-spacing: 0 !important; text-transform: none !important; }
+    /* Inter first: it has no Thaana letters, so Dhivehi text falls through to Faruma while team names and numbers stay in Inter */
+    :root[lang="dv"] body *:not(.ls-opt) { font-family: "Inter", "Faruma", "Noto Sans Thaana", sans-serif; letter-spacing: 0 !important; text-transform: none !important; }
     :root[lang="dv"] body { line-height: 1.9; }
     :root[lang="dv"] .hero h1 { line-height: 1.5; }
     :root[lang="dv"] .h1-top { padding-left: 0; }
@@ -234,6 +235,7 @@
     .stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; background: rgba(255,255,255,.12); border-top: 6px solid var(--brand); }
     .stat { padding: 26px 22px 24px; color: #fff; background: var(--ink); }
     .stat-num { display: block; font-family: "Oswald", sans-serif; font-weight: 700; font-size: 3.2rem; line-height: 1; }
+    :root[dir="rtl"] .stat-num { text-align: right; }
     .stat-label { display: block; margin-top: 10px; font-size: .74rem; font-weight: 600; letter-spacing: .1em; text-transform: uppercase; color: #c3b2b4; }
 
     /* Past winners: square photo cards. The current champion gets a big card; the others sit beside it 2 x 2 */
@@ -511,6 +513,8 @@
     .lg .live-tag { margin-inline-start: 2px; padding: 2px 6px; font-size: .62rem; }
     .lg-form { display: inline-flex; gap: 3px; }
     .lg-form i { display: grid; place-items: center; width: 20px; height: 20px; color: #fff; font: 700 .62rem "Inter", sans-serif; font-style: normal; }
+    .lg-nm { display: flex; flex-direction: column; align-items: flex-start; gap: 4px; min-width: 0; }
+    .lg-fm { display: none; }
     .lg-form .w { background: #17803d; } .lg-form .d { background: #8a7a7c; } .lg-form .l { background: #c8102e; }
     .lg-foot { display: flex; flex-wrap: wrap; gap: 6px 18px; padding: 12px 16px; border-top: 1px solid var(--border); font-size: .78rem; color: var(--muted); }
     .lg-foot span { display: inline-flex; align-items: center; gap: 6px; }
@@ -520,6 +524,14 @@
       .lg th, .lg td { padding: 9px 5px; }
       .lg .fxl { width: 28px; height: 28px; }
       .lg .tl b { font-size: .86rem; white-space: normal; }
+      /* Form goes under the team name on phones: the column doesn't fit */
+      .lg-fm { display: block; }
+      .lg-fm .lg-form i { width: 15px; height: 15px; font-size: .52rem; }
+      .lg-fm .lg-form { gap: 2px; }
+    }
+    @media (max-width: 360px) {
+      .lg th, .lg td { padding-left: 3px; padding-right: 3px; }
+      .lg .tl { gap: 7px; }
     }
 
     /* A team name or logo that opens that team's page */
@@ -3335,16 +3347,16 @@
         <table class="lg">
           <thead><tr><th>#</th><th class="lg-tm">${t("tblTeam")}</th><th>P</th><th>W</th><th>D</th><th>L</th>
             <th class="lg-x">GF</th><th class="lg-x">GA</th><th>GD</th><th>Pts</th><th class="lg-x">${t("tblForm")}</th></tr></thead>
-          <tbody>${list.map((r, i) => `
+          <tbody>${list.map((r, i) => { const form = `<span class="lg-form">${r.form.slice(-5).map(o => `<i class="${o}">${t("tm" + o.toUpperCase()).slice(0, 1)}</i>`).join("")}</span>`; return `
             <tr class="${through.has(r.n) ? "q" : ""}">
               <td class="lg-pos">${i + 1}</td>
-              <td class="lg-tm"><button type="button" class="tl" data-team="${escH(r.n)}">${teamLogo(r.n)}<b>${escH(r.n)}</b>${r.live ? liveTag() : ""}</button></td>
+              <td class="lg-tm"><button type="button" class="tl" data-team="${escH(r.n)}">${teamLogo(r.n)}<span class="lg-nm"><b>${escH(r.n)}</b>${r.form.length ? `<span class="lg-fm">${form}</span>` : ""}</span>${r.live ? liveTag() : ""}</button></td>
               <td>${r.p}</td><td>${r.w}</td><td>${r.d}</td><td>${r.l}</td>
               <td class="lg-x">${r.gf}</td><td class="lg-x">${r.ga}</td>
               <td dir="ltr">${r.gf - r.ga > 0 ? "+" : ""}${r.gf - r.ga}</td>
               <td class="lg-pts">${pts(r)}</td>
-              <td class="lg-x"><span class="lg-form">${r.form.slice(-5).map(o => `<i class="${o}">${t("tm" + o.toUpperCase()).slice(0, 1)}</i>`).join("")}</span></td>
-            </tr>`).join("")}
+              <td class="lg-x">${form}</td>
+            </tr>`; }).join("")}
           </tbody>
         </table>
         <div class="lg-foot">
@@ -3408,7 +3420,8 @@
         });
         if (!r.partial && goals && (!most || goals > most.goals)) most = { goals, year: r.year };
       });
-      const stat = (num, label) => `<div class="stat"><span class="stat-num">${num}</span><span class="stat-label">${label}</span></div>`;
+      // Numbers read left to right in Dhivehi too, so "13–1" and "2×" don't flip
+      const stat = (num, label) => `<div class="stat"><span class="stat-num" dir="ltr">${num}</span><span class="stat-label">${label}</span></div>`;
       const bw = big && (big.m.score[0] > big.m.score[1] ? [big.m.home, big.m.away, big.m.score[0], big.m.score[1]] : [big.m.away, big.m.home, big.m.score[1], big.m.score[0]]);
       const html = [
         stat(years.length, t("statEditions")),
