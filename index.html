@@ -1994,7 +1994,6 @@
       tblTeam: "ޓީމު", tblForm: "ފޯމު",
       tblQ: "ނޮކްއައުޓް ބައިތަކަށް ދިޔަ",
       tblLive: "މެޗު ކުޅެމުންދާއިރު ޓޭބަލް ބަދަލުވާނެ",
-      tblPts: "3 ޕޮއިންޓް މޮޅުވުމަށް، 1 ޕޮއިންޓް އެއްވަރުވުމަށް",
       barNext: "ދެން އޮތް މެޗު",
       barIn: s => s + " ފަހުން",
       statDifferentN: "ތަފާތު ޗެމްޕިއަނުން",
@@ -2069,7 +2068,6 @@
       tblTeam: "Team", tblForm: "Form",
       tblQ: "Through to the knockouts",
       tblLive: "Moves with live scores during matches",
-      tblPts: "3 points for a win, 1 for a draw",
       barNext: "Next match",
       barIn: s => "in " + s,
       statEditions: "Editions",
@@ -3307,7 +3305,6 @@
         </table>
         <div class="lg-foot">
           ${through.size ? `<span><i class="lg-qk"></i>${t("tblQ")}</span>` : ""}
-          <span>${t("tblPts")}</span>
           ${anyLive || currentSeason() ? `<span>● ${t("tblLive")}</span>` : ""}
         </div>`;
     }
