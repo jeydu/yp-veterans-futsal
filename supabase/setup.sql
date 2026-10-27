@@ -643,3 +643,9 @@ alter table public.matches add column if not exists live_since timestamptz;
 -- { "RK SC": { "pts": -3, "note": "Fielded an ineligible player" } } (p, w, d, l, gf, ga, pts are added on).
 alter table public.seasons add column if not exists league jsonb not null default '{}'::jsonb
   check (jsonb_typeof(league) = 'object');
+-- Season buttons (2026, 2025 …) above the website's table: one switch for the whole site
+alter table public.settings add column if not exists table_years boolean not null default true;
+-- Organisers who run Fixtures & Results can flip it (the League table card is on that page)
+drop policy if exists "fixture editors update settings" on public.settings;
+create policy "fixture editors update settings" on public.settings for update to authenticated
+  using (public.has_perm('fixtures')) with check (public.has_perm('fixtures'));

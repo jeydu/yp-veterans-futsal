@@ -3328,6 +3328,7 @@
     // then goal difference and goals scored. Live scores count as they stand, so the table moves during a match.
     // Teams already in a knockout match of that season are marked as through.
     let tblYear = null;   // the season picked with the buttons above the table (null: the current one)
+    let tblYears = true;  // season buttons on or off (organiser portal → Fixtures & Results → League table)
     // A season has a table when it has group-stage matches or teams added in the portal, and isn't hidden there
     const hasTable = r => !r.partial && !(r.league || {}).hidden && (r.matches.some(m => !m.stage) || ((r.league || {}).add || []).length);
     function renderTable() {
@@ -3336,7 +3337,7 @@
       sec.hidden = !years.length;
       if (!years.length) return;
       const cur = currentSeason();
-      const season = years.find(r => r.year === tblYear) || (cur && years.includes(cur) ? cur : years[0]);
+      const season = (tblYears && years.find(r => r.year === tblYear)) || (cur && years.includes(cur) ? cur : years[0]);
       const cfg = season.league || {};
       const list = YP_LEAGUE.table(season.matches.map(m => ({ ...m, score: m.score || m.liveScore, live: !!m.liveScore })), cfg);
       const through = new Set(season.matches.filter(m => m.stage).flatMap(m => [m.home, m.away]));
@@ -3345,7 +3346,7 @@
       const sign = n => (n > 0 ? "+" : "") + n;
       document.getElementById("lg-season").textContent = t("tblSeason", season.year);
       document.getElementById("lg-card").innerHTML = `
-        ${years.length > 1 ? `<div class="lg-yrs" role="tablist">${years.map(r => `<button type="button" role="tab" class="lg-yr ${r === season ? "on" : ""}" aria-selected="${r === season}" data-lgy="${r.year}">${r.year}</button>`).join("")}</div>` : ""}
+        ${tblYears && years.length > 1 ? `<div class="lg-yrs" role="tablist">${years.map(r => `<button type="button" role="tab" class="lg-yr ${r === season ? "on" : ""}" aria-selected="${r === season}" data-lgy="${r.year}">${r.year}</button>`).join("")}</div>` : ""}
         <table class="lg">
           <thead><tr><th>#</th><th class="lg-tm">${t("tblTeam")}</th><th>P</th><th>W</th><th>D</th><th>L</th>
             <th class="lg-x">GF</th><th class="lg-x">GA</th><th>GD</th><th>Pts</th><th class="lg-x">${t("tblForm")}</th></tr></thead>
@@ -3721,6 +3722,10 @@
       if (!l) return;
       applyLogos({ site_logo: l.site_logo || "images/veterans-logo.jpg", club_logo: l.club_logo || "images/yp-logo.jpg" });
       try { localStorage.setItem("yp-logos", JSON.stringify(l)); } catch (e) {}
+    }).catch(() => {});
+    // The season buttons switch, asked on its own so the logos above still load before it's set up
+    if (USE_SERVER) api("settings?select=table_years&id=eq.1").then(([st]) => {
+      if (st && st.table_years === false) { tblYears = false; renderTable(); }
     }).catch(() => {});
     async function loadMedia() {
       if (!USE_SERVER) return;

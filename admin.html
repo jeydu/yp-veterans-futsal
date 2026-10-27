@@ -895,7 +895,10 @@
     .lg-h { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; padding: 16px 18px; border-bottom: 1px solid var(--border); }
     .lg-h h2 { font-size: 1.15rem; }
     .lg-h span { font-size: .82rem; color: var(--muted); }
-    .lg-h .switch-wrap { flex-shrink: 0; }
+    .lg-sw { display: flex; flex-direction: column; align-items: flex-end; gap: 10px; flex-shrink: 0; }
+    .lg-sw .switch-wrap { justify-content: flex-end; text-align: end; }
+    .lg-sw .switch-wrap span { display: flex; flex-direction: column; }
+    .lg-sw small { font-weight: 400; font-size: .72rem; }
     .lg-r { display: grid; grid-template-columns: 26px minmax(0, 1fr) repeat(4, 28px) 40px 36px 18px; align-items: center; gap: 4px; width: 100%; min-height: 52px; padding: 6px 14px; border: 0; border-top: 1px solid var(--border); background: var(--surface); color: var(--text); text-align: center; font: inherit; font-variant-numeric: tabular-nums; }
     button.lg-r:hover { background: var(--surface-2); }
     .lg-r > .ic { transform: rotate(-90deg); color: var(--muted); }
@@ -931,6 +934,8 @@
       .lg-r { grid-template-columns: 22px minmax(0, 1fr) 26px 36px 32px 16px; padding: 6px 12px; }
       .lg-r > :nth-child(4), .lg-r > :nth-child(5), .lg-r > :nth-child(6) { display: none; }
       .lg-h { flex-direction: column; }
+      .lg-sw { align-items: stretch; width: 100%; }
+      .lg-sw .switch-wrap { justify-content: space-between; text-align: start; }
     }
     /* Home: a match being scored live */
     .d-livem { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 16px; width: 100%; margin-bottom: 18px; padding: 16px 18px; text-align: start; border: 2px solid var(--brand); background: var(--tint); color: var(--text); font: inherit; }
@@ -2120,11 +2125,14 @@
 
     async function loadFixtures() {
       app.innerHTML = fixturesHead + `<p class="notice">Loading matches…</p>`;
-      const [s, , m] = await Promise.all([
+      const [s, , m, st] = await Promise.all([
         db.from("seasons").select("*").order("year", { ascending: false }),
         loadClubs(),
-        db.from("matches").select("*").order("day").order("no", { nullsFirst: false }).order("kickoff", { nullsFirst: false })
+        db.from("matches").select("*").order("day").order("no", { nullsFirst: false }).order("kickoff", { nullsFirst: false }),
+        // Season buttons switch; fails until setup.sql section 14 has run, and the switch then stays hidden
+        db.from("settings").select("table_years").eq("id", 1).single()
       ]);
+      fx.tableYears = st.error || !st.data ? undefined : st.data.table_years;
       fx.error = s.error || m.error || null;
       if (!fx.error) {
         fx.seasons = s.data;
@@ -2257,7 +2265,10 @@
       return `<div class="card lg-adm">
           <div class="lg-h">
             <div><h2>League table</h2><span>Worked out from the group-stage results. Tap a team to change its numbers or take it out.</span></div>
-            <label class="switch-wrap">On website<button type="button" class="switch" id="lg-show" role="switch" aria-checked="${!cfg.hidden}" aria-label="Show the table on the website"></button></label>
+            <div class="lg-sw">
+              <label class="switch-wrap"><span>${season.year} table on website</span><button type="button" class="switch" id="lg-show" role="switch" aria-checked="${!cfg.hidden}" aria-label="Show the ${season.year} table on the website"></button></label>
+              ${fx.tableYears === undefined ? "" : `<label class="switch-wrap"><span>Season buttons <small>(2026, 2025 … on the website, all seasons)</small></span><button type="button" class="switch" id="lg-years" role="switch" aria-checked="${fx.tableYears}" aria-label="Show season buttons above the website table"></button></label>`}
+            </div>
           </div>
           ${rows.length ? `<div class="lg-rows">
             <div class="lg-r lg-hd"><span>#</span><span>Team</span><span>P</span><span>W</span><span>D</span><span>L</span><span>GD</span><span>Pts</span><span></span></div>
@@ -2299,6 +2310,17 @@
         c.hidden = !on;
         show.disabled = true;
         await saveLeague(season, c, on ? `✓ ${season.year} table is on the website` : `${season.year} table is hidden on the website`);
+      };
+      const years = document.getElementById("lg-years");
+      if (years) years.onclick = async () => {
+        const on = years.getAttribute("aria-checked") !== "true";
+        years.disabled = true;
+        const { error } = await db.from("settings").update({ table_years: on }).eq("id", 1);
+        years.disabled = false;
+        if (error) return alert("Couldn't save: " + error.message);
+        fx.tableYears = on;
+        years.setAttribute("aria-checked", on);
+        toast(on ? "✓ Season buttons are on the website" : "Season buttons are hidden on the website");
       };
       app.querySelectorAll("[data-lgback]").forEach(b => b.onclick = () => {
         const c = cfg(); c.remove = (c.remove || []).filter(n => n !== b.dataset.lgback);
