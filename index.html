@@ -544,7 +544,9 @@
     .tm-card .fxl-i { font-size: 1.1rem; }
     .tm-card b { font: 700 1rem/1.2 "Oswald", sans-serif; text-transform: uppercase; letter-spacing: .02em; }
     .tm-card small { display: inline-flex; align-items: center; gap: 6px; font-size: .74rem; color: var(--muted); }
-    .tm-cups { display: inline-flex; align-items: center; gap: 3px; color: #c8102e; font-weight: 700; }
+    /* Titles: a small trophy badge in the card's corner */
+    .tm-card { position: relative; }
+    .tm-cups { position: absolute; top: 10px; inset-inline-end: 10px; display: inline-flex; align-items: center; gap: 3px; padding: 2px 7px; background: #fdf5f6; border: 1px solid #f1dadd; color: #c8102e; font-size: .74rem; font-weight: 700; }
 
     /* Team page (a popup like the results): the record up top, then matches coming up, the squad and every result */
     .res-top .fxl { width: 64px; height: 64px; border: 2px solid #fff; }
@@ -1096,6 +1098,8 @@
       header.hero::before { background: linear-gradient(180deg, rgba(150, 8, 30, .9) 0%, rgba(200, 16, 46, .78) 55%, rgba(200, 16, 46, .6) 100%); }
       .gallery { grid-template-columns: 1fr 1fr; }
       .posters { grid-template-columns: 1fr; }
+      /* League table: team names are easy to tap */
+      .lg .tl { min-height: 40px; }
       .champ-head { column-gap: 16px; }
       .champ-logo { width: 72px; height: 72px; border-width: 3px; }
       .stats { grid-template-columns: 1fr 1fr; }
@@ -1177,6 +1181,14 @@
       .hero .tag, .h1-top, .h1-main, .h1-bottom, .hero-sub, .hero-btns { opacity: 1; animation: none; }
       .hero-photo, header.hero::before, header.hero::after, #contact::before, nav::after { animation: none; }
       nav::after { display: none; }
+    }
+
+    /* Small phones (iPhone SE and similar): a smaller logo keeps the language switch on the logo row */
+    @media (max-width: 360px) {
+      nav .logo img { width: 40px; height: 40px; }
+      .logo-name { font-size: .88rem; }
+      .logo-name small { font-size: .5rem; letter-spacing: .1em; }
+      nav .logo { gap: 8px; }
     }
 
     /* Loading screen: the logo inside a spinning ring and a ball bouncing under it, on the club red.
