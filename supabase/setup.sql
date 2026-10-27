@@ -649,3 +649,5 @@ alter table public.settings add column if not exists table_years boolean not nul
 drop policy if exists "fixture editors update settings" on public.settings;
 create policy "fixture editors update settings" on public.settings for update to authenticated
   using (public.has_perm('fixtures')) with check (public.has_perm('fixtures'));
+-- The whole League table section on the website: on or off for every season
+alter table public.settings add column if not exists table_shown boolean not null default true;

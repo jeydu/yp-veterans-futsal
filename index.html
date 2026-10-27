@@ -3329,11 +3329,12 @@
     // Teams already in a knockout match of that season are marked as through.
     let tblYear = null;   // the season picked with the buttons above the table (null: the current one)
     let tblYears = true;  // season buttons on or off (organiser portal → Fixtures & Results → League table)
+    let tblShown = true;  // the whole League table section on or off (same place)
     // A season has a table when it has group-stage matches or teams added in the portal, and isn't hidden there
     const hasTable = r => !r.partial && !(r.league || {}).hidden && (r.matches.some(m => !m.stage) || ((r.league || {}).add || []).length);
     function renderTable() {
       const sec = document.getElementById("table");
-      const years = RESULTS.filter(hasTable);
+      const years = tblShown ? RESULTS.filter(hasTable) : [];
       sec.hidden = !years.length;
       if (!years.length) return;
       const cur = currentSeason();
@@ -3724,8 +3725,11 @@
       try { localStorage.setItem("yp-logos", JSON.stringify(l)); } catch (e) {}
     }).catch(() => {});
     // The season buttons switch, asked on its own so the logos above still load before it's set up
-    if (USE_SERVER) api("settings?select=table_years&id=eq.1").then(([st]) => {
-      if (st && st.table_years === false) { tblYears = false; renderTable(); }
+    if (USE_SERVER) api("settings?select=table_years,table_shown&id=eq.1").then(([st]) => {
+      if (!st) return;
+      tblYears = st.table_years !== false;
+      tblShown = st.table_shown !== false;
+      renderTable();
     }).catch(() => {});
     async function loadMedia() {
       if (!USE_SERVER) return;

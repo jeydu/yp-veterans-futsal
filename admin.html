@@ -2130,9 +2130,10 @@
         loadClubs(),
         db.from("matches").select("*").order("day").order("no", { nullsFirst: false }).order("kickoff", { nullsFirst: false }),
         // Season buttons switch; fails until setup.sql section 14 has run, and the switch then stays hidden
-        db.from("settings").select("table_years").eq("id", 1).single()
+        db.from("settings").select("table_years, table_shown").eq("id", 1).single()
       ]);
       fx.tableYears = st.error || !st.data ? undefined : st.data.table_years;
+      fx.tableShown = st.error || !st.data ? undefined : st.data.table_shown;
       fx.error = s.error || m.error || null;
       if (!fx.error) {
         fx.seasons = s.data;
@@ -2266,8 +2267,9 @@
           <div class="lg-h">
             <div><h2>League table</h2><span>Worked out from the group-stage results. Tap a team to change its numbers or take it out.</span></div>
             <div class="lg-sw">
-              <label class="switch-wrap"><span>${season.year} table on website</span><button type="button" class="switch" id="lg-show" role="switch" aria-checked="${!cfg.hidden}" aria-label="Show the ${season.year} table on the website"></button></label>
-              ${fx.tableYears === undefined ? "" : `<label class="switch-wrap"><span>Season buttons <small>(2026, 2025 … on the website, all seasons)</small></span><button type="button" class="switch" id="lg-years" role="switch" aria-checked="${fx.tableYears}" aria-label="Show season buttons above the website table"></button></label>`}
+              ${fx.tableShown === undefined ? "" : `<label class="switch-wrap"><span>League table on website <small>(the whole table, every season)</small></span><button type="button" class="switch" data-gset="table_shown" role="switch" aria-checked="${fx.tableShown}" aria-label="Show the league table on the website"></button></label>`}
+              <label class="switch-wrap"><span>${season.year} table <small>(this season only)</small></span><button type="button" class="switch" id="lg-show" role="switch" aria-checked="${!cfg.hidden}" aria-label="Show the ${season.year} table on the website"></button></label>
+              ${fx.tableYears === undefined ? "" : `<label class="switch-wrap"><span>Season buttons <small>(2026, 2025 … on the website, all seasons)</small></span><button type="button" class="switch" data-gset="table_years" role="switch" aria-checked="${fx.tableYears}" aria-label="Show season buttons above the website table"></button></label>`}
             </div>
           </div>
           ${rows.length ? `<div class="lg-rows">
@@ -2311,17 +2313,18 @@
         show.disabled = true;
         await saveLeague(season, c, on ? `✓ ${season.year} table is on the website` : `${season.year} table is hidden on the website`);
       };
-      const years = document.getElementById("lg-years");
-      if (years) years.onclick = async () => {
-        const on = years.getAttribute("aria-checked") !== "true";
-        years.disabled = true;
-        const { error } = await db.from("settings").update({ table_years: on }).eq("id", 1);
-        years.disabled = false;
+      // Site-wide switches: the whole table, and the season buttons
+      const GSET = { table_shown: ["tableShown", "League table"], table_years: ["tableYears", "Season buttons"] };
+      app.querySelectorAll("[data-gset]").forEach(sw => sw.onclick = async () => {
+        const col = sw.dataset.gset, [key, label] = GSET[col], on = sw.getAttribute("aria-checked") !== "true";
+        sw.disabled = true;
+        const { error } = await db.from("settings").update({ [col]: on }).eq("id", 1);
+        sw.disabled = false;
         if (error) return alert("Couldn't save: " + error.message);
-        fx.tableYears = on;
-        years.setAttribute("aria-checked", on);
-        toast(on ? "✓ Season buttons are on the website" : "Season buttons are hidden on the website");
-      };
+        fx[key] = on;
+        sw.setAttribute("aria-checked", on);
+        toast(on ? `✓ ${label} on the website` : `${label} hidden on the website`);
+      });
       app.querySelectorAll("[data-lgback]").forEach(b => b.onclick = () => {
         const c = cfg(); c.remove = (c.remove || []).filter(n => n !== b.dataset.lgback);
         saveLeague(season, c, `✓ ${b.dataset.lgback} is back in the table`);
