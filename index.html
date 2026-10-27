@@ -30,6 +30,7 @@
   </script>
   <script src="config.js"></script>
   <script src="teams.js"></script>
+  <script src="league.js"></script>
   <style>
     :root {
       --bg: #f4efec;
@@ -519,6 +520,13 @@
     .lg-foot { display: flex; flex-wrap: wrap; gap: 6px 18px; padding: 12px 16px; border-top: 1px solid var(--border); font-size: .78rem; color: var(--muted); }
     .lg-foot span { display: inline-flex; align-items: center; gap: 6px; }
     .lg-foot .lg-qk { width: 4px; height: 14px; background: #c8102e; }
+    .lg-note { flex-basis: 100%; }
+    .lg-note b { color: #c8102e; }
+    .lg sup { margin-inline-start: 2px; color: #c8102e; font-size: .8em; }
+    /* Season buttons above the table */
+    .lg-yrs { display: flex; gap: 6px; padding: 12px 12px 4px; overflow-x: auto; }
+    .lg-yr { flex-shrink: 0; min-width: 64px; min-height: 40px; padding: 6px 14px; border: 1.5px solid #f1dadd; background: #fff; color: #7a6567; cursor: pointer; font: 700 1rem "Oswald", sans-serif; letter-spacing: .04em; }
+    .lg-yr.on { border-color: #c8102e; background: #c8102e; color: #fff; }
     @media (max-width: 720px) {
       .lg .lg-x { display: none; }
       .lg th, .lg td { padding: 9px 5px; }
@@ -2047,7 +2055,7 @@
       tmShare: "ޓީމު ޝެއާ ކުރައްވާ",
       tblTitle: "ލީގު ޓޭބަލް",
       tblSeason: y => y + " ގެ ގްރޫޕް ބައި",
-      tblTeam: "ޓީމު", tblForm: "ފޯމު",
+      tblTeam: "ޓީމު", tblForm: "ފޯމު", tblPtsShort: "ޕޮއިންޓް",
       tblQ: "ނޮކްއައުޓް ބައިތަކަށް ދިޔަ",
       tblLive: "މެޗު ކުޅެމުންދާއިރު ޓޭބަލް ބަދަލުވާނެ",
       barNext: "ދެން އޮތް މެޗު",
@@ -2121,7 +2129,7 @@
       tmCard: r => r.p + " played · " + r.w + " won",
       tmShare: "Share team",
       tblSeason: y => y + " group stage",
-      tblTeam: "Team", tblForm: "Form",
+      tblTeam: "Team", tblForm: "Form", tblPtsShort: "pts",
       tblQ: "Through to the knockouts",
       tblLive: "Moves with live scores during matches",
       barNext: "Next match",
@@ -3319,50 +3327,46 @@
     // Group-stage standings of the current season (or the latest one): 3 points a win, 1 a draw,
     // then goal difference and goals scored. Live scores count as they stand, so the table moves during a match.
     // Teams already in a knockout match of that season are marked as through.
+    let tblYear = null;   // the season picked with the buttons above the table (null: the current one)
+    // A season has a table when it has group-stage matches or teams added in the portal, and isn't hidden there
+    const hasTable = r => !r.partial && !(r.league || {}).hidden && (r.matches.some(m => !m.stage) || ((r.league || {}).add || []).length);
     function renderTable() {
       const sec = document.getElementById("table");
-      const season = currentSeason() || RESULTS[0];
-      const group = season && !season.partial ? season.matches.filter(m => !m.stage) : [];
-      sec.hidden = !group.length;
-      if (!group.length) return;
-      const rows = {};
-      const row = n => rows[n] = rows[n] || { n, p: 0, w: 0, d: 0, l: 0, gf: 0, ga: 0, form: [], live: false };
-      group.forEach(m => {
-        row(m.home); row(m.away);
-        const sc = m.score || m.liveScore;
-        if (!sc && !m.won) return;
-        [[m.home, 0], [m.away, 1]].forEach(([n, i]) => {
-          const r = row(n), o = sc ? (sc[i] > sc[1 - i] ? "w" : sc[i] < sc[1 - i] ? "l" : "d") : outcome(m, n);
-          r.p++; r[o]++; r.form.push(o);
-          if (sc) { r.gf += sc[i]; r.ga += sc[1 - i]; }
-          if (m.liveScore) r.live = true;
-        });
-      });
+      const years = RESULTS.filter(hasTable);
+      sec.hidden = !years.length;
+      if (!years.length) return;
+      const cur = currentSeason();
+      const season = years.find(r => r.year === tblYear) || (cur && years.includes(cur) ? cur : years[0]);
+      const cfg = season.league || {};
+      const list = YP_LEAGUE.table(season.matches.map(m => ({ ...m, score: m.score || m.liveScore, live: !!m.liveScore })), cfg);
       const through = new Set(season.matches.filter(m => m.stage).flatMap(m => [m.home, m.away]));
-      const pts = r => r.w * 3 + r.d;
-      const list = Object.values(rows).sort((a, b) => pts(b) - pts(a) || (b.gf - b.ga) - (a.gf - a.ga) || b.gf - a.gf || a.n.localeCompare(b.n));
       const anyLive = list.some(r => r.live);
+      const notes = list.filter(r => YP_LEAGUE.changed(r.adj));
+      const sign = n => (n > 0 ? "+" : "") + n;
       document.getElementById("lg-season").textContent = t("tblSeason", season.year);
       document.getElementById("lg-card").innerHTML = `
+        ${years.length > 1 ? `<div class="lg-yrs" role="tablist">${years.map(r => `<button type="button" role="tab" class="lg-yr ${r === season ? "on" : ""}" aria-selected="${r === season}" data-lgy="${r.year}">${r.year}</button>`).join("")}</div>` : ""}
         <table class="lg">
           <thead><tr><th>#</th><th class="lg-tm">${t("tblTeam")}</th><th>P</th><th>W</th><th>D</th><th>L</th>
             <th class="lg-x">GF</th><th class="lg-x">GA</th><th>GD</th><th>Pts</th><th class="lg-x">${t("tblForm")}</th></tr></thead>
           <tbody>${list.map((r, i) => { const form = `<span class="lg-form">${r.form.slice(-5).map(o => `<i class="${o}">${t("tm" + o.toUpperCase()).slice(0, 1)}</i>`).join("")}</span>`; return `
             <tr class="${through.has(r.n) ? "q" : ""}">
               <td class="lg-pos">${i + 1}</td>
-              <td class="lg-tm"><button type="button" class="tl" data-team="${escH(r.n)}">${teamLogo(r.n)}<span class="lg-nm"><b>${escH(r.n)}</b>${r.form.length ? `<span class="lg-fm">${form}</span>` : ""}</span>${r.live ? liveTag() : ""}</button></td>
+              <td class="lg-tm"><button type="button" class="tl" data-team="${escH(r.n)}">${teamLogo(r.n)}<span class="lg-nm"><b>${escH(r.n)}${YP_LEAGUE.changed(r.adj) ? "<sup>*</sup>" : ""}</b>${r.form.length ? `<span class="lg-fm">${form}</span>` : ""}</span>${r.live ? liveTag() : ""}</button></td>
               <td>${r.p}</td><td>${r.w}</td><td>${r.d}</td><td>${r.l}</td>
               <td class="lg-x">${r.gf}</td><td class="lg-x">${r.ga}</td>
-              <td dir="ltr">${r.gf - r.ga > 0 ? "+" : ""}${r.gf - r.ga}</td>
-              <td class="lg-pts">${pts(r)}</td>
+              <td dir="ltr">${sign(r.gf - r.ga)}</td>
+              <td class="lg-pts">${r.pts}</td>
               <td class="lg-x">${form}</td>
             </tr>`; }).join("")}
           </tbody>
         </table>
         <div class="lg-foot">
           ${through.size ? `<span><i class="lg-qk"></i>${t("tblQ")}</span>` : ""}
-          ${anyLive || currentSeason() ? `<span>● ${t("tblLive")}</span>` : ""}
+          ${anyLive || season === cur ? `<span>● ${t("tblLive")}</span>` : ""}
+          ${notes.map(r => `<span class="lg-note">* ${escH(r.n)}${Number(r.adj.pts) ? ` <b dir="ltr">${sign(Number(r.adj.pts))} ${t("tblPtsShort")}</b>` : ""}${r.adj.note ? ` · ${escH(r.adj.note)}` : ""}</span>`).join("")}
         </div>`;
+      document.querySelectorAll("[data-lgy]").forEach(b => b.onclick = () => { tblYear = +b.dataset.lgy; renderTable(); });
     }
 
     // ---------- Strip under the menu bar ----------
@@ -3538,6 +3542,7 @@
         const years = seasons.map(se => ({
           year: se.year,
           partial: se.partial,
+          league: se.league || {},
           champion: { en: se.champion || "", dv: se.champion_dv || "" },
           matches: matches.filter(m => m.year === se.year).map(m => ({
             day: m.day, no: m.no, home: m.home, away: m.away, kickoff: m.kickoff,

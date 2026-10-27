@@ -20,6 +20,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <script src="config.js"></script>
   <script src="teams.js"></script>
+  <script src="league.js"></script>
   <style>
     :root {
       --bg: #f6f2f2;
@@ -889,6 +890,48 @@
     .lv-note { margin-top: 14px; font-size: .82rem; color: var(--muted); text-align: center; }
     .lv-saving { color: var(--muted); font-size: .8rem; }
     .lv-ft { padding: 13px 20px; font-size: 1rem; }
+    /* League table card (Fixtures & Results) */
+    .lg-adm { margin-bottom: 16px; padding: 0; overflow: hidden; }
+    .lg-h { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; padding: 16px 18px; border-bottom: 1px solid var(--border); }
+    .lg-h h2 { font-size: 1.15rem; }
+    .lg-h span { font-size: .82rem; color: var(--muted); }
+    .lg-h .switch-wrap { flex-shrink: 0; }
+    .lg-r { display: grid; grid-template-columns: 26px minmax(0, 1fr) repeat(4, 28px) 40px 36px 18px; align-items: center; gap: 4px; width: 100%; min-height: 52px; padding: 6px 14px; border: 0; border-top: 1px solid var(--border); background: var(--surface); color: var(--text); text-align: center; font: inherit; font-variant-numeric: tabular-nums; }
+    button.lg-r:hover { background: var(--surface-2); }
+    .lg-r > .ic { transform: rotate(-90deg); color: var(--muted); }
+    .lg-hd { min-height: 0; padding-top: 10px; padding-bottom: 10px; border-top: 0; background: var(--surface-2); font-size: .7rem; font-weight: 700; letter-spacing: .07em; text-transform: uppercase; color: var(--muted); }
+    .lg-r .lg-pos { font-weight: 700; color: var(--muted); }
+    .lg-t { display: flex; align-items: center; gap: 8px; min-width: 0; text-align: start; }
+    .lg-t .tl { width: 30px; height: 30px; flex-shrink: 0; }
+    .lg-t b { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font: 700 .9rem "Oswald", sans-serif; text-transform: uppercase; }
+    .lg-hd span:nth-child(2) { text-align: start; }
+    .lg-chg { flex-shrink: 0; padding: 1px 6px; border-radius: 99px; background: var(--amber-bg); color: var(--amber); font-style: normal; font-size: .65rem; font-weight: 700; text-transform: uppercase; }
+    .lg-r .lg-pts { color: var(--brand-text); font-size: 1rem; }
+    .lg-f { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; padding: 14px 18px; border-top: 1px solid var(--border); }
+    .lg-out { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; font-size: .8rem; color: var(--muted); }
+    .lg-out .chip { display: inline-flex; align-items: center; gap: 5px; min-height: 36px; padding: 4px 12px; border: 1px solid var(--border); border-radius: 99px; background: var(--surface-2); color: var(--text); font-size: .8rem; font-weight: 600; }
+    /* Team sheet: a −/+ control for each number */
+    .lg-ed { display: grid; gap: 8px; margin-top: 14px; }
+    .lg-er { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 10px 12px; border: 1px solid var(--border); border-radius: 14px; background: var(--surface-2); }
+    .lg-er > div:first-child { display: flex; flex-direction: column; min-width: 0; }
+    .lg-er small { color: var(--muted); font-size: .78rem; }
+    .lg-er strong { color: var(--brand-text); }
+    .lg-er .sc-step output { min-width: 48px; font-size: 1.6rem; color: var(--muted); }
+    .lg-er .sc-step output.on { color: var(--brand-text); }
+    .lg-er .sc-btn { width: 44px; height: 44px; font-size: 1.5rem; }
+    .sheet .lg-nt { margin-top: 16px; }
+    .lg-danger { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 18px; padding-top: 16px; border-top: 1px solid var(--border); }
+    .lg-pick { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 8px; margin-top: 14px; }
+    .lg-pk { display: flex; align-items: center; gap: 8px; min-height: 52px; padding: 8px 10px; border: 1px solid var(--border); border-radius: 12px; background: var(--surface); color: var(--text); text-align: start; }
+    .lg-pk:hover { border-color: var(--brand); }
+    .lg-pk .tl { width: 30px; height: 30px; flex-shrink: 0; }
+    .lg-pk b { font: 700 .85rem "Oswald", sans-serif; text-transform: uppercase; overflow-wrap: anywhere; }
+    @media (max-width: 480px) {
+      /* Phones: #, team, P, GD, Pts */
+      .lg-r { grid-template-columns: 22px minmax(0, 1fr) 26px 36px 32px 16px; padding: 6px 12px; }
+      .lg-r > :nth-child(4), .lg-r > :nth-child(5), .lg-r > :nth-child(6) { display: none; }
+      .lg-h { flex-direction: column; }
+    }
     /* Home: a match being scored live */
     .d-livem { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 16px; width: 100%; margin-bottom: 18px; padding: 16px 18px; text-align: start; border: 2px solid var(--brand); background: var(--tint); color: var(--text); font: inherit; }
     .d-livem small { font-weight: 700; text-transform: uppercase; letter-spacing: .06em; color: var(--brand-text); }
@@ -2130,6 +2173,7 @@
             <button class="btn" type="submit">${icon("check")} Save season</button>
           </form>
         </div>
+        ${leagueCard(season, all)}
         <div class="card fx-table">
           <div class="fx-row fx-hd"><span>Date</span><span>Match</span><span>Stage</span><span>Status</span><span></span></div>
           ${list.length ? list.map(fixtureRow).join("") : `<div class="fx-empty">${icon("ball")}<b>${all.length ? "Nothing here" : "No matches yet"}</b><span>${all.length ? "Try another tab." : "Add the first match of " + fx.year + "."}</span></div>`}
@@ -2146,6 +2190,7 @@
       app.querySelectorAll("[data-edit]").forEach(b => b.onclick = () => editMatch(fx.matches.find(m => m.id === b.dataset.edit)));
       const champ = document.getElementById("fx-champ");
       if (champ) champ.onsubmit = e => { e.preventDefault(); saveSeason(season, champ); };
+      if (season) wireLeague(season, all);
     }
 
     function fixtureRow(m) {
@@ -2192,6 +2237,165 @@
       toast("✓ Season " + season.year + " saved");
     }
 
+
+    // ---------- League table ----------
+    // The season's group-stage table, worked out from the results (league.js, the same maths as the website).
+    // Organisers can hide it on the website, put teams in before they've played, take teams out, and change
+    // a team's numbers by hand with a note (e.g. a points deduction). All of it is saved in seasons.league.
+    const LG_FIELDS = [["pts", "Points"], ["p", "Played"], ["w", "Won"], ["d", "Drawn"], ["l", "Lost"], ["gf", "Goals for"], ["ga", "Goals against"]];
+    const leagueRows = (season, all) => YP_LEAGUE.table(all.map(m => ({
+      home: m.home, away: m.away, stage: m.stage, live: !!m.live,
+      score: m.home_score !== null && m.away_score !== null ? [m.home_score, m.away_score] : null
+    })), season.league);
+    function leagueCard(season, all) {
+      if (!season) return "";
+      if (!("league" in season)) return `<div class="card lg-adm"><div class="lg-h"><div><h2>League table</h2>
+        <span>To show, hide and edit the table here, run section 14 of supabase/setup.sql in Supabase once.</span></div></div></div>`;
+      const cfg = season.league || {};
+      const rows = leagueRows(season, all);
+      const removed = cfg.remove || [];
+      return `<div class="card lg-adm">
+          <div class="lg-h">
+            <div><h2>League table</h2><span>Worked out from the group-stage results. Tap a team to change its numbers or take it out.</span></div>
+            <label class="switch-wrap">On website<button type="button" class="switch" id="lg-show" role="switch" aria-checked="${!cfg.hidden}" aria-label="Show the table on the website"></button></label>
+          </div>
+          ${rows.length ? `<div class="lg-rows">
+            <div class="lg-r lg-hd"><span>#</span><span>Team</span><span>P</span><span>W</span><span>D</span><span>L</span><span>GD</span><span>Pts</span><span></span></div>
+            ${rows.map((r, i) => `<button type="button" class="lg-r" data-lgt="${esc(r.n)}">
+              <span class="lg-pos">${i + 1}</span>
+              <span class="lg-t">${teamLogo(r.n)}<b>${esc(r.n)}</b>${YP_LEAGUE.changed(r.adj) ? `<em class="lg-chg" title="Changed by hand">Edited</em>` : ""}</span>
+              <span>${r.p}</span><span>${r.w}</span><span>${r.d}</span><span>${r.l}</span><span>${r.gf - r.ga > 0 ? "+" : ""}${r.gf - r.ga}</span><b class="lg-pts">${r.pts}</b>
+              ${icon("chev")}</button>`).join("")}
+          </div>` : `<div class="fx-empty">${icon("users")}<b>No teams yet</b><span>Add matches, or add teams to show an empty table before the season starts.</span></div>`}
+          <div class="lg-f">
+            <button type="button" class="btn" id="lg-add">${icon("plus")} Add team</button>
+            ${removed.length ? `<span class="lg-out">Taken out: ${removed.map(n => `<button type="button" class="chip" data-lgback="${esc(n)}">${esc(n)} ${icon("undo")}</button>`).join("")}</span>` : ""}
+          </div>
+        </div>`;
+    }
+
+    async function saveLeague(season, cfg, done) {
+      const clean = { ...cfg };
+      ["add", "remove"].forEach(k => { if (!(clean[k] || []).length) delete clean[k]; });
+      if (clean.adj) {
+        Object.keys(clean.adj).forEach(n => { if (!YP_LEAGUE.changed(clean.adj[n])) delete clean.adj[n]; });
+        if (!Object.keys(clean.adj).length) delete clean.adj;
+      }
+      if (!clean.hidden) delete clean.hidden;
+      const { error } = await db.from("seasons").update({ league: clean }).eq("year", season.year);
+      if (error) { alert("Couldn't save the table: " + error.message); return false; }
+      season.league = clean;
+      if (done) toast(done);
+      renderFixtures();
+      return true;
+    }
+
+    function wireLeague(season, all) {
+      if (!("league" in season)) return;
+      const cfg = () => JSON.parse(JSON.stringify(season.league || {}));
+      const show = document.getElementById("lg-show");
+      show.onclick = async () => {
+        const c = cfg(), on = show.getAttribute("aria-checked") !== "true";
+        c.hidden = !on;
+        show.disabled = true;
+        await saveLeague(season, c, on ? `✓ ${season.year} table is on the website` : `${season.year} table is hidden on the website`);
+      };
+      app.querySelectorAll("[data-lgback]").forEach(b => b.onclick = () => {
+        const c = cfg(); c.remove = (c.remove || []).filter(n => n !== b.dataset.lgback);
+        saveLeague(season, c, `✓ ${b.dataset.lgback} is back in the table`);
+      });
+      app.querySelectorAll("[data-lgt]").forEach(b => b.onclick = () => editLeagueTeam(season, all, b.dataset.lgt));
+      document.getElementById("lg-add").onclick = () => addLeagueTeam(season, all);
+    }
+
+    // One team's changes: each number is added to what the results give (e.g. −3 points)
+    function editLeagueTeam(season, all, name) {
+      const c = JSON.parse(JSON.stringify(season.league || {}));
+      const adj = { ...((c.adj || {})[name] || {}) };
+      // The team's numbers from the results alone (no hand changes), shown next to each control
+      const plain =YP_LEAGUE.table(all.map(m => ({ home: m.home, away: m.away, stage: m.stage, live: !!m.live,
+        score: m.home_score !== null && m.away_score !== null ? [m.home_score, m.away_score] : null })), { ...c, adj: { ...(c.adj || {}), [name]: {} }, remove: [] })
+        .find(r => r.n === name) || { p: 0, w: 0, d: 0, l: 0, gf: 0, ga: 0, pts: 0 };
+      fxDlg.dataset.sheet = "league";
+      const draw = () => {
+        fxDlg.innerHTML = `
+          <div class="sheet-in">
+            <div class="sheet-h"><div><h2>${esc(name)}</h2><p>${season.year} league table · changes are added to the results</p></div>
+              <button type="button" class="icon-btn" id="sh-close" aria-label="Close">${icon("x")}</button></div>
+            <div class="sheet-b">
+              <div class="lg-ed">
+                ${LG_FIELDS.map(([k, label]) => { const v = Number(adj[k]) || 0, from = k === "pts" ? plain.w * 3 + plain.d : plain[k]; return `
+                  <div class="lg-er">
+                    <div><b>${label}</b><small>From results ${from}${v ? ` → <strong>${from + v}</strong>` : ""}</small></div>
+                    <div class="sc-step">
+                      <button type="button" class="sc-btn" data-k="${k}" data-d="-1" aria-label="${label} minus one">−</button>
+                      <output class="${v ? "on" : ""}">${v > 0 ? "+" + v : v}</output>
+                      <button type="button" class="sc-btn plus" data-k="${k}" data-d="1" aria-label="${label} plus one">+</button>
+                    </div>
+                  </div>`; }).join("")}
+              </div>
+              <label class="lg-nt">Note on the website <small>(optional, e.g. “Points deducted for an ineligible player”)</small>
+                <input id="lg-note" maxlength="120" value="${esc(adj.note || "")}" placeholder="Why the numbers were changed"></label>
+              <div class="lg-danger">
+                <button type="button" class="btn" id="lg-reset" ${YP_LEAGUE.changed(adj) ? "" : "disabled"}>${icon("undo")} Undo all changes</button>
+                <button type="button" class="btn danger" id="lg-remove">${icon("trash")} Take out of table</button>
+              </div>
+            </div>
+            <div class="sheet-f"><button type="button" class="btn" id="lg-cancel">Cancel</button><span class="sp"></span>
+              <button type="button" class="btn primary" id="lg-save">${icon("check")} Save</button></div>
+          </div>`;
+        document.getElementById("sh-close").onclick = document.getElementById("lg-cancel").onclick = () => fxDlg.close();
+        fxDlg.querySelectorAll(".sc-btn").forEach(b => b.onclick = () => {
+          adj.note = document.getElementById("lg-note").value;
+          adj[b.dataset.k] = Math.max(-99, Math.min(99, (Number(adj[b.dataset.k]) || 0) + Number(b.dataset.d)));
+          draw();
+        });
+        document.getElementById("lg-reset").onclick = () => { LG_FIELDS.forEach(([k]) => delete adj[k]); delete adj.note; draw(); };
+        document.getElementById("lg-remove").onclick = async () => {
+          if (!confirm(`Take ${name} out of the ${season.year} table?\n\nIts matches stay. You can put it back from the table card.`)) return;
+          c.remove = [...new Set([...(c.remove || []), name])];
+          c.add = (c.add || []).filter(n => n !== name);
+          if (await saveLeague(season, c, `${name} taken out of the table`)) fxDlg.close();
+        };
+        document.getElementById("lg-save").onclick = async () => {
+          adj.note = document.getElementById("lg-note").value.trim();
+          c.adj = { ...(c.adj || {}), [name]: adj };
+          if (await saveLeague(season, c, `✓ ${name} saved`)) fxDlg.close();
+        };
+      };
+      draw();
+      if (!fxDlg.open) fxDlg.showModal();
+    }
+
+    // Put a team in the table before it has played (or back after taking it out)
+    function addLeagueTeam(season, all) {
+      const c = JSON.parse(JSON.stringify(season.league || {}));
+      const inTable = new Set(leagueRows(season, all).map(r => r.n));
+      const options = teamNames().filter(n => !inTable.has(n));
+      fxDlg.dataset.sheet = "league";
+      fxDlg.innerHTML = `
+        <div class="sheet-in">
+          <div class="sheet-h"><div><h2>Add team</h2><p>${season.year} league table · it starts on 0 until it plays</p></div>
+            <button type="button" class="icon-btn" id="sh-close" aria-label="Close">${icon("x")}</button></div>
+          <div class="sheet-b">
+            ${options.length ? `<div class="lg-pick">${options.map(n => `<button type="button" class="lg-pk" data-pk="${esc(n)}">${teamLogo(n)}<b>${esc(n)}</b></button>`).join("")}</div>` : ""}
+            <label class="lg-nt">Or type a name <input id="lg-new" maxlength="60" placeholder="Team name, as used in fixtures" autocomplete="off"></label>
+          </div>
+          <div class="sheet-f"><button type="button" class="btn" id="lg-cancel">Cancel</button><span class="sp"></span>
+            <button type="button" class="btn primary" id="lg-addit">${icon("plus")} Add</button></div>
+        </div>`;
+      const add = async name => {
+        name = name.trim();
+        if (!name) return;
+        c.add = [...new Set([...(c.add || []), name])];
+        c.remove = (c.remove || []).filter(n => n !== name);
+        if (await saveLeague(season, c, `✓ ${name} added to the ${season.year} table`)) fxDlg.close();
+      };
+      document.getElementById("sh-close").onclick = document.getElementById("lg-cancel").onclick = () => fxDlg.close();
+      fxDlg.querySelectorAll("[data-pk]").forEach(b => b.onclick = () => add(b.dataset.pk));
+      document.getElementById("lg-addit").onclick = () => add(document.getElementById("lg-new").value);
+      if (!fxDlg.open) fxDlg.showModal();
+    }
 
     // ---------- Add many matches at once ----------
     // Set the day once (date, first kick-off, gap, match day, stage), then tap two teams to make each match.

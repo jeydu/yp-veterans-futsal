@@ -635,3 +635,11 @@ create policy "editors remove media" on storage.objects for delete to authentica
 alter table public.matches add column if not exists live text check (live in ('1h', 'ht', '2h'));
 -- When the current half (or half time) started; the scoreboard's clock counts from here
 alter table public.matches add column if not exists live_since timestamptz;
+
+
+-- 14. League table settings (organiser portal → Fixtures & Results → League table) --------------
+-- Per season: { "hidden": true } hides that season's table on the website; "add" puts teams in the table
+-- before they've played; "remove" takes teams out; "adj" changes a team's numbers by hand, e.g.
+-- { "RK SC": { "pts": -3, "note": "Fielded an ineligible player" } } (p, w, d, l, gf, ga, pts are added on).
+alter table public.seasons add column if not exists league jsonb not null default '{}'::jsonb
+  check (jsonb_typeof(league) = 'object');
