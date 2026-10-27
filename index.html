@@ -654,9 +654,6 @@
     .sps-it { flex-shrink: 0; display: flex; align-items: center; justify-content: center; width: 160px; height: 76px; padding: 10px 14px; background: #fff; border: 1px solid #f1dadd; color: #221516; text-decoration: none; font: 600 .8rem "Inter", sans-serif; text-align: center; transition: border-color .15s ease; }
     .sps-it img { max-width: 100%; max-height: 56px; object-fit: contain; }
     a.sps-it:hover { border-color: var(--brand); }
-    .sps-it.ad { flex-direction: column; gap: 2px; border: 2px dashed #e7b9c1; background: #fdf5f6; color: #c8102e; }
-    .sps-it.ad b { font: 700 .9rem "Oswald", sans-serif; letter-spacing: .04em; text-transform: uppercase; }
-    .sps-it.ad small { font-size: .68rem; color: #7a6567; }
     @media (prefers-reduced-motion: reduce) {
       .sps-view { overflow-x: auto; -webkit-mask-image: none; mask-image: none; }
       .sps-track { animation: none !important; }
@@ -664,8 +661,6 @@
     @media (max-width: 720px) {
       .sps-it { width: 130px; height: 64px; }
       .sps-it img { max-height: 46px; }
-      .sps-it.ad b { font-size: .74rem; }
-      .sps-it.ad small { font-size: .62rem; }
     }
     .sp-become { display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap; margin-top: 28px; padding: 20px 22px; background: var(--ink); color: #fff; border-inline-start: 6px solid var(--brand); }
     .sp-become b { font: 700 1.3rem "Oswald", sans-serif; text-transform: uppercase; }
@@ -1998,7 +1993,6 @@
       spBecomeText: "ވެޓެރަން ފުޓްސަލަށް އެހީވެދެއްވާ.",
       spContact: "ގުޅުއްވާ",
       spsLabel: "އެހީތެރިވެދެއްވާ ފަރާތްތައް",
-      spsAd: "ތިޔަ ލޯގޯ މިތާ",
       lvl0: "މައި ސްޕޮންސަރު", lvl1: "ގޯލްޑް ސްޕޮންސަރުން", lvl2: "ސިލްވަރ ސްޕޮންސަރުން", lvl3: "ޕާޓްނަރުން", lvl4: "މީޑިއާ ޕާޓްނަރުން",
       fxTitle: "ފިކްސްޗަރސް",
       resMatch: n => "މެޗު " + n,
@@ -2098,8 +2092,6 @@
       tmCard: r => r.p + " played · " + r.w + " won",
       tmShare: "Share team",
       tblSeason: y => y + " group stage",
-      spsAd: "Your logo here",
-      spBecome: "Become a sponsor",
       tblTeam: "Team", tblForm: "Form",
       tblQ: "Through to the knockouts",
       tblLive: "Moves with live scores during matches",
@@ -3662,7 +3654,7 @@
       }).join("");
     }
 
-    // The strip: all sponsors, main ones first, then a "Your logo here" card that opens WhatsApp.
+    // The strip: all sponsors, main ones first.
     // Repeated until one copy is wider than a big screen, then doubled so the loop has no seam.
     function renderSponsorStrip() {
       const strip = document.getElementById("sp-strip");
@@ -3673,8 +3665,7 @@
         return s.website ? `<a class="sps-it" href="${escH(/^https?:/i.test(s.website) ? s.website : "https://" + s.website)}" target="_blank" rel="noopener">${inner}</a>`
                          : `<span class="sps-it">${inner}</span>`;
       };
-      const ad = `<a class="sps-it ad" href="https://wa.me/${escH(CONFIG.whatsapp)}" target="_blank" rel="noopener"><b>${t("spsAd")}</b><small>${t("spBecome")}</small></a>`;
-      const one = [...sponsors].sort((a, b) => LEVELS.indexOf(a.level) - LEVELS.indexOf(b.level)).map(tile).concat(ad);
+      const one = [...sponsors].sort((a, b) => LEVELS.indexOf(a.level) - LEVELS.indexOf(b.level)).map(tile);
       let half = [];
       while (half.length < 12) half = half.concat(one);
       const track = document.getElementById("sps-track");
