@@ -111,6 +111,18 @@
     /* Tournament emblem: cut to a circle so its black background melts into the bar */
     nav .logo img { width: 52px; height: 52px; border-radius: 50%; object-fit: cover; }
     .logo-name { display: flex; flex-direction: column; font: 700 1.1rem/1 "Oswald", sans-serif; text-transform: uppercase; letter-spacing: .04em; white-space: nowrap; }
+    /* Under the menu bar: the match being played now, or a countdown to the next one */
+    .livebar { display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: 6px 14px; padding: 7px 16px; background: #c8102e; color: #fff; font: 600 .82rem "Inter", sans-serif; text-align: center; }
+    .livebar[hidden] { display: none; }
+    .livebar.next { background: #2a1416; color: #f3e6e7; }
+    .livebar b { font: 700 .9rem "Oswald", sans-serif; letter-spacing: .06em; text-transform: uppercase; }
+    .livebar .lb-m { display: inline-flex; align-items: center; gap: 8px; color: inherit; text-decoration: none; }
+    .livebar .lb-m:hover b { text-decoration: underline; }
+    .livebar .lb-sc { padding: 1px 8px; background: #fff; color: #c8102e; font: 700 .9rem "Oswald", sans-serif; font-variant-numeric: tabular-nums; }
+    .livebar .lb-dot { width: 8px; height: 8px; border-radius: 50%; background: #fff; animation: live-dot 1.2s ease-in-out infinite; }
+    .livebar .lb-in { color: #ffd34d; font-variant-numeric: tabular-nums; }
+    .livebar .lb-watch { padding: 3px 10px; border: 1.5px solid #fff; color: #fff; text-decoration: none; font: 600 .75rem "Oswald", sans-serif; letter-spacing: .06em; text-transform: uppercase; }
+    .livebar .lb-watch:hover { background: #fff; color: #c8102e; }
     .logo-name small { margin-top: 4px; font: 600 .6rem/1 "Inter", sans-serif; letter-spacing: .16em; color: #ff8a9b; }
     nav .logo:focus-visible { outline: 2px solid #fff; outline-offset: 4px; }
     nav ul { list-style: none; display: flex; gap: 24px; }
@@ -218,9 +230,9 @@
     /* About: heading, then the numbers on a black scoreboard strip */
     .sec-head { margin-bottom: 28px; }
     .sec-head .lead { max-width: 560px; margin: 0; }
-    .stats { display: grid; grid-template-columns: repeat(4, 1fr); background: var(--ink); border-top: 6px solid var(--brand); }
-    .stat { padding: 26px 22px 24px; color: #fff; }
-    .stat + .stat { border-inline-start: 1px solid rgba(255,255,255,.12); }
+    /* Hairlines between stats come from the gap, so any number of them lines up */
+    .stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; background: rgba(255,255,255,.12); border-top: 6px solid var(--brand); }
+    .stat { padding: 26px 22px 24px; color: #fff; background: var(--ink); }
     .stat-num { display: block; font-family: "Oswald", sans-serif; font-weight: 700; font-size: 3.2rem; line-height: 1; }
     .stat-label { display: block; margin-top: 10px; font-size: .74rem; font-weight: 600; letter-spacing: .1em; text-transform: uppercase; color: #c3b2b4; }
 
@@ -480,6 +492,35 @@
       .fxl { width: 44px; height: 44px; }
     }
 
+
+    /* League table: group-stage standings, worked out from the results (and live scores) */
+    #table { padding-top: 0; }
+    .lg-card { margin-top: 18px; background: #fff; color: #221516; border: 1px solid #f1dadd; border-top: 4px solid var(--brand); box-shadow: 0 6px 18px rgba(60, 10, 20, .06); overflow-x: auto;
+      --text: #221516; --muted: #7a6567; --border: #f1dadd; color-scheme: light; }
+    .lg { width: 100%; border-collapse: collapse; font-variant-numeric: tabular-nums; }
+    .lg th { padding: 12px 8px; font: 700 .72rem "Inter", sans-serif; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); text-align: center; border-bottom: 2px solid var(--border); white-space: nowrap; }
+    .lg td { padding: 10px 8px; text-align: center; border-top: 1px solid var(--border); font-size: .95rem; }
+    .lg .lg-tm { text-align: start; width: 100%; }
+    .lg th.lg-tm { padding-inline-start: 4px; }
+    .lg .lg-pos { width: 40px; font: 700 1rem "Oswald", sans-serif; color: var(--muted); box-shadow: inset 4px 0 0 transparent; }
+    .lg tr.q .lg-pos { color: #c8102e; box-shadow: inset 4px 0 0 #c8102e; }
+    .lg .lg-pts { font: 700 1.15rem "Oswald", sans-serif; color: #c8102e; }
+    .lg .tl { display: inline-flex; align-items: center; gap: 10px; }
+    .lg .fxl { width: 34px; height: 34px; }
+    .lg .tl b { font: 700 .98rem "Oswald", sans-serif; text-transform: uppercase; letter-spacing: .02em; white-space: nowrap; }
+    .lg .live-tag { margin-inline-start: 2px; padding: 2px 6px; font-size: .62rem; }
+    .lg-form { display: inline-flex; gap: 3px; }
+    .lg-form i { display: grid; place-items: center; width: 20px; height: 20px; color: #fff; font: 700 .62rem "Inter", sans-serif; font-style: normal; }
+    .lg-form .w { background: #17803d; } .lg-form .d { background: #8a7a7c; } .lg-form .l { background: #c8102e; }
+    .lg-foot { display: flex; flex-wrap: wrap; gap: 6px 18px; padding: 12px 16px; border-top: 1px solid var(--border); font-size: .78rem; color: var(--muted); }
+    .lg-foot span { display: inline-flex; align-items: center; gap: 6px; }
+    .lg-foot .lg-qk { width: 4px; height: 14px; background: #c8102e; }
+    @media (max-width: 720px) {
+      .lg .lg-x { display: none; }
+      .lg th, .lg td { padding: 9px 5px; }
+      .lg .fxl { width: 28px; height: 28px; }
+      .lg .tl b { font-size: .86rem; white-space: normal; }
+    }
 
     /* A team name or logo that opens that team's page */
     :where(.tl) { background: none; border: 0; padding: 0; margin: 0; color: inherit; font: inherit; text-align: inherit; cursor: pointer; }
@@ -1034,9 +1075,8 @@
       .champ-head { column-gap: 16px; }
       .champ-logo { width: 72px; height: 72px; border-width: 3px; }
       .stats { grid-template-columns: 1fr 1fr; }
+      .livebar { font-size: .76rem; padding: 6px 12px; }
       .stat { padding: 20px 16px; }
-      .stat:nth-child(3) { border-inline-start: 0; }
-      .stat:nth-child(n+3) { border-top: 1px solid rgba(255,255,255,.12); }
       .stat-num { font-size: 2.4rem; }
       #contact { padding-top: 64px; }
 
@@ -1217,6 +1257,8 @@
       </button>
       </div>
     </div>
+    <!-- The match being played now, or a countdown to the next one: filled in by the script -->
+    <div class="livebar" id="livebar" role="status" hidden></div>
   </nav>
 
   <header class="hero">
@@ -1290,7 +1332,8 @@
         <p data-i18n="aboutLead" class="lead">A futsal tournament for veteran players, run every year by Young Players SC.</p>
       </div>
 
-      <div class="stats">
+      <!-- Worked out by the script from the past winners and the results; these are the numbers before it runs -->
+      <div class="stats" id="stats">
         <div class="stat"><span class="stat-num">5</span><span data-i18n="statEditions" class="stat-label">Editions</span></div>
         <div class="stat"><span class="stat-num">2022</span><span data-i18n="statFirst" class="stat-label">First tournament</span></div>
         <div class="stat"><span class="stat-num">4</span><span data-i18n="statDifferent" class="stat-label">Different champions</span></div>
@@ -1327,6 +1370,15 @@
       <span class="eyebrow"><svg class="ic" aria-hidden="true"><use href="#i-calendar"/></svg><span id="fx-season"></span></span>
       <h2 data-i18n="fxTitle">Fixtures</h2>
       <div class="fx-list" id="fx-list"></div>
+    </div>
+  </section>
+
+  <!-- LEAGUE TABLE: group-stage standings of the current season, worked out from the results; moves with live scores -->
+  <section id="table" hidden>
+    <div class="wrap">
+      <span class="eyebrow"><svg class="ic" aria-hidden="true"><use href="#i-trophy"/></svg><span id="lg-season"></span></span>
+      <h2 data-i18n="tblTitle">League Table</h2>
+      <div class="lg-card" id="lg-card"></div>
     </div>
   </section>
 
@@ -1937,6 +1989,18 @@
       tmResults: "ނަތީޖާ",
       tmCard: r => r.p + " މެޗު · " + r.w + " މޮޅު",
       tmShare: "ޓީމު ޝެއާ ކުރައްވާ",
+      tblTitle: "ލީގު ޓޭބަލް",
+      tblSeason: y => y + " ގެ ގްރޫޕް ބައި",
+      tblTeam: "ޓީމު", tblForm: "ފޯމު",
+      tblQ: "ނޮކްއައުޓް ބައިތަކަށް ދިޔަ",
+      tblLive: "މެޗު ކުޅެމުންދާއިރު ޓޭބަލް ބަދަލުވާނެ",
+      tblPts: "3 ޕޮއިންޓް މޮޅުވުމަށް، 1 ޕޮއިންޓް އެއްވަރުވުމަށް",
+      barNext: "ދެން އޮތް މެޗު",
+      barIn: s => s + " ފަހުން",
+      statDifferentN: "ތަފާތު ޗެމްޕިއަނުން",
+      statMostN: names => "އެންމެ ގިނަ ތަށި · " + names,
+      statBiggest: o => "އެންމެ ބޮޑު ތަފާތުން މޮޅުވުން · " + o.w + " ، " + o.l + " (" + o.y + ")",
+      statMostGoals: y => "އެއް މުބާރާތެއްގައި އެންމެ ގިނަ ގޯލު · " + y,
       tmCopied: "ލިންކް ކޮޕީ ކުރެވިއްޖެ"
     };
     const EN = {
@@ -2001,6 +2065,19 @@
       tmResults: "Results",
       tmCard: r => r.p + " played · " + r.w + " won",
       tmShare: "Share team",
+      tblSeason: y => y + " group stage",
+      tblTeam: "Team", tblForm: "Form",
+      tblQ: "Through to the knockouts",
+      tblLive: "Moves with live scores during matches",
+      tblPts: "3 points for a win, 1 for a draw",
+      barNext: "Next match",
+      barIn: s => "in " + s,
+      statEditions: "Editions",
+      statFirst: "First tournament",
+      statDifferentN: "Different champions",
+      statMostN: names => "Most titles · " + names,
+      statBiggest: o => "Biggest win · " + o.w + " v " + o.l + ", " + o.y,
+      statMostGoals: y => "Most goals in a tournament · " + y,
       tmCopied: "Link copied"
     };
 
@@ -2875,11 +2952,12 @@
     // or it kicked off less than two hours ago and has no score yet
     const isLive = m => !!m.liveScore || (!m.score && !m.won && m.kickoff && Date.now() >= Date.parse(m.kickoff) && Date.now() < Date.parse(m.kickoff) + LIVE_FOR);
     const liveTag = m => `<span class="live-tag"><i></i>${t(m && m.live === "ht" ? "fxHt" : "fxLive")}</span>`;
+    // The current season is the newest one with a match still to play or a kick-off date (older years only have results)
+    const currentSeason = () => fromDatabase ? RESULTS.find(r => r.matches.some(m => (!m.score && !m.won) || m.kickoff)) : null;
     // Fixtures: every match of the current season, grouped by day. Played ones show their score and stay listed.
-    // The current season is the newest one with a match still to play or a kick-off date (older years only have results).
     function renderFixtures() {
       const sec = document.getElementById("fixtures");
-      const season = fromDatabase ? RESULTS.find(r => r.matches.some(m => (!m.score && !m.won) || m.kickoff)) : null;
+      const season = currentSeason();
       const list = (season ? season.matches.map(m => ({ ...m, year: season.year })) : fromDatabase ? [] : TEST_FIXTURES)
         .slice().sort((a, b) => (a.kickoff ? Date.parse(a.kickoff) : Infinity) - (b.kickoff ? Date.parse(b.kickoff) : Infinity) || a.day - b.day || (a.no || 0) - (b.no || 0));
       sec.hidden = !list.length;
@@ -2917,6 +2995,9 @@
       list.querySelectorAll(".res-year").forEach((b, i) => b.addEventListener("click", () => openResults(RESULTS[i].year, b)));
       if (resOpen) fillResults();
       renderTeams();
+      renderTable();
+      renderBar();
+      renderStats();
     }
 
     function openResults(year, card) {
@@ -3179,6 +3260,127 @@
       const team = e.target.closest("[data-team]");
       if (team) openTeam(team.dataset.team, team);
     });
+
+    // ---------- League table ----------
+    // Group-stage standings of the current season (or the latest one): 3 points a win, 1 a draw,
+    // then goal difference and goals scored. Live scores count as they stand, so the table moves during a match.
+    // Teams already in a knockout match of that season are marked as through.
+    function renderTable() {
+      const sec = document.getElementById("table");
+      const season = currentSeason() || RESULTS[0];
+      const group = season && !season.partial ? season.matches.filter(m => !m.stage) : [];
+      sec.hidden = !group.length;
+      if (!group.length) return;
+      const rows = {};
+      const row = n => rows[n] = rows[n] || { n, p: 0, w: 0, d: 0, l: 0, gf: 0, ga: 0, form: [], live: false };
+      group.forEach(m => {
+        row(m.home); row(m.away);
+        const sc = m.score || m.liveScore;
+        if (!sc && !m.won) return;
+        [[m.home, 0], [m.away, 1]].forEach(([n, i]) => {
+          const r = row(n), o = sc ? (sc[i] > sc[1 - i] ? "w" : sc[i] < sc[1 - i] ? "l" : "d") : outcome(m, n);
+          r.p++; r[o]++; r.form.push(o);
+          if (sc) { r.gf += sc[i]; r.ga += sc[1 - i]; }
+          if (m.liveScore) r.live = true;
+        });
+      });
+      const through = new Set(season.matches.filter(m => m.stage).flatMap(m => [m.home, m.away]));
+      const pts = r => r.w * 3 + r.d;
+      const list = Object.values(rows).sort((a, b) => pts(b) - pts(a) || (b.gf - b.ga) - (a.gf - a.ga) || b.gf - a.gf || a.n.localeCompare(b.n));
+      const anyLive = list.some(r => r.live);
+      document.getElementById("lg-season").textContent = t("tblSeason", season.year);
+      document.getElementById("lg-card").innerHTML = `
+        <table class="lg">
+          <thead><tr><th>#</th><th class="lg-tm">${t("tblTeam")}</th><th>P</th><th>W</th><th>D</th><th>L</th>
+            <th class="lg-x">GF</th><th class="lg-x">GA</th><th>GD</th><th>Pts</th><th class="lg-x">${t("tblForm")}</th></tr></thead>
+          <tbody>${list.map((r, i) => `
+            <tr class="${through.has(r.n) ? "q" : ""}">
+              <td class="lg-pos">${i + 1}</td>
+              <td class="lg-tm"><button type="button" class="tl" data-team="${escH(r.n)}">${teamLogo(r.n)}<b>${escH(r.n)}</b>${r.live ? liveTag() : ""}</button></td>
+              <td>${r.p}</td><td>${r.w}</td><td>${r.d}</td><td>${r.l}</td>
+              <td class="lg-x">${r.gf}</td><td class="lg-x">${r.ga}</td>
+              <td dir="ltr">${r.gf - r.ga > 0 ? "+" : ""}${r.gf - r.ga}</td>
+              <td class="lg-pts">${pts(r)}</td>
+              <td class="lg-x"><span class="lg-form">${r.form.slice(-5).map(o => `<i class="${o}">${t("tm" + o.toUpperCase()).slice(0, 1)}</i>`).join("")}</span></td>
+            </tr>`).join("")}
+          </tbody>
+        </table>
+        <div class="lg-foot">
+          ${through.size ? `<span><i class="lg-qk"></i>${t("tblQ")}</span>` : ""}
+          <span>${t("tblPts")}</span>
+          ${anyLive || currentSeason() ? `<span>● ${t("tblLive")}</span>` : ""}
+        </div>`;
+    }
+
+    // ---------- Strip under the menu bar ----------
+    // Matches being played now (score, half time, a Watch link when streamed), otherwise a countdown to the next kick-off
+    function renderBar() {
+      const bar = document.getElementById("livebar");
+      const season = currentSeason();
+      const ms = season ? season.matches : [];
+      const live = ms.filter(m => m.liveScore || isLive(m));
+      const next = ms.filter(m => !m.score && !m.won && !isLive(m) && m.kickoff && Date.parse(m.kickoff) > Date.now())
+        .sort((a, b) => Date.parse(a.kickoff) - Date.parse(b.kickoff))[0];
+      bar.classList.toggle("next", !live.length);
+      bar.hidden = !live.length && !next;
+      if (live.length) {
+        bar.innerHTML = live.map(m => `<span class="lb-m">
+            <span class="lb-dot"></span><b>${t(m.live === "ht" ? "fxHt" : "fxLive")}</b>
+            <a class="lb-m" href="#fixtures"><b>${escH(m.home)}</b><span class="lb-sc" dir="ltr">${m.liveScore ? m.liveScore.join(" – ") : "v"}</span><b>${escH(m.away)}</b></a>
+            ${m.video ? `<a class="lb-watch" href="https://www.youtube.com/watch?v=${escH(m.video)}" target="_blank" rel="noopener">${t("fxWatchLive")}</a>` : ""}
+          </span>`).join("");
+      } else if (next) {
+        const mins = Math.max(1, Math.ceil((Date.parse(next.kickoff) - Date.now()) / 60000));
+        const d = Math.floor(mins / 1440), h = Math.floor(mins % 1440 / 60), mm = mins % 60;
+        const left = d ? `${d}d ${h}h` : h ? `${h}h ${mm}m` : `${mm}m`;
+        bar.innerHTML = `<span>${t("barNext")}</span>
+          <a class="lb-m" href="#fixtures"><b>${escH(next.home)}</b><span>v</span><b>${escH(next.away)}</b></a>
+          <span class="lb-in" dir="ltr">${t("barIn", left)}</span>`;
+      }
+    }
+    setInterval(() => { if (!document.hidden) renderBar(); }, 30000);
+
+    // ---------- About: tournament facts ----------
+    // Worked out from the past winners (the popup above, plus champions saved in the organiser portal) and the results
+    function renderStats() {
+      const champs = {};
+      document.querySelectorAll("#winners-pop .champ-link[data-year]").forEach(b => {
+        const key = (b.querySelector(".w-team") || {}).dataset?.i18n;
+        champs[+b.dataset.year] = { en: b.dataset.team, dv: (key && DV[key]) || "" };
+      });
+      RESULTS.forEach(r => { if (r.champion && r.champion.en) champs[r.year] = r.champion; });
+      const years = Object.keys(champs).map(Number).sort((a, b) => a - b);
+      if (!years.length) return;
+      const titles = {};
+      years.forEach(y => { const c = champs[y]; titles[c.en] = titles[c.en] || { n: 0, dv: c.dv }; titles[c.en].n++; });
+      const top = Math.max(...Object.values(titles).map(c => c.n));
+      const leaders = Object.keys(titles).filter(n => titles[n].n === top).map(n => (lang === "dv" && titles[n].dv) || n);
+      // Biggest winning margin, and the tournament with the most goals (complete years only)
+      let big = null, most = null;
+      RESULTS.forEach(r => {
+        let goals = 0;
+        r.matches.forEach(m => {
+          if (!m.score) return;
+          goals += m.score[0] + m.score[1];
+          const margin = Math.abs(m.score[0] - m.score[1]);
+          if (!big || margin > big.margin) big = { margin, m, year: r.year };
+        });
+        if (!r.partial && goals && (!most || goals > most.goals)) most = { goals, year: r.year };
+      });
+      const stat = (num, label) => `<div class="stat"><span class="stat-num">${num}</span><span class="stat-label">${label}</span></div>`;
+      const bw = big && (big.m.score[0] > big.m.score[1] ? [big.m.home, big.m.away, big.m.score[0], big.m.score[1]] : [big.m.away, big.m.home, big.m.score[1], big.m.score[0]]);
+      const html = [
+        stat(years.length, t("statEditions")),
+        stat(years[0], t("statFirst")),
+        stat(Object.keys(titles).length, t("statDifferentN")),
+        stat(top + "×", escH(t("statMostN", leaders.join(lang === "dv" ? "، " : ", ")))),
+        big ? stat(`${bw[2]}–${bw[3]}`, escH(t("statBiggest", { w: bw[0], l: bw[1], y: big.year }))) : "",
+        most ? stat(most.goals, escH(t("statMostGoals", most.year))) : ""
+      ].join("");
+      const box = document.getElementById("stats");
+      // Only redraw when something changed, so the count-up on scroll isn't lost
+      if (box.dataset.sig !== html) { box.dataset.sig = html; box.innerHTML = html; }
+    }
 
     // ---------- Match videos and highlights ----------
     // Videos play from Ahoo Live's YouTube streams inside the popup (nothing is copied or re-uploaded).
