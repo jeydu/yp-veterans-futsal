@@ -444,7 +444,7 @@
     .seg { display: flex; gap: 3px; padding: 3px; margin-inline-start: auto; border-radius: 11px; background: var(--surface); border: 1px solid var(--border); }
     .seg-b { border: 0; background: none; padding: 7px 13px; border-radius: 8px; font-size: .85rem; font-weight: 600; color: var(--muted); }
     .seg-b em { font-style: normal; opacity: .7; }
-    @media (max-width: 360px) { .seg-b { padding: 7px 8px; font-size: .8rem; white-space: nowrap; } }
+    @media (max-width: 420px) { .seg-b { padding: 7px 8px; font-size: .8rem; white-space: nowrap; } }
     .seg-b:hover { color: var(--text); }
     .seg-b.on { background: var(--brand); color: #fff; }
     .fx-season-card { display: flex; gap: 18px; flex-wrap: wrap; align-items: center; padding: 16px 18px; margin-bottom: 14px; }
@@ -1065,6 +1065,13 @@
     .ld-shadow { background: rgba(0, 0, 0, .18); }
     .ld-name small { color: #6b6b73; }
     .ld-crest img { box-shadow: 0 8px 24px rgba(0, 0, 0, .15); }
+
+    /* ---------- Clean spacing (the same rhythm as the website) ----------
+       Every page: title, 8px, description, then the buttons; 20px to the content; 16px between all cards and blocks */
+    .ph p { margin-top: 8px; }
+    body.app-mode #app { display: flex; flex-direction: column; gap: 16px; }
+    body.app-mode #app > * { margin-top: 0; margin-bottom: 0; }
+    body.app-mode #app > .ph { margin-bottom: 4px; }
 </style>
 </head>
 <body>
