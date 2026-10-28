@@ -657,3 +657,46 @@ alter table public.settings add column if not exists table_shown boolean not nul
 -- Manager names and phone numbers stay with signed-in organisers.
 revoke select on public.clubs from anon;
 grant select (id, name, short, logo, logo_fit, players, created_at) on public.clubs to anon;
+
+
+-- 16. Passwords for organisers (organiser portal and app → Users) ---------------------------------
+-- A Super Admin can give a user on the organiser list a password: it creates their login if they don't
+-- have one yet, or sets a new password. Phone logins use 960XXXXXXX@phone.ypveterans.com, like the login page.
+create or replace function public.set_login_password(p_email text, p_password text)
+returns text
+language plpgsql security definer
+set search_path = public, auth, extensions
+as $$
+declare
+  target text := lower(trim(p_email));
+  uid uuid;
+begin
+  if coalesce((select role from public.organisers where lower(email) = lower(auth.jwt() ->> 'email')), '') <> 'Super Admin' then
+    raise exception 'Only a Super Admin can set passwords';
+  end if;
+  if char_length(coalesce(p_password, '')) < 8 then
+    raise exception 'The password needs at least 8 characters';
+  end if;
+  if not exists (select 1 from public.organisers where lower(email) = target) then
+    raise exception 'Add them as a user first';
+  end if;
+  select id into uid from auth.users where lower(email) = target;
+  if uid is null then
+    uid := gen_random_uuid();
+    insert into auth.users (instance_id, id, aud, role, email, encrypted_password, email_confirmed_at,
+                            raw_app_meta_data, raw_user_meta_data, created_at, updated_at,
+                            confirmation_token, email_change, email_change_token_new, recovery_token)
+    values ('00000000-0000-0000-0000-000000000000', uid, 'authenticated', 'authenticated', target,
+            crypt(p_password, gen_salt('bf')), now(),
+            '{"provider": "email", "providers": ["email"]}'::jsonb, '{}'::jsonb, now(), now(), '', '', '', '');
+    insert into auth.identities (id, user_id, provider_id, provider, identity_data, last_sign_in_at, created_at, updated_at)
+    values (gen_random_uuid(), uid, uid::text, 'email',
+            jsonb_build_object('sub', uid::text, 'email', target, 'email_verified', true), now(), now(), now());
+    return 'created';
+  end if;
+  update auth.users set encrypted_password = crypt(p_password, gen_salt('bf')), updated_at = now() where id = uid;
+  return 'updated';
+end;
+$$;
+revoke all on function public.set_login_password(text, text) from public, anon;
+grant execute on function public.set_login_password(text, text) to authenticated;

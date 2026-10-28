@@ -572,6 +572,9 @@
     .logo-btns { display: grid; gap: 10px; }
     .file-btn { cursor: pointer; justify-self: start; flex-direction: row !important; color: var(--text) !important; }
     .sheet .fx-check { flex-direction: row; align-items: center; gap: 8px; font-weight: 500; color: var(--text); }
+    .pw-row { display: flex; gap: 8px; }
+    .pw-row input { flex: 1; font-family: ui-monospace, Menlo, monospace !important; letter-spacing: .04em; }
+    .pw-row .btn { flex-shrink: 0; }
     .sheet .ft-check { flex-wrap: wrap; row-gap: 2px; margin-top: 14px; padding: 12px; border-radius: 12px; background: var(--tint); font-size: .92rem; }
     .ft-check small { flex-basis: 100%; padding-inline-start: 26px; font-size: .8rem; }
     .pl-rows { display: grid; gap: 6px; }
@@ -3364,6 +3367,7 @@
       const isNew = !u;
       u = u || { email: "", name: "", role: roleList.find(r => r.name === "Administrator") ? "Administrator" : roleList[0].name };
       const self = !isNew && u.email.toLowerCase() === me.email.toLowerCase();
+      const superAdmin = me.role === "Super Admin";
       fxDlg.innerHTML = `
         <form class="sheet-in" id="us-form" novalidate>
           <div class="sheet-h"><div><h2>${isNew ? "Add user" : "Edit user"}</h2><p>${isNew ? "New organiser" : esc(shownLogin(u.email))}</p></div>
@@ -3375,14 +3379,25 @@
               <label>Role<select name="role" ${self ? "disabled" : ""}>${roleList.map(r => `<option ${r.name === u.role ? "selected" : ""}>${esc(r.name)}</option>`).join("")}</select></label>
               ${self ? `<small class="hint">You can't change your own role.</small>` : ""}
             </fieldset>
-            ${isNew ? `<div class="card note">${icon("alert")}<div><b>They also need a password</b>
-              <p>In Supabase open <b>Authentication → Users → Add user</b>, enter the same email (or for a phone number: <code>960XXXXXXX@phone.ypveterans.com</code>) and a password, and tick “Auto Confirm User”. Then give them the password.</p></div></div>` : ""}
+            ${superAdmin ? `<fieldset class="fs"><legend>${isNew ? "Password" : "New password"}</legend>
+              <div class="pw-row"><input name="password" type="text" minlength="8" maxlength="72" autocomplete="new-password" spellcheck="false"
+                placeholder="${isNew ? "At least 8 characters" : "Leave empty to keep their password"}">
+                <button type="button" class="btn" id="pw-make">${icon("refresh")} Make one</button></div>
+              <small class="hint">${isNew ? "They sign in with their email or phone number and this password." : "Sets a new password; their old one stops working."} Tell them the password yourself.</small>
+            </fieldset>` : isNew ? `<div class="card note">${icon("alert")}<div><b>They also need a password</b>
+              <p>Ask a Super Admin to set one under Users → Edit user.</p></div></div>` : ""}
             <p class="form-error" id="sh-err" role="alert"></p>
           </div>
           <div class="sheet-f">${isNew || self ? "" : `<button type="button" class="btn danger" id="sh-del">${icon("trash")} Remove</button>`}<span class="sp"></span>
             <button type="button" class="btn" id="sh-cancel">Cancel</button><button type="submit" class="btn primary">${icon("check")} ${isNew ? "Add user" : "Save"}</button></div>
         </form>`;
       const f = document.getElementById("us-form");
+      // A strong password that's easy to read out: no 0/O or 1/l
+      const make = document.getElementById("pw-make");
+      if (make) make.onclick = () => {
+        const chars = "abcdefghijkmnpqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+        f.password.value = [...crypto.getRandomValues(new Uint32Array(10))].map(n => chars[n % chars.length]).join("");
+      };
       wireSheet(async () => {
         if (u.role === "Super Admin" && people.filter(x => x.role === "Super Admin").length < 2) { alert("This is the only Super Admin, so it can't be removed."); return false; }
         if (!confirm(`Remove ${u.name || shownLogin(u.email)}? They won't be able to use the portal any more.`)) return false;
@@ -3396,6 +3411,8 @@
         const row = { name: f.name.value.trim() || null, role: f.role.value };
         if (self) delete row.role;
         if (!isNew && u.role === "Super Admin" && row.role && row.role !== "Super Admin" && people.filter(x => x.role === "Super Admin").length < 2) { err.textContent = "Keep at least one Super Admin."; return; }
+        const password = superAdmin ? f.password.value : "";
+        if (password && password.length < 8) { err.textContent = "The password needs at least 8 characters."; return; }
         let res;
         if (isNew) {
           if (!f.login.value.trim()) { err.textContent = "Enter an email or phone number."; return; }
@@ -3404,7 +3421,20 @@
           res = await db.from("organisers").insert(row);
         } else res = await db.from("organisers").update(row).eq("email", u.email);
         if (res.error) { err.textContent = "Couldn't save: " + res.error.message; return; }
-        fxDlg.close(); toast(isNew ? "✓ User added" : "✓ User saved"); loadUsers();
+        if (password) {
+          const email = isNew ? row.email : u.email;
+          const pw = await db.rpc("set_login_password", { p_email: email, p_password: password });
+          if (pw.error) {
+            const missing = /set_login_password|PGRST202|42883/i.test(pw.error.message + " " + pw.error.code);
+            err.textContent = (isNew ? "User added, but the password wasn't set: " : "Saved, but the password wasn't set: ")
+              + (missing ? "run section 16 of supabase/setup.sql once." : pw.error.message);
+            if (isNew) loadUsers();
+            return;
+          }
+        }
+        fxDlg.close();
+        toast(password ? `✓ ${isNew ? "User added" : "Saved"} with the new password. Tell them: ${shownLogin(isNew ? row.email : u.email)}` : isNew ? "✓ User added" : "✓ User saved");
+        loadUsers();
       };
       fxDlg.showModal();
     }
