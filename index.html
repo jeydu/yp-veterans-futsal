@@ -1297,6 +1297,33 @@
     @media (max-width: 720px) {
       header.hero::before { background: linear-gradient(180deg, rgba(12, 12, 14, .88) 0%, rgba(12, 12, 14, .72) 55%, rgba(12, 12, 14, .55) 100%); }
     }
+
+    /* ---------- Clean spacing ----------
+       One rhythm everywhere: sections --sec apart (sections on the same background follow on with no top padding);
+       small label → title 8px, title → description 8px, title or description → content --head */
+    :root { --sec: 72px; --head: 22px; }
+    @media (max-width: 720px) { :root { --sec: 56px; --head: 18px; } }
+    section { padding: var(--sec) 0; }
+    #fixtures, #table, #teams, #news, #gallery, #sponsors, .duo { padding-top: 0; }
+    .duo, #register { padding-bottom: var(--sec); }
+    header.hero { padding: 96px 0; }
+    .eyebrow, .champ-head .eyebrow { margin-bottom: 8px; }
+    section h2 { margin-bottom: var(--head); }
+    section h2:has(+ .lead), .champ-head h2 { margin-bottom: 8px; }
+    section .lead { margin-bottom: var(--head); }
+    .sec-head, .champ-head { margin-bottom: var(--head); }
+    .sec-head .lead { margin-bottom: 0; }
+    .duo h2 { margin-bottom: 14px; }
+    .fx-list, .lg-card, .tm-strip, .gal-grid { margin-top: 0; }
+    .sp-level { margin-top: 0; }
+    .sp-level + .sp-level { margin-top: var(--head); }
+    .sp-become { margin-top: calc(var(--head) + 8px); }
+    .gal-more { margin-top: var(--head); }
+    .contact-num { margin-bottom: var(--head); }
+    #contact { padding-top: var(--sec); }
+    @media (max-width: 720px) {
+      header.hero { padding: 64px 0; }
+    }
 </style>
 </head>
 <body>
