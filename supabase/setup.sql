@@ -651,3 +651,9 @@ create policy "fixture editors update settings" on public.settings for update to
   using (public.has_perm('fixtures')) with check (public.has_perm('fixtures'));
 -- The whole League table section on the website: on or off for every season
 alter table public.settings add column if not exists table_shown boolean not null default true;
+
+
+-- 15. Privacy: the public (website) reads only what it shows of each club ----------------------------
+-- Manager names and phone numbers stay with signed-in organisers.
+revoke select on public.clubs from anon;
+grant select (id, name, short, logo, logo_fit, players, created_at) on public.clubs to anon;
