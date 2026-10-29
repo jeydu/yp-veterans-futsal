@@ -3544,7 +3544,7 @@
       });
       return ytApi;
     }
-    let watching = null;   // { player, box, clips, i }
+    let watching = null;   // { player, box, clips, i, loading }
     function stopVideo() {
       if (!watching) return;
       try { watching.player.destroy(); } catch (e) {}
@@ -3566,7 +3566,8 @@
       const slot = document.createElement("div");
       box.querySelector(".m-player").replaceChildren(slot);
       const clips = highlights && m.goals.length ? m.goals.map(g => ({ start: Math.max(0, g.s ?? g.t - CLIP_BEFORE), end: g.t + CLIP_AFTER })) : [null];
-      const w = watching = { video: m.video, box, clips, i: from || 0 };
+      // loading: a clip was asked for and hasn't started playing yet
+      const w = watching = { video: m.video, box, clips, i: from || 0, loading: true };
       await loadYouTube();
       if (watching !== w) return;
       const first = showClip();
@@ -3576,10 +3577,13 @@
         playerVars: { autoplay: 1, rel: 0, playsinline: 1, start: first.startSeconds, end: first.endSeconds },
         events: {
           onReady: ev => ev.target.playVideo(),
-          // A clip ended: go on to the next goal
+          // A clip ended: go on to the next goal. YouTube sends "ended" twice at the end of a clip, and the
+          // second one arrives while the next clip is loading, so "ended" counts only once a clip is playing.
           onStateChange: ev => {
-            if (ev.data === YT.PlayerState.ENDED && w.clips[w.i] && w.i < w.clips.length - 1) {
+            if (ev.data === YT.PlayerState.PLAYING) w.loading = false;
+            if (ev.data === YT.PlayerState.ENDED && !w.loading && w.clips[w.i] && w.i < w.clips.length - 1) {
               w.i++;
+              w.loading = true;
               ev.target.loadVideoById(showClip());
             }
           }
@@ -3594,6 +3598,7 @@
         // Jump within the highlights already playing, or start them at this goal
         if (watching && watching.player && watching.clips[0] && watching.box === el.querySelector(".m-video")) {
           watching.i = +goal.dataset.goal;
+          watching.loading = true;
           watching.player.loadVideoById(showClip());
         } else playMatch(el, true, +goal.dataset.goal);
       } else if (btn) {
