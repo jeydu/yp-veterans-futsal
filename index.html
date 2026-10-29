@@ -3138,7 +3138,9 @@
       list.innerHTML = played.map(r =>
         `<button type="button" class="res-year" aria-label="${t("resPopTitle", r.year)}"><span class="res-big">${r.year}</span></button>`).join("");
       list.querySelectorAll(".res-year").forEach((b, i) => b.addEventListener("click", () => openResults(played[i].year, b)));
-      if (resOpen) fillResults();
+      // The open results popup is rebuilt with the new data, except while a match video or its highlights
+      // are playing: rebuilding would stop the video (the page reloads results every minute)
+      if (resOpen && !watching) fillResults();
       renderTeams();
       renderTable();
       renderBar();
@@ -3616,7 +3618,6 @@
             squads[c.name] = c.players || [];
           });
           renderResults();
-          if (resOpen) fillResults();
         }).catch(() => {});
         const [seasons, matches] = await Promise.all([
           get("seasons?select=*&order=year.desc"),
