@@ -3552,10 +3552,12 @@
       watching.box.closest(".match").querySelectorAll(".m-play").forEach(b => b.classList.remove("on"));
       watching = null;
     }
-    function showClip() {
+    // [after]: where the clip before it stopped. Two goals close together have overlapping clips; playing on,
+    // the next clip carries on from there instead of jumping back and showing those seconds twice.
+    function showClip(after = 0) {
       const w = watching, c = w.clips[w.i];
       w.box.querySelectorAll("[data-goal]").forEach((b, n) => b.classList.toggle("now", !!c && n === w.i));
-      return c ? { videoId: w.video, startSeconds: c.start, endSeconds: c.end } : { videoId: w.video };
+      return c ? { videoId: w.video, startSeconds: Math.max(c.start, Math.min(after, c.end - 5)), endSeconds: c.end } : { videoId: w.video };
     }
     async function playMatch(el, highlights, from) {
       stopVideo();
@@ -3582,9 +3584,10 @@
           onStateChange: ev => {
             if (ev.data === YT.PlayerState.PLAYING) w.loading = false;
             if (ev.data === YT.PlayerState.ENDED && !w.loading && w.clips[w.i] && w.i < w.clips.length - 1) {
+              const ended = w.clips[w.i].end;
               w.i++;
               w.loading = true;
-              ev.target.loadVideoById(showClip());
+              ev.target.loadVideoById(showClip(ended));
             }
           }
         }
