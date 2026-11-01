@@ -1382,7 +1382,7 @@
     .duo h2 { font-size: 1.15rem; text-align: start; letter-spacing: -.01em; }
 
     /* Soft rounded cards */
-    .poster, .gallery .photo, .fx-day, .lg-card, .tm-card, .res-year, .sp-logo, .sps-it, .sp-become, .res-card, .gal-item, .reg-info, .reg-form { border-radius: var(--r); overflow: hidden; }
+    .poster, .gallery .photo, .fx-day, .lg-card, .tm-card, .res-year, .sp-logo, .sps-it, .sp-become, .res-card, .gal-item { border-radius: var(--r); overflow: hidden; }
     .sps-it { border-radius: 14px; }
     .res-pop { border-radius: var(--r); }
     .poster { border: 1px solid var(--border); box-shadow: 0 2px 10px rgba(0, 0, 0, .04); }
@@ -1427,6 +1427,28 @@
     #contact .contact-circle svg { width: 26px; height: 26px; }
     footer { background: #fff; color: var(--muted); border-top: 1px solid var(--border); justify-content: center; }
 
+    /* Registration: a calm white card, like the rest of the page */
+    .reg { border: 1px solid var(--border); border-top: 1px solid var(--border); border-radius: var(--r); box-shadow: 0 2px 10px rgba(0, 0, 0, .04); }
+    .reg-info { background: var(--tint-strong); color: var(--text); border-radius: 0; }
+    .reg-info h2 { font-size: clamp(1.6rem, 4vw, 2.1rem); text-align: start; }
+    .reg-info .eyebrow { justify-content: flex-start; }
+    .reg-info > p, .reg-info-inner > p { color: var(--muted); }
+    .reg-steps li::before, .sec-num, .rp-dot { border-radius: 50%; }
+    .reg-steps li::before, .sec-num { background: #18181b; color: #fff; font-weight: 600; }
+    .reg-steps span { color: var(--muted); }
+    .reg-howto { padding: 16px; background: #fff; border: 1px solid var(--border); border-radius: 14px; }
+    .reg-howto h3 { color: var(--text); font-size: .95rem; font-weight: 600; }
+    .reg-howto li { color: var(--text); }
+    .reg-howto li::before { border-radius: 50%; background: #16a34a; }
+    .reg-deadline { background: #fff; border: 1px solid var(--border); border-inline-start: 1px solid var(--border); border-radius: 14px; color: var(--text); }
+    .reg-progress { top: 84px; border-radius: 14px; }
+    .rp-bar { border-radius: 99px; }
+    .rp-fill { background: #18181b; }
+    .rp-step.cur .rp-dot { background: #18181b; border-color: #18181b; }
+    .reg-form input:not([type=checkbox]):not([type=file]), .reg-form select, .reg-form textarea { border-radius: 12px; }
+    .reg-form label { letter-spacing: 0; text-transform: none; }
+    .wz-back, .wz-next { border-radius: 99px; padding: 12px 22px; font: 600 .95rem "Inter", sans-serif; letter-spacing: 0; text-transform: none; }
+
     /* Phones: the menu moves to a floating tab bar at the bottom */
     .tabbar { display: none; }
     @media (max-width: 720px) {
@@ -1444,6 +1466,9 @@
       .tabbar .ic { font-size: 1.3rem; }
       .tabbar a.on { background: var(--tint); color: var(--text); }
       footer { padding-bottom: 22px; }
+      /* The step bar sits under the menu and Next stays above the tab bar */
+      .reg-progress { top: 72px; }
+      .wz-nav { bottom: calc(82px + env(safe-area-inset-bottom)); }
       .stats { grid-template-columns: 1fr 1fr; }
       .stat { padding: 16px 14px; }
     }
