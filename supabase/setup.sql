@@ -700,3 +700,29 @@ end;
 $$;
 revoke all on function public.set_login_password(text, text) from public, anon;
 grant execute on function public.set_login_password(text, text) to authenticated;
+
+
+-- 17. Tighter permissions -------------------------------------------------------------------------
+-- Organisers with only the Fixtures permission may change the season buttons switch and nothing else in settings.
+-- (Row rules can't limit columns, so a trigger does. SQL run without a signed-in user is not affected.)
+create or replace function public.settings_guard()
+returns trigger
+language plpgsql security definer
+set search_path = public
+as $$
+begin
+  if auth.uid() is not null and not (public.has_perm('registrations') or public.has_perm('settings'))
+     and (to_jsonb(new) - 'table_years' - 'updated_at') is distinct from (to_jsonb(old) - 'table_years' - 'updated_at') then
+    raise exception 'Only the season buttons can be changed with the Fixtures permission' using errcode = '42501';
+  end if;
+  return new;
+end;
+$$;
+revoke all on function public.settings_guard() from public, anon, authenticated;
+drop trigger if exists settings_guard on public.settings;
+create trigger settings_guard before update on public.settings for each row execute function public.settings_guard();
+
+-- The public (anon) only reads; adding a visit is its one write. Signed-in organisers keep what the rules allow them.
+revoke insert, update, delete, truncate, references, trigger on all tables in schema public from anon;
+revoke truncate, references, trigger on all tables in schema public from authenticated;
+grant insert on public.visits to anon;
