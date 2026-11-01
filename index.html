@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="utf-8">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://www.youtube.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: blob: https:; media-src 'self' blob: https://ooofcwqeosatktwlahnq.supabase.co; connect-src 'self' https://ooofcwqeosatktwlahnq.supabase.co; frame-src https://www.youtube.com https://www.youtube-nocookie.com; object-src 'none'; base-uri 'self'; form-action 'self' https://wa.me">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="color-scheme" content="light only">
   <title>YP Veterans Futsal</title>
@@ -2363,7 +2364,6 @@
     const REG_WHATSAPP = CONFIG.whatsapp || "9609763551";
     // With Supabase set up, registrations and ID photos are saved online; otherwise they go to WhatsApp
     const USE_SERVER = !!(CONFIG.supabaseUrl && CONFIG.supabaseKey);
-    const SUPABASE_JS = "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/+esm";
 
     if (USE_SERVER) {
       // Sent straight to the organisers, so a "send" arrow instead of the WhatsApp icon
@@ -2615,7 +2615,15 @@
 
     // Save a registration to Supabase: photos to private storage, then the team, its officials and its players
     async function saveRegistration(f, onProgress) {
-      const { createClient } = await import(SUPABASE_JS);
+      // Only registering needs this file, so it's added the first time a team is sent
+      if (!window.supabase) await new Promise((ok, fail) => {
+        const sc = document.createElement("script");
+        sc.src = "vendor/supabase-2.118.0.js";
+        sc.onload = ok;
+        sc.onerror = () => fail(new Error("Couldn't connect. Check the internet and try again."));
+        document.head.appendChild(sc);
+      });
+      const { createClient } = window.supabase;
       const db = createClient(CONFIG.supabaseUrl, CONFIG.supabaseKey, { auth: { persistSession: false } });
       const teamId = newId();
 
@@ -3763,7 +3771,7 @@
       galPop.querySelector(".gal-stage").innerHTML = g.kind === "photo" ? `<img src="${escH(g.url)}" alt="${escH(g.title || "")}">`
         : yt ? `<iframe src="https://www.youtube-nocookie.com/embed/${yt}?autoplay=1&rel=0" allow="autoplay; encrypted-media; picture-in-picture; fullscreen" allowfullscreen title="${escH(g.title || "Video")}"></iframe>`
         : isFile(g.url) ? `<video src="${escH(g.url)}" controls autoplay playsinline></video>`
-        : `<a class="gal-ext" href="${escH(g.url)}" target="_blank" rel="noopener">${t("galOpen")}</a>`;
+        : `<a class="gal-ext" href="${escH(/^https?:/i.test(g.url) ? g.url : "#")}" target="_blank" rel="noopener">${t("galOpen")}</a>`;
     }
     function openGal(i, from) { showGal(i); openPop(galPop, from); }
     galPop.querySelector(".gal-prev").onclick = () => showGal(galAt - 1);

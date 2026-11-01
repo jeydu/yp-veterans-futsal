@@ -1,7 +1,7 @@
 // Organiser app: lets the dashboard open quickly and show a message when offline.
 // Only the page itself and its icons are kept; registrations and photos always come live from the server.
-const CACHE = "yp-organiser-v1";
-const SHELL = ["/admin.html", "/config.js", "/images/yp-logo.jpg", "/images/app/icon-192.png"];
+const CACHE = "yp-organiser-v2";
+const SHELL = ["/admin.html", "/config.js", "/teams.js", "/league.js", "/vendor/supabase-2.118.0.js", "/images/yp-logo.jpg", "/images/app/icon-192.png"];
 
 self.addEventListener("install", e => {
   e.waitUntil(caches.open(CACHE).then(c => c.addAll(SHELL)).then(() => self.skipWaiting()));
