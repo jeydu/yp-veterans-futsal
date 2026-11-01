@@ -1447,6 +1447,7 @@
     .rp-step.cur .rp-dot { background: #18181b; border-color: #18181b; }
     .reg-form input:not([type=checkbox]):not([type=file]), .reg-form select, .reg-form textarea { border-radius: 12px; }
     .reg-form label { letter-spacing: 0; text-transform: none; }
+    .reg-form label a { color: var(--text); font-weight: 600; text-decoration: underline; }
     .wz-back, .wz-next { border-radius: 99px; padding: 12px 22px; font: 600 .95rem "Inter", sans-serif; letter-spacing: 0; text-transform: none; }
 
     /* Phones: the menu moves to a floating tab bar at the bottom */
@@ -1922,7 +1923,7 @@
             <div class="wz-review" id="wz-review"></div>
             <div class="fields">
               <div class="field full check">
-                <label><input type="checkbox" name="agree" required> <span data-i18n="agree">All our players meet the age rule and we agree to the tournament rules.</span></label>
+                <label><input type="checkbox" name="agree" required> <span data-i18n="agree">All our players meet the age rule, every player and official has agreed to share their details and ID photos for registration, and we agree to the tournament rules and the <a href="privacy.html" target="_blank" rel="noopener">Privacy Policy</a>.</span></label>
                 <span data-i18n="errAgree" class="err">Please confirm to continue</span>
               </div>
             </div>
@@ -2166,7 +2167,7 @@
       playersHint: "10 އާއި 12 އާ ދެމެދުގެ ކުޅުންތެރިން · ހުރިހާ ކުޅުންތެރިންގެ އުމުރު 35 ނުވަތަ މަތި",
       addPlayer: "ކުޅުންތެރިއަކު އިތުރުކުރައްވާ",
       lblNotes: "ނޯޓު <small>(ލާޒިމެއް ނޫން)</small>",
-      agree: "އަހަރެމެންގެ ހުރިހާ ކުޅުންތެރިންނަށް އުމުރުގެ ޝަރުތު ހަމަވާ ކަމަށާއި މުބާރާތުގެ ޤަވާޢިދަށް އެއްބަސްވާ ކަމަށް ކަށަވަރުކުރަމެވެ.",
+      agree: 'އަހަރެމެންގެ ހުރިހާ ކުޅުންތެރިންނަށް އުމުރުގެ ޝަރުތު ހަމަވާ ކަމަށާއި، ކޮންމެ ކުޅުންތެރިއަކާއި އޮފިޝަލަކު ވެސް އެމީހެއްގެ މަޢުލޫމާތާއި އައި.ޑީ ފޮޓޯ ރަޖިސްޓްރޭޝަނަށް ހިއްސާކުރުމަށް އެއްބަސްވެފައިވާ ކަމަށާއި، މުބާރާތުގެ ޤަވާޢިދާއި <a href="privacy.html" target="_blank" rel="noopener">ޕްރައިވެސީ ޕޮލިސީ</a> އަށް އެއްބަސްވާ ކަމަށް ކަށަވަރުކުރަމެވެ.',
       errAgree: "ކުރިއަށް ދިޔުމަށް ކަށަވަރުކުރައްވާ",
       submit: "ވަޓްސްއަޕްގައި ރަޖިސްޓްރޭޝަން ފޮނުއްވާ",
       submitNote: "ތިޔަ މަޢުލޫމާތު ފުރިފައި ވަޓްސްއަޕް ހުޅުވޭނެ.",
