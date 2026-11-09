@@ -3,3 +3,4 @@
 *.local
 supabase/.temp/
 dist/
+supabase/*.sql
