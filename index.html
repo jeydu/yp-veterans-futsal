@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://www.youtube.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: blob: https:; media-src 'self' blob: https://ooofcwqeosatktwlahnq.supabase.co; connect-src 'self' https://ooofcwqeosatktwlahnq.supabase.co; frame-src https://www.youtube.com https://www.youtube-nocookie.com; object-src 'none'; base-uri 'self'; form-action 'self' https://wa.me">
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, interactive-widget=resizes-content">
   <meta name="theme-color" content="#ffffff">
   <meta name="color-scheme" content="light only">
   <title>YP Veterans Futsal</title>
@@ -1497,6 +1497,12 @@
       .livebar { position: absolute; left: 0; right: 0; top: 100%; box-shadow: 0 6px 16px rgba(16, 16, 20, .12); }
       html.mc-away { scroll-padding-top: 108px; }
     }
+    /* Tablets: the menu links sit closer so the language switch stays on screen */
+    @media (min-width: 721px) and (max-width: 900px) {
+      nav .wrap { gap: 10px; }
+      nav ul { gap: 0; }
+      nav ul a { padding: 8px 9px; font-size: .84rem; }
+    }
     /* The strip under the top bar only once the Match Centre has scrolled away (it shows the same match) */
     html:not(.mc-away) .livebar { display: none !important; }
     .livebar { min-height: 38px; }
@@ -1711,6 +1717,8 @@
       .tabbar.is-live [data-sec="matches"]::after { content: ""; position: absolute; top: 7px; left: calc(50% + 8px); width: 8px; height: 8px; border-radius: 50%; background: var(--red); box-shadow: 0 0 0 2px #fff; animation: live-dot 1.2s ease-in-out infinite; }
       /* Registration: Next and Back stay just above the tab bar */
       .wz-nav { bottom: calc(var(--tabh) + 8px + env(safe-area-inset-bottom)); }
+      html.kb .tabbar { display: none; }
+      html.kb .wz-nav { bottom: 8px; }
       footer { padding-bottom: 20px; }
     }
 
@@ -4532,6 +4540,20 @@
         io.unobserve(e.target);
       }), { threshold: 0.15, rootMargin: "0px 0px -40px 0px" });
       document.querySelectorAll(".reveal").forEach(el => io.observe(el));
+    }
+
+    // ---------- Phones: typing ----------
+    // While the keyboard is up the tab bar steps aside, so the form and its Next button keep the space
+    if (window.visualViewport) {
+      const vv = window.visualViewport, root = document.documentElement;
+      const fit = () => {
+        const el = document.activeElement;
+        const typing = !!el && /^(INPUT|TEXTAREA|SELECT)$/.test(el.tagName) && !/^(checkbox|radio|button|submit|file|range|color)$/.test(el.type);
+        root.classList.toggle("kb", typing && innerHeight - vv.height > 120);
+      };
+      vv.addEventListener("resize", fit);
+      addEventListener("focusin", () => setTimeout(fit, 50));
+      addEventListener("focusout", () => setTimeout(fit, 50));
     }
 
     // Show the page in the visitor's saved language
