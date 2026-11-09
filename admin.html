@@ -1191,7 +1191,12 @@
       .bn.on::before { content: ""; position: absolute; top: -6px; left: 50%; width: 22px; height: 3px; margin-left: -11px; border-radius: 0 0 3px 3px; background: var(--red); }
       body.app-mode main.wrap { padding-bottom: calc(84px + env(safe-area-inset-bottom)); }
       /* Quick actions: a compact two-column list */
-      .qa { gap: 8px; }
+      .qa { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+      .qa-it { min-width: 0; }
+      .qa-it b, .qa-it small { min-width: 0; overflow-wrap: anywhere; }
+      /* Site Settings: the logo buttons wrap on small phones */
+      .sp-top, .sp-act { flex-wrap: wrap; }
+      .sp-card { min-width: 0; }
       .qa-it { grid-template-columns: 40px 1fr; grid-template-rows: auto auto; column-gap: 10px; row-gap: 0; min-height: 64px; padding: 10px 12px; border-radius: 16px; }
       .qa-ic { grid-row: span 2; width: 40px; height: 40px; font-size: 1.15rem; }
       .qa-it b { font-size: .9rem; line-height: 1.25; }
