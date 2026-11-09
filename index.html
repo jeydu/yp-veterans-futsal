@@ -3,7 +3,8 @@
 <head>
   <meta charset="utf-8">
   <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://www.youtube.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: blob: https:; media-src 'self' blob: https://ooofcwqeosatktwlahnq.supabase.co; connect-src 'self' https://ooofcwqeosatktwlahnq.supabase.co; frame-src https://www.youtube.com https://www.youtube-nocookie.com; object-src 'none'; base-uri 'self'; form-action 'self' https://wa.me">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#ffffff">
   <meta name="color-scheme" content="light only">
   <title>YP Veterans Futsal</title>
   <meta name="description" content="YP Veterans Futsal Tournament, organised by Young Players SC.">
@@ -22,7 +23,7 @@
   <meta name="twitter:card" content="summary_large_image">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700&family=Inter:wght@400;500;600&family=Noto+Sans+Thaana:wght@400;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800&family=Inter:wght@400;500;600&family=Noto+Sans+Thaana:wght@400;700&display=swap" rel="stylesheet">
   <script>
     // Lets the CSS hide parts that the script fills in (e.g. registration, until we know it is open)
     document.documentElement.classList.add("js");
@@ -1473,6 +1474,275 @@
       .stats { grid-template-columns: 1fr 1fr; }
       .stat { padding: 16px 14px; }
     }
+
+    /* ---------- Matchday (phone first) ----------
+       White, charcoal and YP red. The Match Centre sits on the first screen; scores are big and bold;
+       rounded cards with one spacing rhythm; a tab bar along the bottom on phones (clear of the iPhone home bar). */
+    :root { --ink: #18181b; --ink-2: #27272a; --red: #c8102e; --line: #e7e7ea; --soft: #f4f4f5; --page: #f6f6f7;
+      --r: 20px; --r-sm: 14px; --shadow: 0 1px 2px rgba(16, 16, 20, .04), 0 8px 24px rgba(16, 16, 20, .06); --ease: cubic-bezier(.2, .8, .2, 1); --tabh: 64px; }
+    body { background: var(--page); -webkit-tap-highlight-color: transparent; }
+    .wrap { padding-left: max(16px, env(safe-area-inset-left)); padding-right: max(16px, env(safe-area-inset-right)); }
+    html { scroll-padding-top: 76px; }
+    a:focus-visible, button:focus-visible { outline: 3px solid var(--red); outline-offset: 2px; }
+
+    /* Top bar: on phones it runs edge to edge under the iPhone status bar */
+    @media (max-width: 720px) {
+      nav { margin: 0; top: 0; padding-top: env(safe-area-inset-top); border: 0; border-bottom: 1px solid var(--line); border-radius: 0; box-shadow: none; background: rgba(255, 255, 255, .94); }
+      nav .wrap { height: 58px; padding-left: max(14px, env(safe-area-inset-left)); padding-right: max(14px, env(safe-area-inset-right)); }
+      nav .logo img { width: 38px; height: 38px; }
+      .logo-name { font-size: .95rem; }
+      html { scroll-padding-top: 70px; }
+      /* The live strip lies over the page under the bar, so showing or hiding it never moves the page */
+      nav { overflow: visible; }
+      .livebar { position: absolute; left: 0; right: 0; top: 100%; box-shadow: 0 6px 16px rgba(16, 16, 20, .12); }
+      html.mc-away { scroll-padding-top: 108px; }
+    }
+    /* The strip under the top bar only once the Match Centre has scrolled away (it shows the same match) */
+    html:not(.mc-away) .livebar { display: none !important; }
+    .livebar { min-height: 38px; }
+
+    /* Top: shorter, so the Match Centre is on the first screen */
+    header.hero { min-height: 300px; }
+    @media (max-width: 720px) {
+      header.hero { min-height: 0; margin: 12px 16px 0; margin-left: max(16px, env(safe-area-inset-left)); margin-right: max(16px, env(safe-area-inset-right)); padding: 20px 0 18px; border-radius: var(--r); }
+      header.hero .wrap { padding-left: 18px; padding-right: 18px; }
+      .hero-photo { background-position: 50% 30%; }
+      header.hero::before { background: linear-gradient(180deg, rgba(12, 12, 14, .45) 0%, rgba(12, 12, 14, .82) 100%); }
+      .hero .tag { padding: 4px 10px; font-size: .68rem; }
+      .hero h1 { margin: 10px 0 2px; font-size: 1.6rem; line-height: 1.15; }
+      :root[lang="dv"] .hero h1 { font-size: 1.45rem; line-height: 1.6; }
+      .hero-sub { font-size: .86rem; line-height: 1.45; }
+      .hero-btns { display: none; }
+    }
+
+    /* ---------- Match Centre ---------- */
+    .mc { padding: 20px 0 var(--sec); }
+    .mc-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 12px; }
+    section .mc-head h2 { margin: 0; text-align: start; font: 800 1.3rem/1.2 "Plus Jakarta Sans", sans-serif; letter-spacing: -.02em; }
+    :root[lang="dv"] section .mc-head h2 { font-family: "Faruma", "Noto Sans Thaana", sans-serif; font-weight: 400; line-height: 1.6; }
+    .mc-all { display: inline-flex; align-items: center; gap: 6px; min-height: 44px; padding: 0 2px; color: var(--red); font: 600 .9rem "Inter", sans-serif; text-decoration: none; }
+    .mc-all:hover { text-decoration: underline; }
+    :root[dir="rtl"] .mc-all .ic, :root[dir="rtl"] .mc-go { transform: scaleX(-1); }
+    .mc-grid { display: grid; gap: 12px; }
+    @media (min-width: 720px) { .mc-grid { grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 16px; } }
+    .mc-card { position: relative; display: block; min-width: 0; padding: 16px; background: #fff; color: var(--ink); border: 1px solid var(--line); border-radius: var(--r); box-shadow: var(--shadow); text-decoration: none; }
+    .mc-top { display: flex; align-items: center; flex-wrap: wrap; gap: 6px 8px; min-height: 26px; margin-bottom: 14px; color: var(--muted); font: 600 .78rem/1.3 "Inter", sans-serif; }
+    .mc-meta { margin-inline-start: auto; text-align: end; }
+    .mc-label { color: var(--ink); font-weight: 700; font-size: .82rem; }
+    .mc-pill { padding: 3px 9px; border-radius: 99px; background: var(--ink); color: #fff; font-size: .7rem; font-weight: 700; letter-spacing: .02em; }
+    .mc-row { display: grid; grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr); align-items: center; gap: 8px; }
+    .mc-t { align-self: start; display: flex; flex-direction: column; align-items: center; gap: 8px; min-width: 0; min-height: 44px; padding: 4px 2px; border-radius: var(--r-sm); text-align: center; transition: transform .15s var(--ease); }
+    .mc-t:active { transform: scale(.96); }
+    .mc-t .fxl { width: 52px; height: 52px; border-color: var(--line); }
+    .mc-t .fxl-i { background: var(--ink-2); font-size: .95rem; }
+    .mc-n { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; max-width: 100%; font: 700 .9rem/1.25 "Plus Jakarta Sans", sans-serif; letter-spacing: -.01em; overflow-wrap: anywhere; }
+    .mc-t.lose .mc-n { color: var(--muted); font-weight: 600; }
+    .mc-score { display: flex; align-items: center; gap: 6px; font: 800 2.6rem/1 "Plus Jakarta Sans", sans-serif; letter-spacing: -.03em; font-variant-numeric: tabular-nums; }
+    .mc-score i { font-style: normal; font-weight: 600; font-size: .6em; color: #c4c4cc; }
+    .mc-vs { padding: 6px 10px; border-radius: 10px; background: var(--soft); color: var(--muted); font: 800 .85rem "Plus Jakarta Sans", sans-serif; letter-spacing: .06em; }
+    .mc-ko { display: flex; flex-direction: column; align-items: center; gap: 3px; min-width: 76px; padding: 9px 10px; border-radius: var(--r-sm); background: var(--soft); }
+    .mc-ko b { font: 800 1.45rem/1 "Plus Jakarta Sans", sans-serif; letter-spacing: -.02em; font-variant-numeric: tabular-nums; }
+    .mc-ko small { font: 600 .72rem/1.2 "Inter", sans-serif; color: var(--muted); white-space: nowrap; }
+    .mc-foot { display: flex; align-items: center; flex-wrap: wrap; gap: 4px 8px; margin-top: 14px; padding-top: 12px; border-top: 1px solid var(--line); color: var(--muted); font: 500 .82rem/1.35 "Inter", sans-serif; }
+    .mc-foot b { margin-inline-start: auto; color: var(--ink); font-weight: 700; }
+    .mc-pens { justify-content: center; color: var(--ink); font-weight: 600; }
+    /* Live: charcoal card, red LIVE label, the biggest score on the page */
+    .mc-live { background: var(--ink); border-color: var(--ink); color: #fff; box-shadow: 0 12px 32px rgba(24, 24, 27, .22); }
+    .mc-live .mc-top, .mc-live .mc-meta { color: rgba(255, 255, 255, .66); }
+    .mc-live .live-tag { padding: 5px 10px; border-radius: 99px; background: var(--red); font: 800 .72rem/1 "Inter", sans-serif; letter-spacing: .1em; }
+    .mc-live .mc-state { color: #fff; font-weight: 700; }
+    .mc-live .mc-score { font-size: 3.1rem; }
+    .mc-live .mc-score i { color: rgba(255, 255, 255, .35); }
+    .mc-live .fxl { border-color: transparent; box-shadow: 0 0 0 3px rgba(255, 255, 255, .12); }
+    .mc-live .fxl-i { background: #3f3f46; }
+    .mc-live .mc-vs { background: rgba(255, 255, 255, .1); color: #fff; }
+    .mc-watch { display: flex; align-items: center; justify-content: center; gap: 8px; min-height: 48px; margin-top: 16px; border-radius: 99px; background: var(--red); color: #fff; font: 700 .92rem "Inter", sans-serif; text-decoration: none; transition: background .15s ease; }
+    .mc-watch:hover { background: #a90d27; }
+    .mc-watch svg { width: 18px; height: 18px; }
+    /* Nothing scheduled yet, and the registration card */
+    .mc-soon, .mc-reg { display: flex; align-items: center; gap: 14px; }
+    .mc-soon > span:last-child, .mc-reg > span:nth-child(2) { min-width: 0; }
+    .mc-ic { flex: none; display: grid; place-items: center; width: 46px; height: 46px; border-radius: var(--r-sm); background: var(--soft); color: var(--ink); font-size: 1.3rem; }
+    .mc-soon b, .mc-reg b { display: block; font: 700 .98rem/1.3 "Plus Jakarta Sans", sans-serif; }
+    .mc-soon small, .mc-reg small { display: block; margin-top: 2px; color: var(--muted); font-size: .84rem; line-height: 1.4; }
+    .mc-reg { border-color: rgba(200, 16, 46, .22); background: #fff6f7; transition: transform .15s var(--ease); }
+    .mc-reg:active { transform: scale(.985); }
+    .mc-reg .mc-ic { background: var(--red); color: #fff; }
+    .mc-go { flex: none; margin-inline-start: auto; color: var(--red); font-size: 1.2rem; }
+    :root[lang="dv"] .mc-n, :root[lang="dv"] .mc-soon b, :root[lang="dv"] .mc-reg b { line-height: 1.6; }
+    @media (max-width: 359px) {
+      .mc-card { padding: 14px 12px; }
+      .mc-t .fxl { width: 44px; height: 44px; }
+      .mc-score { font-size: 2.2rem; }
+      .mc-live .mc-score { font-size: 2.6rem; }
+      .mc-n { font-size: .84rem; }
+      .mc-ko { min-width: 68px; padding: 8px; }
+      .mc-ko b { font-size: 1.25rem; }
+    }
+
+    /* ---------- Fixtures: a card per day, a clear row per match ---------- */
+    .fx-day { border: 1px solid var(--line); border-top: 1px solid var(--line); border-radius: var(--r); box-shadow: var(--shadow); }
+    .fx-day h3 { padding: 14px 16px 10px; color: var(--ink); font: 700 .88rem "Plus Jakarta Sans", sans-serif; letter-spacing: 0; border-bottom: 1px solid var(--line); }
+    .fx-m { padding: 14px 16px; }
+    .fx-m + .fx-m { border-top: 1px solid var(--line); }
+    .fx-time { color: var(--ink); font-weight: 800; }
+    .fx-m.played .fx-time { color: var(--muted); font: 700 .74rem "Inter", sans-serif; letter-spacing: .04em; }
+    .fx-score, .m-score, .tm-sc { background: var(--ink); border-radius: 10px; font-weight: 800; }
+    .fx-score { min-width: 70px; font-size: 1.3rem; }
+    .fx-m.live { background: #fff; box-shadow: inset 4px 0 0 var(--red); }
+    .fx-m.live .fx-score { background: var(--red); }
+    .fx-vs { border: 0; border-radius: 10px; background: var(--soft); color: var(--muted); font-weight: 800; }
+    .live-tag { border-radius: 99px; }
+    .fx-watch { display: inline-flex; align-items: center; min-height: 36px; border-radius: 99px; }
+    @media (max-width: 720px) {
+      .fx-m { padding: 12px 14px; }
+      .fx-n, .fx-t.home .fx-n { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; font-size: .88rem; line-height: 1.25; text-transform: none; overflow-wrap: anywhere; }
+      .fx-t { min-width: 0; }
+      .fxl { width: 42px; height: 42px; }
+    }
+
+    /* ---------- League table: rank, team and points first; readable at 320 px ---------- */
+    .lg-card { border: 1px solid var(--line); border-top: 1px solid var(--line); border-radius: var(--r); box-shadow: var(--shadow); }
+    .lg th { padding: 11px 6px; border-bottom: 1px solid var(--line); font-size: .68rem; letter-spacing: .06em; }
+    .lg abbr { text-decoration: none; }
+    .lg td { padding: 10px 6px; border-top: 1px solid var(--line); font-weight: 500; }
+    .lg tbody tr:first-child td { border-top: 0; }
+    .lg .lg-pos { width: 34px; color: var(--muted); font: 700 .92rem "Plus Jakarta Sans", sans-serif; }
+    .lg tr.q .lg-pos { color: var(--red); box-shadow: inset 3px 0 0 var(--red); }
+    .lg .lg-pts { width: 46px; color: var(--ink); font: 800 1.08rem "Plus Jakarta Sans", sans-serif; }
+    .lg th.lg-pts { color: var(--ink); font: 800 .7rem "Inter", sans-serif; }
+    .lg .tl { display: flex; align-items: center; gap: 10px; min-height: 44px; min-width: 0; text-align: start; }
+    .lg .tl b { font: 700 .95rem/1.25 "Plus Jakarta Sans", sans-serif; text-transform: none; letter-spacing: -.01em; white-space: normal; overflow-wrap: anywhere; }
+    .lg .lg-nm { min-width: 0; }
+    .lg-foot { font-size: .78rem; }
+    .lg-foot .lg-qk { border-radius: 2px; }
+    .lg-yr { border-radius: 99px; }
+    .lg-yr.on { border-color: var(--ink); background: var(--ink); }
+    @media (max-width: 559px) {
+      .lg .lg-wdl, .lg .lg-x { display: none; }
+      .lg th, .lg td { padding: 9px 5px; }
+      .lg .lg-tm { padding-inline-start: 2px; }
+      .lg .tl { gap: 9px; }
+      .lg .fxl { width: 30px; height: 30px; }
+      .lg .tl b { font-size: .9rem; }
+      .lg .lg-gd { width: 40px; color: var(--muted); }
+      .lg-fm { display: block; }
+    }
+    @media (max-width: 359px) {
+      .lg .lg-pos { width: 26px; }
+      .lg .fxl { width: 26px; height: 26px; }
+      .lg .tl b { font-size: .86rem; }
+      .lg .lg-pts { width: 36px; }
+    }
+
+    /* ---------- Teams, champions, gallery: rounded cards with the existing crests and photos ---------- */
+    .tm-strip { grid-template-columns: repeat(auto-fill, minmax(148px, 1fr)); gap: 12px; }
+    .tm-card { padding: 18px 12px 14px; border: 1px solid var(--line); border-top: 1px solid var(--line); border-radius: var(--r); box-shadow: var(--shadow); transition: transform .2s var(--ease), box-shadow .2s var(--ease); }
+    .tm-card:hover { transform: translateY(-2px); box-shadow: 0 12px 28px rgba(16, 16, 20, .1); }
+    .tm-card:active { transform: scale(.98); }
+    .tm-card .fxl { width: 68px; height: 68px; box-shadow: 0 4px 14px rgba(0, 0, 0, .08); }
+    .tm-card b { font: 700 .95rem/1.25 "Plus Jakarta Sans", sans-serif; text-transform: none; overflow-wrap: anywhere; }
+    @media (max-width: 400px) { .tm-strip { grid-template-columns: 1fr 1fr; gap: 10px; } .tm-card { padding: 16px 8px 12px; } .tm-card .fxl { width: 58px; height: 58px; } }
+    .poster { border: 1px solid var(--line); border-radius: var(--r); box-shadow: var(--shadow); }
+    .poster-cap { padding: 14px 16px 16px; }
+    .poster-tag, .w-badge { background: rgba(24, 24, 27, .82); -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px); }
+    .gallery .photo { border-radius: var(--r-sm); }
+    .gal-grid { gap: 8px; }
+    .gal-item { border-radius: var(--r-sm); }
+    .gal-item:active img { transform: scale(1.02); }
+    .gal-play { width: 48px; height: 48px; border-radius: 50%; background: rgba(24, 24, 27, .78); }
+    @media (max-width: 720px) {
+      .posters { grid-template-columns: 1fr; gap: 14px; }
+      .gal-grid { grid-template-columns: repeat(2, 1fr); gap: 6px; }
+      .gallery { grid-template-columns: repeat(3, 1fr); gap: 6px; }
+      .champ-logo { width: 72px; height: 72px; }
+    }
+    .stat { border-radius: var(--r); }
+    .stat-num { font-weight: 800; }
+
+    /* Section titles on phones: start-aligned and a little smaller, so content comes sooner */
+    @media (max-width: 720px) {
+      section h2 { font-size: 1.45rem; }
+      .champ-head h2 { font-size: 1.6rem; }
+    }
+
+    /* Past winners and results by year (phones): one column; the years as a row of compact cards */
+    .res-year { border-radius: var(--r); border: 1px solid var(--line); box-shadow: var(--shadow); transition: transform .15s var(--ease), border-color .15s ease; }
+    .res-year:active { transform: scale(.97); }
+    @media (max-width: 720px) {
+      .duo-row { grid-template-columns: 1fr; gap: 22px; }
+      .duo h2 { font-size: 1.1rem; margin-bottom: 10px; }
+      .duo .res-list { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+      .duo .res-year { height: 76px; padding: 12px; justify-content: center; }
+      .duo .res-year .res-big { font-size: 1.5rem; font-weight: 800; }
+      #history .res-list { grid-template-columns: 1fr; }
+      #history .res-year { flex-direction: row; align-items: center; justify-content: flex-start; gap: 12px; height: 64px; padding: 0 16px; }
+      .pw-years { font-size: 1.15rem; }
+    }
+    /* Section titles on phones: start-aligned, like the Match Centre (Contact stays centred) */
+    @media (max-width: 720px) {
+      section:not(#contact):not(.sp-strip) .eyebrow { justify-content: flex-start; }
+      section:not(#contact) h2, section:not(#contact) .lead, .sec-head { text-align: start; }
+      section:not(#contact) .lead { margin-inline: 0; }
+      .champ-head { align-items: flex-start; text-align: start; }
+      .gal-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 4px; }
+      .gal-item { border-radius: 10px; }
+      .gal-cap { display: none; }
+    }
+
+    /* ---------- Tab bar (phones): Home, Matches, Table, Teams, More ---------- */
+    @media (max-width: 720px) {
+      body { padding-bottom: calc(var(--tabh) + env(safe-area-inset-bottom)); }
+      .tabbar { left: 0; right: 0; bottom: 0; z-index: 30; display: grid; grid-template-columns: none; grid-auto-flow: column; grid-auto-columns: minmax(0, 1fr); gap: 2px;
+        padding: 6px max(8px, env(safe-area-inset-right)) calc(6px + env(safe-area-inset-bottom)) max(8px, env(safe-area-inset-left));
+        border: 0; border-top: 1px solid var(--line); border-radius: 0; background: rgba(255, 255, 255, .95); box-shadow: 0 -6px 24px rgba(16, 16, 20, .05);
+        -webkit-backdrop-filter: blur(16px) saturate(1.5); backdrop-filter: blur(16px) saturate(1.5); }
+      .tabbar [hidden] { display: none !important; }
+      .tabbar a, .tabbar button { position: relative; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; min-height: 52px; padding: 4px 2px;
+        border: 0; border-radius: var(--r-sm); background: none; color: #71717a; font: 600 .68rem/1.2 "Inter", sans-serif; text-decoration: none; cursor: pointer; transition: color .15s ease; }
+      .tabbar .ic { font-size: 1.4rem; stroke-width: 1.9; transition: transform .2s var(--ease); }
+      .tabbar a:active .ic, .tabbar button:active .ic { transform: scale(.88); }
+      .tabbar a.on, .tabbar button.on { background: none; color: var(--red); }
+      .tabbar .on .ic { stroke-width: 2.3; }
+      .tabbar .on::before { content: ""; position: absolute; top: 0; left: 50%; width: 22px; height: 3px; margin-left: -11px; border-radius: 0 0 3px 3px; background: var(--red); }
+      .tabbar span { max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+      :root[lang="dv"] .tabbar a, :root[lang="dv"] .tabbar button { font: .78rem/1.3 "Faruma", "Noto Sans Thaana", sans-serif; }
+      /* A match is being played: a red dot on Matches */
+      .tabbar.is-live [data-sec="matches"]::after { content: ""; position: absolute; top: 7px; left: calc(50% + 8px); width: 8px; height: 8px; border-radius: 50%; background: var(--red); box-shadow: 0 0 0 2px #fff; animation: live-dot 1.2s ease-in-out infinite; }
+      /* Registration: Next and Back stay just above the tab bar */
+      .wz-nav { bottom: calc(var(--tabh) + 8px + env(safe-area-inset-bottom)); }
+      footer { padding-bottom: 20px; }
+    }
+
+    /* ---------- More (phones): a sheet that slides up ---------- */
+    .more-sheet { position: fixed; inset: auto 0 0 0; width: 100%; max-width: 560px; max-height: min(88dvh, 760px); margin: 0 auto; padding: 0; border: 0; background: transparent; color: var(--ink); overflow: visible; }
+    .more-sheet::backdrop { background: rgba(12, 12, 14, .45); }
+    .more-sheet[open] { animation: ms-fade .2s ease; }
+    .ms-in { max-height: inherit; overflow-y: auto; overscroll-behavior: contain; padding: 6px 16px calc(16px + env(safe-area-inset-bottom)); border-radius: 24px 24px 0 0; background: #fff; box-shadow: 0 -12px 40px rgba(0, 0, 0, .16); transition: transform .25s var(--ease); }
+    .more-sheet[open] .ms-in { animation: ms-up .34s var(--ease); }
+    @keyframes ms-up { from { transform: translateY(100%); } }
+    @keyframes ms-fade { from { opacity: 0; } }
+    html:has(.more-sheet[open]) { overflow: hidden; }
+    .ms-grab { width: 40px; height: 5px; margin: 6px auto 8px; border-radius: 99px; background: #d4d4d8; }
+    .ms-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 12px; }
+    .ms-head h2 { margin: 0; font: 800 1.25rem "Plus Jakarta Sans", sans-serif; text-align: start; text-transform: none; }
+    :root[lang="dv"] .ms-head h2 { font-family: "Faruma", "Noto Sans Thaana", sans-serif; font-weight: 400; }
+    .ms-close { display: grid; place-items: center; width: 44px; height: 44px; border: 0; border-radius: 50%; background: var(--soft); color: var(--ink); font-size: 1.15rem; cursor: pointer; }
+    .ms-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+    .ms-grid a { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; min-height: 86px; padding: 10px 6px; border-radius: 16px; background: var(--soft); color: var(--ink); text-align: center; text-decoration: none; font: 600 .8rem/1.25 "Inter", sans-serif; transition: transform .15s var(--ease), background .15s ease; }
+    .ms-grid a:active { transform: scale(.96); background: #ececee; }
+    .ms-grid a[hidden] { display: none; }
+    .ms-grid .ic { font-size: 1.45rem; color: var(--red); }
+    :root[lang="dv"] .ms-grid a { font: .86rem/1.5 "Faruma", "Noto Sans Thaana", sans-serif; }
+    .ms-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-top: 14px; padding: 12px 0; border-top: 1px solid var(--line); font: 600 .9rem "Inter", sans-serif; }
+    .ms-lang { display: flex; padding: 4px; border-radius: 99px; background: var(--soft); }
+    .ms-lang button { min-width: 44px; min-height: 44px; padding: 0 16px; border: 0; border-radius: 99px; background: none; color: var(--muted); cursor: pointer; font: 600 .88rem "Inter", sans-serif; }
+    .ms-lang .ms-dv { font: 1rem "Faruma", "Noto Sans Thaana", sans-serif; }
+    .ms-lang [aria-pressed="true"] { background: var(--ink); color: #fff; }
+    .ms-contact { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 4px; }
+    .ms-contact a { display: flex; align-items: center; justify-content: center; min-height: 48px; border-radius: 99px; text-decoration: none; font: 700 .9rem "Inter", sans-serif; }
+    .ms-wa { background: var(--ink); color: #fff; }
+    .ms-call { background: var(--soft); color: var(--ink); font-variant-numeric: tabular-nums; }
 </style>
 </head>
 <body>
@@ -1530,14 +1800,20 @@
     <symbol id="i-check" viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5"/></symbol>
     <symbol id="i-x" viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12"/></symbol>
     <symbol id="i-camera" viewBox="0 0 24 24"><path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z"/><circle cx="12" cy="13" r="3"/></symbol>
+    <symbol id="i-grid" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></symbol>
+    <symbol id="i-news" viewBox="0 0 24 24"><path d="M4 22h14a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2H8a2 2 0 0 0-2 2v16a2 2 0 0 1-2 2zm0 0a2 2 0 0 1-2-2v-9h4M10 6h6M10 10h6M10 14h4"/></symbol>
+    <symbol id="i-star" viewBox="0 0 24 24"><path d="M12 2l3.1 6.3 6.9 1-5 4.9 1.2 6.8L12 17.8 5.8 21l1.2-6.8-5-4.9 6.9-1z"/></symbol>
+    <symbol id="i-info" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></symbol>
   </svg>
 
   <nav>
     <div class="wrap">
       <a class="logo" href="#"><img src="images/veterans-logo.jpg" alt="YP Veterans Futsal Tournament"><span class="logo-name"><span data-i18n="h1Top">YP Veterans</span><small data-i18n="logoSub">Futsal Tournament</small></span></a>
       <ul>
+        <li><a data-i18n="navMatches" href="#fixtures" data-go="matches">Matches</a></li>
+        <li><a data-i18n="navTable" href="#table">Table</a></li>
+        <li><a data-i18n="navTeams" href="#teams">Teams</a></li>
         <li><a data-i18n="navChamps" href="#champions">Champions</a></li>
-        <li><a data-i18n="navResults" href="#results">Results</a></li>
         <li><a data-i18n="navRegister" href="#register">Register</a></li>
         <li><a data-i18n="navContact" href="#contact">Contact</a></li>
       </ul>
@@ -1568,6 +1844,67 @@
       </div>
     </div>
   </header>
+
+  <!-- MATCH CENTRE: the match being played now first, then the next kick-off and the latest result; filled in by the script -->
+  <section id="matches" class="mc" hidden>
+    <div class="wrap">
+      <div class="mc-head">
+        <h2 data-i18n="mcTitle">Match Centre</h2>
+        <a class="mc-all" href="#fixtures" data-go="matches"><span data-i18n="mcAll">All matches</span><svg class="ic" aria-hidden="true"><use href="#i-arrow"/></svg></a>
+      </div>
+      <div class="mc-grid" id="mc-grid" aria-live="polite"></div>
+    </div>
+  </section>
+
+  <!-- FIXTURES: upcoming matches, filled in by the script from the organiser portal; hidden when there are none -->
+  <section id="fixtures" hidden>
+    <div class="wrap">
+      <span class="eyebrow"><svg class="ic" aria-hidden="true"><use href="#i-calendar"/></svg><span id="fx-season"></span></span>
+      <h2 data-i18n="fxTitle">Fixtures</h2>
+      <div class="fx-list" id="fx-list"></div>
+    </div>
+  </section>
+
+  <!-- LEAGUE TABLE: group-stage standings of the current season, worked out from the results; moves with live scores -->
+  <section id="table" hidden>
+    <div class="wrap">
+      <span class="eyebrow"><svg class="ic" aria-hidden="true"><use href="#i-trophy"/></svg><span id="lg-season"></span></span>
+      <h2 data-i18n="tblTitle">League Table</h2>
+      <div class="lg-card" id="lg-card"></div>
+    </div>
+  </section>
+
+  <!-- PAST WINNERS and MATCH RESULTS side by side: each is a small card that opens a popup -->
+  <section class="duo" style="padding-top:0">
+    <div class="wrap duo-row">
+    <div id="history">
+      <h2 data-i18n="pastTitle">Past Winners</h2>
+      <!-- Opens the popup below with every winner -->
+      <div class="res-list">
+        <button type="button" class="res-year pw-open" data-i18n-label="pastTitle" aria-label="Past Winners">
+          <svg class="ic pw-icon" aria-hidden="true"><use href="#i-trophy"/></svg>
+          <span class="pw-years" dir="ltr">2022 – 2026</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Match results: one card per year. Scores live in RESULTS in the script at the bottom. -->
+    <div id="results">
+      <h2 data-i18n="resTitle">Match Results</h2>
+      <div class="res-list" id="res-list"></div>
+    </div>
+    </div>
+  </section>
+
+  <!-- TEAMS: a card per club from the fixtures and results; each opens that team's page (a popup with its own link, #team=Name) -->
+  <section id="teams" hidden>
+    <div class="wrap">
+      <span class="eyebrow"><svg class="ic" aria-hidden="true"><use href="#i-users"/></svg><span data-i18n="teamsEyebrow">Clubs</span></span>
+      <h2 data-i18n="teamsTitle">Teams</h2>
+      <p class="lead" data-i18n="teamsLead">Tap a team to see every match it has played, its record and its squad.</p>
+      <div class="tm-strip" id="tm-strip"></div>
+    </div>
+  </section>
 
   <!-- LATEST CHAMPIONS — put your photos in the "images" folder with these exact names -->
   <!-- SPONSOR STRIP: every sponsor's logo in a moving loop, from the organiser portal (Sponsors); hidden until there is one -->
@@ -1609,13 +1946,13 @@
       </div>
       <div class="gallery">
         <div class="photo" data-file="images/champions-1.jpg">
-          <img loading="lazy" decoding="async" src="images/champions-1.jpg" alt="Champions celebrating" onerror="this.parentElement.classList.add('empty')">
+          <img decoding="async" src="images/champions-1.jpg" alt="Champions celebrating" onerror="this.parentElement.classList.add('empty')">
         </div>
         <div class="photo" data-file="images/champions-2.jpg">
-          <img loading="lazy" decoding="async" src="images/champions-2.jpg" alt="Final match action" onerror="this.parentElement.classList.add('empty')">
+          <img decoding="async" src="images/champions-2.jpg" alt="Final match action" onerror="this.parentElement.classList.add('empty')">
         </div>
         <div class="photo" data-file="images/champions-3.jpg">
-          <img loading="lazy" decoding="async" src="images/champions-3.jpg" alt="Trophy presentation" onerror="this.parentElement.classList.add('empty')">
+          <img decoding="async" src="images/champions-3.jpg" alt="Trophy presentation" onerror="this.parentElement.classList.add('empty')">
         </div>
       </div>
     </div>
@@ -1636,56 +1973,6 @@
         <div class="stat"><span class="stat-num">4</span><span data-i18n="statDifferent" class="stat-label">Different champions</span></div>
         <div class="stat"><span class="stat-num">2×</span><span data-i18n="statMost" class="stat-label">Most titles · FT Nakasole</span></div>
       </div>
-    </div>
-  </section>
-
-  <!-- PAST WINNERS and MATCH RESULTS side by side: each is a small card that opens a popup -->
-  <section class="duo" style="padding-top:0">
-    <div class="wrap duo-row">
-    <div id="history">
-      <h2 data-i18n="pastTitle">Past Winners</h2>
-      <!-- Opens the popup below with every winner -->
-      <div class="res-list">
-        <button type="button" class="res-year pw-open" data-i18n-label="pastTitle" aria-label="Past Winners">
-          <svg class="ic pw-icon" aria-hidden="true"><use href="#i-trophy"/></svg>
-          <span class="pw-years">2022 – 2026</span>
-        </button>
-      </div>
-    </div>
-
-    <!-- Match results: one card per year. Scores live in RESULTS in the script at the bottom. -->
-    <div id="results">
-      <h2 data-i18n="resTitle">Match Results</h2>
-      <div class="res-list" id="res-list"></div>
-    </div>
-    </div>
-  </section>
-
-  <!-- FIXTURES: upcoming matches, filled in by the script from the organiser portal; hidden when there are none -->
-  <section id="fixtures" hidden>
-    <div class="wrap">
-      <span class="eyebrow"><svg class="ic" aria-hidden="true"><use href="#i-calendar"/></svg><span id="fx-season"></span></span>
-      <h2 data-i18n="fxTitle">Fixtures</h2>
-      <div class="fx-list" id="fx-list"></div>
-    </div>
-  </section>
-
-  <!-- LEAGUE TABLE: group-stage standings of the current season, worked out from the results; moves with live scores -->
-  <section id="table" hidden>
-    <div class="wrap">
-      <span class="eyebrow"><svg class="ic" aria-hidden="true"><use href="#i-trophy"/></svg><span id="lg-season"></span></span>
-      <h2 data-i18n="tblTitle">League Table</h2>
-      <div class="lg-card" id="lg-card"></div>
-    </div>
-  </section>
-
-  <!-- TEAMS: a card per club from the fixtures and results; each opens that team's page (a popup with its own link, #team=Name) -->
-  <section id="teams" hidden>
-    <div class="wrap">
-      <span class="eyebrow"><svg class="ic" aria-hidden="true"><use href="#i-users"/></svg><span data-i18n="teamsEyebrow">Clubs</span></span>
-      <h2 data-i18n="teamsTitle">Teams</h2>
-      <p class="lead" data-i18n="teamsLead">Tap a team to see every match it has played, its record and its squad.</p>
-      <div class="tm-strip" id="tm-strip"></div>
     </div>
   </section>
 
@@ -2060,14 +2347,47 @@
     </div>
   </section>
 
-  <!-- Phones: the menu as a tab bar at the bottom, like an app -->
+  <!-- Phones: the menu as a tab bar along the bottom, like an app. More opens a sheet with every other part of the page -->
   <div class="tabbar" id="tabbar" role="navigation" aria-label="Main">
-    <a href="#top" data-sec="top" class="on"><svg class="ic" aria-hidden="true"><use href="#i-home"/></svg><span data-i18n="navHome">Home</span></a>
-    <a href="#results" data-sec="results"><svg class="ic" aria-hidden="true"><use href="#i-calendar"/></svg><span data-i18n="navResults">Results</span></a>
+    <a href="#top" data-sec="top" class="on" aria-current="true"><svg class="ic" aria-hidden="true"><use href="#i-home"/></svg><span data-i18n="navHome">Home</span></a>
+    <a href="#fixtures" data-sec="matches" data-go="matches"><svg class="ic" aria-hidden="true"><use href="#i-ball"/></svg><span data-i18n="navMatches">Matches</span></a>
     <a href="#table" data-sec="table"><svg class="ic" aria-hidden="true"><use href="#i-table"/></svg><span data-i18n="navTable">Table</span></a>
     <a href="#teams" data-sec="teams"><svg class="ic" aria-hidden="true"><use href="#i-users"/></svg><span data-i18n="navTeams">Teams</span></a>
-    <a href="#contact" data-sec="contact"><svg class="ic" aria-hidden="true"><use href="#i-phone"/></svg><span data-i18n="navContact">Contact</span></a>
+    <button type="button" data-sec="more" id="more-btn" aria-haspopup="dialog" aria-controls="more-sheet"><svg class="ic" aria-hidden="true"><use href="#i-grid"/></svg><span data-i18n="navMore">More</span></button>
   </div>
+
+  <!-- More: the rest of the page, the language and the contact buttons, in a sheet that slides up -->
+  <dialog id="more-sheet" class="more-sheet" aria-labelledby="more-title">
+    <div class="ms-in">
+      <div class="ms-grab" aria-hidden="true"></div>
+      <div class="ms-head">
+        <h2 id="more-title" data-i18n="navMore">More</h2>
+        <button type="button" class="ms-close" data-i18n-label="close" aria-label="Close"><svg class="ic" aria-hidden="true"><use href="#i-x"/></svg></button>
+      </div>
+      <div class="ms-grid">
+        <a href="#champions" data-ms="champions"><svg class="ic" aria-hidden="true"><use href="#i-trophy"/></svg><span data-i18n="navChamps">Champions</span></a>
+        <a href="#history" data-ms="history"><svg class="ic" aria-hidden="true"><use href="#i-crown"/></svg><span data-i18n="pastTitle">Past Winners</span></a>
+        <a href="#results" data-ms="results"><svg class="ic" aria-hidden="true"><use href="#i-calendar"/></svg><span data-i18n="navResults">Results</span></a>
+        <a href="#news" data-ms="news"><svg class="ic" aria-hidden="true"><use href="#i-news"/></svg><span data-i18n="newsTitle">News</span></a>
+        <a href="#gallery" data-ms="gallery"><svg class="ic" aria-hidden="true"><use href="#i-camera"/></svg><span data-i18n="galTitle">Gallery</span></a>
+        <a href="#register" data-ms="register"><svg class="ic" aria-hidden="true"><use href="#i-user-plus"/></svg><span data-i18n="navRegister">Register</span></a>
+        <a href="#sponsors" data-ms="sponsors"><svg class="ic" aria-hidden="true"><use href="#i-star"/></svg><span data-i18n="spTitle">Our Sponsors</span></a>
+        <a href="#about" data-ms="about"><svg class="ic" aria-hidden="true"><use href="#i-info"/></svg><span data-i18n="aboutTitle">The Tournament</span></a>
+        <a href="#contact" data-ms="contact"><svg class="ic" aria-hidden="true"><use href="#i-phone"/></svg><span data-i18n="navContact">Contact</span></a>
+      </div>
+      <div class="ms-row">
+        <span data-i18n="msLang">Language</span>
+        <div class="ms-lang" role="group" aria-label="Language" dir="ltr">
+          <button type="button" data-l="en" lang="en">English</button>
+          <button type="button" data-l="dv" lang="dv" class="ms-dv">ދިވެހި</button>
+        </div>
+      </div>
+      <div class="ms-contact" dir="ltr">
+        <a href="https://wa.me/9609763551" target="_blank" rel="noopener" class="ms-wa">WhatsApp</a>
+        <a href="tel:+9609763551" class="ms-call">+960 976-3551</a>
+      </div>
+    </div>
+  </dialog>
 
   <footer>
     <img src="images/yp-logo.jpg" alt="" loading="lazy" decoding="async">
@@ -2306,6 +2626,21 @@
       tblLive: "މެޗު ކުޅެމުންދާއިރު ޓޭބަލް ބަދަލުވާނެ",
       barNext: "ދެން އޮތް މެޗު",
       barIn: s => s + " ފަހުން",
+      navMatches: "މެޗުތައް",
+      navMore: "އިތުރު",
+      mcTitle: "މެޗު ސެންޓަރ",
+      mcAll: "ހުރިހާ މެޗެއް",
+      mcLatest: "ފަހުގެ ނަތީޖާ",
+      mcFt: "ނިމުނީ",
+      mc1h: "ފުރަތަމަ ހާފު",
+      mc2h: "ދެވަނަ ހާފު",
+      mcToday: "މިއަދު",
+      mcTomorrow: "މާދަމާ",
+      mcSoon: y => y + " ގެ ފިކްސްޗަރސް ވަރަށް އަވަހަށް",
+      mcSoonSub: "ތާވަލު ތައްޔާރުވުމާއެކު މިތަނުގައި ފެންނާނެ.",
+      mcRegOpen: "ރަޖިސްޓްރީ ހުޅުވިފައި",
+      mcRegSub: d => d ? d + " ގައި ބަންދުވާނެ" : "ޓީމު ރަޖިސްޓްރީ ކުރައްވާ",
+      msLang: "ބަސް",
       statDifferentN: "ތަފާތު ޗެމްޕިއަނުން",
       statMostN: names => "އެންމެ ގިނަ ތަށި · " + names,
       statBiggest: o => "އެންމެ ބޮޑު ތަފާތުން މޮޅުވުން · " + o.w + " ، " + o.l + " (" + o.y + ")",
@@ -2380,6 +2715,16 @@
       tblLive: "Moves with live scores during matches",
       barNext: "Next match",
       barIn: s => "in " + s,
+      mcLatest: "Latest result",
+      mcFt: "Full time",
+      mc1h: "1st half",
+      mc2h: "2nd half",
+      mcToday: "Today",
+      mcTomorrow: "Tomorrow",
+      mcSoon: y => y + " fixtures coming soon",
+      mcSoonSub: "The schedule appears here as soon as it is ready.",
+      mcRegOpen: "Registration is open",
+      mcRegSub: d => d ? "Closes " + d : "Enter your team for the next edition",
       statEditions: "Editions",
       statFirst: "First tournament",
       statDifferentN: "Different champions",
@@ -2842,7 +3187,11 @@
       if (officialsBad || playersBad) ok = false;
 
       if (!ok) {
-        const first = regForm.querySelector(".field.invalid:not(.people-field) input, .pcard input.bad, .pcard .ph-tile.bad input");
+        const first = regForm.querySelector(".field.invalid:not(.people-field) input, .pcard input.bad, .pcard .ph-tile.bad input")
+          || regForm.querySelector(".people-field.invalid");
+        // Open the step that has the first mistake (the others are hidden), keeping everything typed in
+        const at = first && first.closest("[id^='sec-']");
+        if (at && STEPS.indexOf(at.id.slice(4)) !== step) goStep(STEPS.indexOf(at.id.slice(4)), false);
         if (first) {
           first.focus({ preventScroll: true });
           (first.closest(".ph-tile") || first).scrollIntoView({ block: "center", behavior: "smooth" });
@@ -3073,6 +3422,7 @@
         // Closed: the registration section, its menu link and the header button all disappear
         document.documentElement.classList.toggle("reg-off", !open);
         try { localStorage.setItem("yp-reg", open ? "open" : "closed"); } catch (e) {}
+        if (typeof renderMatchCentre === "function") renderMatchCentre();
         if (open) return;
         reg.classList.add("is-closed");
         regClosedOn = deadlinePassed ? settings.closes_at : null;
@@ -3226,7 +3576,7 @@
 
     // Team names and other saved text go into the page as plain text
     const escH = v => String(v ?? "").replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
-    const kickoffText = iso => new Intl.DateTimeFormat(lang === "dv" ? "dv" : "en-GB",
+    const kickoffText = iso => new Intl.DateTimeFormat(lang === "dv" ? ["dv", "en-GB"] : "en-GB",
       { timeZone: "Indian/Maldives", weekday: "short", day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" }).format(new Date(iso));
     // A club's round logo, or its initials when it has none
     const teamLogo = name => {
@@ -3278,7 +3628,7 @@
       sec.hidden = !list.length;
       if (!list.length) return;
       document.getElementById("fx-season").textContent = t("fxSeason", season ? season.year : list[0].year);
-      const fmt = (iso, o) => new Intl.DateTimeFormat(lang === "dv" ? "dv" : "en-GB", { timeZone: "Indian/Maldives", ...o }).format(new Date(iso));
+      const fmt = (iso, o) => new Intl.DateTimeFormat(lang === "dv" ? ["dv", "en-GB"] : "en-GB", { timeZone: "Indian/Maldives", ...o }).format(new Date(iso));
       const dayOf = m => m.kickoff ? fmt(m.kickoff, { weekday: "long", day: "numeric", month: "long" }) : m.year + " · " + t("resDay", m.day);
       const groups = [];
       list.forEach(m => { const d = dayOf(m); (groups.at(-1) && groups.at(-1).d === d ? groups.at(-1).ms : (groups.push({ d, ms: [] }), groups.at(-1).ms)).push(m); });
@@ -3304,6 +3654,7 @@
 
     function renderResults() {
       renderFixtures();
+      renderMatchCentre();
       const list = document.getElementById("res-list");
       const played = RESULTS.filter(r => r.matches.length);
       list.innerHTML = played.map(r =>
@@ -3608,15 +3959,15 @@
       document.getElementById("lg-card").innerHTML = `
         ${tblYears && years.length > 1 ? `<div class="lg-yrs" role="tablist">${years.map(r => `<button type="button" role="tab" class="lg-yr ${r === season ? "on" : ""}" aria-selected="${r === season}" data-lgy="${r.year}">${r.year}</button>`).join("")}</div>` : ""}
         <table class="lg">
-          <thead><tr><th>#</th><th class="lg-tm">${t("tblTeam")}</th><th>P</th><th>W</th><th>D</th><th>L</th>
-            <th class="lg-x">GF</th><th class="lg-x">GA</th><th>GD</th><th>Pts</th><th class="lg-x">${t("tblForm")}</th></tr></thead>
+          <thead><tr><th class="lg-pos" scope="col">#</th><th class="lg-tm" scope="col">${t("tblTeam")}</th><th scope="col"><abbr title="Played">P</abbr></th><th class="lg-wdl" scope="col"><abbr title="Won">W</abbr></th><th class="lg-wdl" scope="col"><abbr title="Drawn">D</abbr></th><th class="lg-wdl" scope="col"><abbr title="Lost">L</abbr></th>
+            <th class="lg-x" scope="col">GF</th><th class="lg-x" scope="col">GA</th><th class="lg-gd" scope="col"><abbr title="Goal difference">GD</abbr></th><th class="lg-pts" scope="col"><abbr title="Points">Pts</abbr></th><th class="lg-x" scope="col">${t("tblForm")}</th></tr></thead>
           <tbody>${list.map((r, i) => { const form = `<span class="lg-form">${r.form.slice(-5).map(o => `<i class="${o}">${t("tm" + o.toUpperCase()).slice(0, 1)}</i>`).join("")}</span>`; return `
             <tr class="${through.has(r.n) ? "q" : ""}">
               <td class="lg-pos">${i + 1}</td>
               <td class="lg-tm"><button type="button" class="tl" data-team="${escH(r.n)}">${teamLogo(r.n)}<span class="lg-nm"><b>${escH(r.n)}${YP_LEAGUE.changed(r.adj) ? "<sup>*</sup>" : ""}</b>${r.form.length ? `<span class="lg-fm">${form}</span>` : ""}</span>${r.live ? liveTag() : ""}</button></td>
-              <td>${r.p}</td><td>${r.w}</td><td>${r.d}</td><td>${r.l}</td>
+              <td>${r.p}</td><td class="lg-wdl">${r.w}</td><td class="lg-wdl">${r.d}</td><td class="lg-wdl">${r.l}</td>
               <td class="lg-x">${r.gf}</td><td class="lg-x">${r.ga}</td>
-              <td dir="ltr">${sign(r.gf - r.ga)}</td>
+              <td class="lg-gd" dir="ltr">${sign(r.gf - r.ga)}</td>
               <td class="lg-pts">${r.pts}</td>
               <td class="lg-x">${form}</td>
             </tr>`; }).join("")}
@@ -3656,7 +4007,74 @@
           <span class="lb-in" dir="ltr">${t("barIn", left)}</span>`;
       }
     }
-    setInterval(() => { if (!document.hidden) renderBar(); }, 30000);
+    setInterval(() => { if (!document.hidden) { renderBar(); renderMatchCentre(); } }, 30000);
+
+    // ---------- Match Centre ----------
+    // What a supporter wants first: the match being played now, then the next kick-off, then the latest result
+    const mvDay = ms => new Intl.DateTimeFormat("en-CA", { timeZone: "Indian/Maldives" }).format(new Date(ms));
+    const mcFmt = (iso, o) => new Intl.DateTimeFormat(lang === "dv" ? ["dv", "en-GB"] : "en-GB", { timeZone: "Indian/Maldives", ...o }).format(new Date(iso));
+    const dayWord = iso => mvDay(Date.parse(iso)) === mvDay(Date.now()) ? t("mcToday")
+      : mvDay(Date.parse(iso)) === mvDay(Date.now() + 864e5) ? t("mcTomorrow") : mcFmt(iso, { weekday: "short", day: "numeric", month: "short" });
+    const timeLeft = iso => {
+      const mins = Math.max(1, Math.ceil((Date.parse(iso) - Date.now()) / 60000));
+      const d = Math.floor(mins / 1440), h = Math.floor(mins % 1440 / 60), mm = mins % 60;
+      return d ? `${d}d ${h}h` : h ? `${h}h ${mm}m` : `${mm}m`;
+    };
+    const mcMeta = m => [m.stage ? t(STAGE_KEYS[m.stage]) : m.no ? t("resMatch", m.no) : "", m.year].filter(Boolean).join(" · ");
+    const mcTeam = (name, cls = "") => `<button type="button" class="mc-t tl${cls}" data-team="${escH(name)}">${teamLogo(name)}<span class="mc-n">${escH(name)}</span></button>`;
+    const mcScore = (a, b) => `<span class="mc-score" dir="ltr"><b>${a}</b><i aria-hidden="true">–</i><b>${b}</b></span>`;
+    let mcLast = "";
+    function renderMatchCentre() {
+      const sec = document.getElementById("matches");
+      if (!sec) return;
+      const season = currentSeason();
+      const cur = season ? season.matches.map(m => ({ ...m, year: season.year })) : [];
+      const live = cur.filter(isLive);
+      const next = cur.filter(m => !m.score && !m.won && !isLive(m) && m.kickoff && Date.parse(m.kickoff) > Date.now())
+        .sort((a, b) => Date.parse(a.kickoff) - Date.parse(b.kickoff))[0];
+      const kick = m => m.kickoff ? Date.parse(m.kickoff) : 0;
+      const latest = RESULTS.flatMap(r => r.matches.map(m => ({ ...m, year: r.year }))).filter(m => m.score)
+        .sort((a, b) => b.year - a.year || kick(b) - kick(a) || b.day - a.day || (b.no || 0) - (a.no || 0))[0];
+      const cards = [];
+      live.forEach(m => cards.push(`
+        <article class="mc-card mc-live">
+          <div class="mc-top"><span class="live-tag"><i></i>${t("fxLive")}</span>${m.live ? `<span class="mc-state">${t(m.live === "ht" ? "fxHt" : m.live === "1h" ? "mc1h" : "mc2h")}</span>` : ""}<span class="mc-meta">${escH(mcMeta(m))}</span></div>
+          <div class="mc-row" dir="ltr">${mcTeam(m.home)}${m.liveScore ? mcScore(m.liveScore[0], m.liveScore[1]) : `<span class="mc-vs">VS</span>`}${mcTeam(m.away)}</div>
+          ${m.video ? `<a class="mc-watch" href="https://www.youtube.com/watch?v=${escH(m.video)}" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5v14l11-7z" fill="currentColor"/></svg>${t("fxWatchLive")}</a>` : ""}
+        </article>`));
+      if (next) cards.push(`
+        <article class="mc-card mc-next">
+          <div class="mc-top"><span class="mc-label">${t("barNext")}</span><span class="mc-meta">${escH(mcMeta(next))}</span></div>
+          <div class="mc-row" dir="ltr">${mcTeam(next.home)}<span class="mc-ko"><b>${mcFmt(next.kickoff, { hour: "2-digit", minute: "2-digit", hour12: false })}</b><small>${escH(dayWord(next.kickoff))}</small></span>${mcTeam(next.away)}</div>
+          <div class="mc-foot"><svg class="ic" aria-hidden="true"><use href="#i-calendar"/></svg><span>${escH(mcFmt(next.kickoff, { weekday: "long", day: "numeric", month: "long" }))}</span><b dir="ltr">${escH(t("barIn", timeLeft(next.kickoff)))}</b></div>
+        </article>`);
+      if (latest) {
+        const [a, b] = latest.score[0] === latest.score[1] && latest.pens ? latest.pens : latest.score;
+        cards.push(`
+        <article class="mc-card mc-ft">
+          <div class="mc-top"><span class="mc-label">${t("mcLatest")}</span><span class="mc-pill">${t("mcFt")}</span><span class="mc-meta">${escH(mcMeta(latest))}</span></div>
+          <div class="mc-row" dir="ltr">${mcTeam(latest.home, a > b ? " win" : a < b ? " lose" : "")}${mcScore(latest.score[0], latest.score[1])}${mcTeam(latest.away, b > a ? " win" : b < a ? " lose" : "")}</div>
+          ${latest.pens ? `<div class="mc-foot mc-pens"><span dir="ltr">${escH(t("resPens", latest.pens[0] + "–" + latest.pens[1]))}</span></div>` : ""}
+        </article>`);
+      }
+      if (!live.length && !next && RESULTS.length) cards.push(`
+        <article class="mc-card mc-soon">
+          <span class="mc-ic"><svg class="ic" aria-hidden="true"><use href="#i-calendar"/></svg></span>
+          <span><b>${escH(t("mcSoon", season ? season.year : Math.max(...RESULTS.map(r => r.year)) + 1))}</b><small>${t("mcSoonSub")}</small></span>
+        </article>`);
+      if (!document.documentElement.classList.contains("reg-off") && regSettings) cards.push(`
+        <a class="mc-card mc-reg" href="#register">
+          <span class="mc-ic"><svg class="ic" aria-hidden="true"><use href="#i-user-plus"/></svg></span>
+          <span><b>${t("mcRegOpen")}</b><small>${escH(t("mcRegSub", regSettings.closes_at ? mcFmt(regSettings.closes_at, { day: "numeric", month: "long" }) : ""))}</small></span>
+          <svg class="ic mc-go" aria-hidden="true"><use href="#i-arrow"/></svg>
+        </a>`);
+      sec.hidden = !cards.length;
+      sec.classList.toggle("has-live", live.length > 0);
+      const html = cards.join("");
+      if (html !== mcLast) { document.getElementById("mc-grid").innerHTML = html; mcLast = html; }
+      // The Matches tab gets a red dot while a match is being played
+      document.getElementById("tabbar").classList.toggle("is-live", live.length > 0);
+    }
 
     // ---------- About: tournament facts ----------
     // Worked out from the past winners (the popup above, plus champions saved in the organiser portal) and the results
@@ -3854,7 +4272,7 @@
     // ---------- News, gallery and sponsors (added in the organiser portal) ----------
     const api = path => fetch(CONFIG.supabaseUrl + "/rest/v1/" + path, { headers: { apikey: CONFIG.supabaseKey } })
       .then(r => r.ok ? r.json() : Promise.reject(r.status));
-    const fmtDay = d => new Intl.DateTimeFormat(lang === "dv" ? "dv" : "en-GB", { day: "numeric", month: "long", year: "numeric" }).format(new Date(d + "T00:00:00"));
+    const fmtDay = d => new Intl.DateTimeFormat(lang === "dv" ? ["dv", "en-GB"] : "en-GB", { day: "numeric", month: "long", year: "numeric" }).format(new Date(d + "T00:00:00"));
     let posts = [], gallery = [], sponsors = [];
 
     // News: a slider of the stories marked "in slider", then cards for the latest stories
@@ -4008,18 +4426,82 @@
     }
     loadMedia();
 
-    // ---------- Phone tab bar: highlights the section on screen ----------
+    // ---------- Phone tab bar: highlights the part of the page on screen ----------
+    const tabs = [...document.querySelectorAll("#tabbar [data-sec]")];
+    const setTab = k => tabs.forEach(a => { a.classList.toggle("on", a.dataset.sec === k); a.toggleAttribute("aria-current", a.dataset.sec === k && a.tagName === "A"); });
     if ("IntersectionObserver" in window) {
-      const tabs = [...document.querySelectorAll("#tabbar a")];
-      const seen = new IntersectionObserver(entries => entries.forEach(e => {
-        if (!e.isIntersecting) return;
-        tabs.forEach(a => a.classList.toggle("on", a.dataset.sec === e.target.dataset.tab));
-      }), { rootMargin: "-45% 0px -50% 0px" });
-      [["top", "#top"], ["top", "#champions"], ["top", "#about"], ["results", ".duo"], ["results", "#fixtures"], ["table", "#table"], ["teams", "#teams"], ["contact", "#contact"]].forEach(([k, sel]) => {
+      const seen = new IntersectionObserver(entries => entries.forEach(e => { if (e.isIntersecting && !moreSheet.open) setTab(e.target.dataset.tab); }), { rootMargin: "-45% 0px -50% 0px" });
+      [["top", "#top"], ["top", "#matches"], ["matches", "#fixtures"], ["table", "#table"], ["matches", ".duo"], ["teams", "#teams"],
+       ["more", "#sp-strip"], ["more", "#champions"], ["more", "#about"], ["more", "#news"], ["more", "#gallery"], ["more", "#register"], ["more", "#sponsors"], ["more", "#contact"]].forEach(([k, sel]) => {
         const el = document.querySelector(sel);
         if (el) { el.dataset.tab = k; seen.observe(el); }
       });
+      // The strip under the menu bar repeats the Match Centre, so it only shows once the Match Centre has scrolled away
+      const mc = document.getElementById("matches");
+      new IntersectionObserver(([e]) => document.documentElement.classList.toggle("mc-away", !e.isIntersecting && e.boundingClientRect.top < 0)).observe(mc);
     }
+    // Matches: the full schedule, or the results by year when no season is being played
+    document.querySelectorAll('[data-go="matches"]').forEach(a => a.addEventListener("click", e => {
+      const fx = document.getElementById("fixtures");
+      if (!fx.hidden) return;
+      e.preventDefault();
+      document.querySelector(".duo").scrollIntoView({ behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth" });
+    }));
+    // Table and Teams tabs only when those parts are on the page
+    const syncTabs = () => ["table", "teams"].forEach(k => { const tab = tabs.find(a => a.dataset.sec === k); if (tab) tab.hidden = document.getElementById(k).hidden; });
+    new MutationObserver(syncTabs).observe(document.querySelector("main") || document.body, { subtree: true, attributes: true, attributeFilter: ["hidden"] });
+    syncTabs();
+
+    // ---------- More: a sheet with the rest of the page ----------
+    const moreSheet = document.getElementById("more-sheet");
+    const moreBtn = document.getElementById("more-btn");
+    let moreWas = "top";
+    function openMore() {
+      const shown = k => {
+        if (k === "register") return !document.documentElement.classList.contains("reg-off");
+        const el = document.getElementById(k);
+        return !!el && !el.hidden && !el.closest("[hidden]");
+      };
+      moreSheet.querySelectorAll("[data-ms]").forEach(a => a.hidden = !shown(a.dataset.ms));
+      moreSheet.querySelectorAll(".ms-lang [data-l]").forEach(b => b.setAttribute("aria-pressed", b.dataset.l === lang));
+      moreWas = (tabs.find(a => a.classList.contains("on")) || {}).dataset?.sec || "top";
+      setTab("more");
+      moreBtn.setAttribute("aria-expanded", "true");
+      moreSheet.showModal();
+    }
+    moreBtn.addEventListener("click", openMore);
+    moreSheet.addEventListener("close", () => { moreBtn.setAttribute("aria-expanded", "false"); if (!moreSheet.dataset.went) setTab(moreWas); delete moreSheet.dataset.went; });
+    moreSheet.querySelector(".ms-close").addEventListener("click", () => moreSheet.close());
+    // Tap outside the sheet (on the dimmed page) to close it
+    moreSheet.addEventListener("click", e => { if (e.target === moreSheet) moreSheet.close(); });
+    // A link in the sheet: close it first (the page behind is locked while it is open), then go there
+    moreSheet.querySelectorAll("[data-ms]").forEach(a => a.addEventListener("click", e => {
+      e.preventDefault();
+      moreSheet.dataset.went = "1";
+      moreSheet.close();
+      const to = document.getElementById(a.dataset.ms);
+      requestAnimationFrame(() => {
+        to.scrollIntoView({ behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth", block: "start" });
+        try { history.replaceState(null, "", "#" + a.dataset.ms); } catch (err) {}
+      });
+    }));
+    moreSheet.querySelectorAll(".ms-lang [data-l]").forEach(b => b.addEventListener("click", () => {
+      if (b.dataset.l !== lang) setLang(b.dataset.l);
+      moreSheet.querySelectorAll(".ms-lang [data-l]").forEach(x => x.setAttribute("aria-pressed", x.dataset.l === lang));
+    }));
+    // Drag the sheet down to close it
+    (() => {
+      let y0 = null, dy = 0;
+      const card = moreSheet.querySelector(".ms-in");
+      moreSheet.addEventListener("touchstart", e => { if (e.target.closest(".ms-grab, .ms-head")) { y0 = e.touches[0].clientY; dy = 0; card.style.transition = "none"; } }, { passive: true });
+      moreSheet.addEventListener("touchmove", e => { if (y0 === null) return; dy = Math.max(0, e.touches[0].clientY - y0); card.style.transform = `translateY(${dy}px)`; }, { passive: true });
+      moreSheet.addEventListener("touchend", () => {
+        if (y0 === null) return;
+        card.style.transition = ""; card.style.transform = "";
+        if (dy > 70) moreSheet.close();
+        y0 = null;
+      });
+    })();
 
     // ---------- Scroll animations ----------
     if ("IntersectionObserver" in window && !matchMedia("(prefers-reduced-motion: reduce)").matches) {
