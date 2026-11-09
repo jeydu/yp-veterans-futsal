@@ -2,3 +2,4 @@
 .claude/
 *.local
 supabase/.temp/
+dist/
