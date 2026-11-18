@@ -1751,6 +1751,104 @@
     .ms-contact a { display: flex; align-items: center; justify-content: center; min-height: 48px; border-radius: 99px; text-decoration: none; font: 700 .9rem "Inter", sans-serif; }
     .ms-wa { background: var(--ink); color: #fff; }
     .ms-call { background: var(--soft); color: var(--ink); font-variant-numeric: tabular-nums; }
+
+    /* ---------- Polish ----------
+       One heading system for every section (left-aligned, a red label above, one title scale);
+       season cards that name their champion; champions posters side by side on phones;
+       the gallery in whole rows; sponsor logos on one grid; a full footer. */
+    section .eyebrow, .champ-head .eyebrow { display: flex; justify-content: flex-start; align-items: center; gap: 6px; margin-bottom: 8px;
+      color: var(--red); font: 700 .72rem/1.3 "Inter", sans-serif; letter-spacing: .14em; text-transform: uppercase; }
+    :root[lang="dv"] section .eyebrow, :root[lang="dv"] .champ-head .eyebrow { font: .82rem/1.5 "Faruma", "Noto Sans Thaana", sans-serif; letter-spacing: 0; text-transform: none; }
+    section h2, .champ-head h2 { text-align: start; font: 800 clamp(1.55rem, 1.9vw + .9rem, 2.25rem)/1.15 "Plus Jakarta Sans", "Faruma", "Noto Sans Thaana", sans-serif; letter-spacing: -.025em; text-transform: none; }
+    :root[lang="dv"] section h2, :root[lang="dv"] .champ-head h2 { font-weight: 400; line-height: 1.55; letter-spacing: 0; }
+    section .lead, .sec-head, .sec-head .lead { max-width: 60ch; margin-inline: 0; text-align: start; }
+    section .mc-head h2 { font-size: clamp(1.3rem, 1.2vw + .9rem, 1.6rem); }
+    #contact h2, #contact .lead { text-align: center; margin-inline: auto; }
+    /* 2026 champions: the crest beside the heading */
+    .champ-head { display: grid; grid-template-columns: auto minmax(0, 1fr); column-gap: 20px; align-items: center; text-align: start; }
+    .champ-head > :not(.champ-logo) { grid-column: 2; justify-self: start; }
+    .champ-head .champ-logo { grid-column: 1; grid-row: 1 / span 3; width: 88px; height: 88px; margin: 0; }
+    #champions .lead { margin-bottom: 0; }
+
+    /* Results and champions: a sub-heading per part, cards that say what they hold */
+    .duo .sec-head { margin-bottom: var(--head); }
+    .duo .sec-head h2 { margin-bottom: 0; font-size: clamp(1.55rem, 1.9vw + .9rem, 2.25rem); letter-spacing: -.025em; }
+    .duo-h { margin: 0 0 10px; color: var(--ink); font: 700 .95rem/1.3 "Plus Jakarta Sans", "Faruma", sans-serif; letter-spacing: 0; text-transform: none; }
+    .duo-row { grid-template-columns: minmax(0, 1fr) minmax(0, 2.2fr); gap: 24px; }
+    #results .res-list { grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); gap: 12px; }
+    #history .res-list { grid-template-columns: 1fr; }
+    .duo .res-year { display: flex; flex-direction: column; align-items: flex-start; justify-content: space-between; gap: 6px; height: auto; min-height: 136px; padding: 16px; color: var(--ink); text-align: start; }
+    .duo .res-year .res-big { color: var(--ink); font: 800 1.9rem/1 "Plus Jakarta Sans", sans-serif; letter-spacing: -.02em; }
+    .ry-champ { color: var(--muted); font: 600 .86rem/1.35 "Inter", "Faruma", sans-serif; }
+    .ry-go { display: inline-flex; align-items: center; gap: 4px; color: var(--red); font: 700 .8rem "Inter", "Faruma", sans-serif; }
+    .ry-go .ic { transition: transform .2s var(--ease); }
+    .res-year:hover .ry-go .ic { transform: translateX(3px); }
+    :root[dir="rtl"] .ry-go .ic { transform: scaleX(-1); }
+    #history .pw-open .pw-icon { color: var(--red); font-size: 1.5rem; }
+    #history .pw-open .pw-years { font: 800 1.45rem/1.1 "Plus Jakarta Sans", sans-serif; }
+
+    /* Gallery: whole rows (12 photos: 4 x 3) */
+    .gal-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; }
+    @media (max-width: 900px) { .gal-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px; } }
+
+    /* Sponsors: one grid of equal tiles; the main sponsor wider */
+    .sp-level h3 { margin-bottom: 10px; color: var(--ink); font: 700 .95rem/1.3 "Plus Jakarta Sans", "Faruma", sans-serif; letter-spacing: 0; text-transform: none; }
+    .sp-logos { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 12px; }
+    .sp-logo { width: auto; height: 108px; border-radius: var(--r-sm); transition: transform .2s var(--ease), box-shadow .2s var(--ease); }
+    a.sp-logo:hover { transform: translateY(-2px); box-shadow: var(--shadow); }
+    .sp-btn { display: inline-flex; align-items: center; min-height: 44px; }
+    .sp-level.main .sp-logos { grid-template-columns: minmax(0, 440px); }
+    .sp-level.main .sp-logo { width: auto; height: 160px; }
+
+    /* Footer: who runs it, every part of the page, contact, privacy */
+    footer.site-foot { display: block; padding: 44px 0 26px; background: #fff; color: var(--ink); border-top: 1px solid var(--line); text-align: start; }
+    .sf-top { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, 1.5fr) auto; grid-template-areas: "brand links social" "about links social"; grid-template-rows: auto 1fr; gap: 12px 48px; align-items: start; padding-bottom: 28px; border-bottom: 1px solid var(--line); }
+    .sf-brand { grid-area: brand; display: flex; align-items: center; gap: 12px; }
+    .sf-brand img { width: 52px; height: 52px; border-radius: 50%; object-fit: cover; }
+    .sf-brand b { display: block; font: 800 1.05rem/1.2 "Plus Jakarta Sans", "Faruma", sans-serif; }
+    .sf-brand span { display: block; color: var(--muted); font-size: .82rem; }
+    .sf-about { grid-area: about; max-width: 40ch; color: var(--muted); font-size: .9rem; line-height: 1.55; }
+    .sf-links { grid-area: links; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0 28px; }
+    .sf-links a { display: flex; align-items: center; min-height: 44px; color: var(--ink); text-decoration: none; font: 600 .92rem "Inter", "Faruma", sans-serif; transition: color .15s ease; }
+    .sf-links a:hover { color: var(--red); }
+    .sf-links a[hidden] { display: none; }
+    .sf-social { grid-area: social; display: flex; gap: 10px; }
+    .sf-social a { display: grid; place-items: center; width: 44px; height: 44px; border-radius: 50%; background: var(--soft); color: var(--ink); transition: background .15s ease, color .15s ease, transform .15s var(--ease); }
+    .sf-social a:hover { background: var(--ink); color: #fff; }
+    .sf-social a:active { transform: scale(.94); }
+    .sf-social svg { width: 20px; height: 20px; }
+    .sf-bottom { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 22px; padding-top: 14px; color: var(--muted); font-size: .82rem; }
+    .sf-org { display: inline-flex; align-items: center; gap: 8px; margin-inline-end: auto; }
+    .sf-org img { width: 22px; height: 22px; border-radius: 50%; }
+    .sf-bottom a { display: inline-flex; align-items: center; min-height: 44px; color: var(--muted); }
+    .sf-bottom a:hover { color: var(--ink); }
+
+    @media (max-width: 720px) {
+      .champ-head { column-gap: 14px; }
+      .champ-head .champ-logo { width: 64px; height: 64px; }
+      .duo-row { grid-template-columns: 1fr; gap: 20px; }
+      .duo .res-list, #results .res-list { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+      #history .res-list { grid-template-columns: 1fr; }
+      .duo .res-year { height: auto; min-height: 118px; padding: 14px; justify-content: space-between; }
+      .duo .res-year .res-big { font-size: 1.6rem; }
+      #history .res-year { display: grid; grid-template-columns: auto minmax(0, 1fr); column-gap: 12px; row-gap: 2px; align-items: center; height: auto; min-height: 0; padding: 14px 16px; }
+      #history .pw-open .pw-icon { grid-row: 1 / span 2; }
+      #history .pw-open .pw-years { font-size: 1.2rem; }
+      /* Champions posters side by side */
+      .posters { grid-template-columns: 1fr 1fr; gap: 10px; }
+      .poster-cap { flex: 1; padding: 10px 12px 12px; }
+      .poster-name { font-size: .92rem; line-height: 1.25; }
+      .poster-sub { font-size: .76rem; line-height: 1.35; }
+      .poster-tag, .w-badge { top: 8px; inset-inline-start: 8px; padding: 4px 8px; font-size: .62rem; }
+      .sp-logos { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+      .sp-logo { height: 96px; }
+      .sp-level.main .sp-logos { grid-template-columns: 1fr; }
+      .sp-level.main .sp-logo { height: 140px; }
+      footer.site-foot { padding: 32px 0 20px; }
+      .sf-top { grid-template-columns: 1fr; grid-template-areas: "brand" "about" "links" "social"; gap: 14px; }
+      .sf-bottom { flex-direction: column; align-items: flex-start; gap: 0; }
+      .sf-org { margin: 0; min-height: 36px; }
+    }
 </style>
 </head>
 <body>
@@ -1884,22 +1982,29 @@
 
   <!-- PAST WINNERS and MATCH RESULTS side by side: each is a small card that opens a popup -->
   <section class="duo" style="padding-top:0">
-    <div class="wrap duo-row">
+    <div class="wrap">
+    <div class="sec-head">
+      <span class="eyebrow"><svg class="ic" aria-hidden="true"><use href="#i-trophy"/></svg><span data-i18n="arcEyebrow">Past tournaments</span></span>
+      <h2 data-i18n="arcTitle">Results and champions</h2>
+    </div>
+    <div class="duo-row">
     <div id="history">
-      <h2 data-i18n="pastTitle">Past Winners</h2>
+      <h3 class="duo-h" data-i18n="pastTitle">Past Winners</h3>
       <!-- Opens the popup below with every winner -->
       <div class="res-list">
         <button type="button" class="res-year pw-open" data-i18n-label="pastTitle" aria-label="Past Winners">
           <svg class="ic pw-icon" aria-hidden="true"><use href="#i-trophy"/></svg>
           <span class="pw-years" dir="ltr">2022 – 2026</span>
+          <span class="ry-champ" data-i18n="pwSub">Every champion since 2022</span>
         </button>
       </div>
     </div>
 
     <!-- Match results: one card per year. Scores live in RESULTS in the script at the bottom. -->
     <div id="results">
-      <h2 data-i18n="resTitle">Match Results</h2>
+      <h3 class="duo-h" data-i18n="resTitle">Match Results</h3>
       <div class="res-list" id="res-list"></div>
+    </div>
     </div>
     </div>
   </section>
@@ -2397,9 +2502,39 @@
     </div>
   </dialog>
 
-  <footer>
-    <img src="images/yp-logo.jpg" alt="" loading="lazy" decoding="async">
-    <span>&copy; <span id="yr"></span> Young Players SC &middot; YP Veterans Futsal</span>
+  <footer class="site-foot">
+    <div class="wrap">
+      <div class="sf-top">
+        <div class="sf-brand">
+          <img src="images/veterans-logo.jpg" alt="" width="52" height="52" loading="lazy" decoding="async">
+          <div><b data-i18n="h1Top">YP Veterans</b><span data-i18n="logoSub">Futsal Tournament</span></div>
+        </div>
+        <p class="sf-about" data-i18n="aboutLead">A futsal tournament for veteran players, run every year by Young Players SC.</p>
+        <div class="sf-links" role="navigation" aria-label="Footer">
+          <a href="#fixtures" data-go="matches" data-i18n="navMatches">Matches</a>
+          <a href="#table" data-sf="table" data-i18n="navTable">Table</a>
+          <a href="#teams" data-sf="teams" data-i18n="navTeams">Teams</a>
+          <a href="#champions" data-i18n="navChamps">Champions</a>
+          <a href="#gallery" data-sf="gallery" data-i18n="galTitle">Gallery</a>
+          <a href="#register" data-sf="register" data-i18n="navRegister">Register</a>
+          <a href="#sponsors" data-sf="sponsors" data-i18n="spTitle">Our Sponsors</a>
+          <a href="#contact" data-i18n="navContact">Contact</a>
+        </div>
+        <div class="sf-social">
+          <a class="sf-wa" href="https://wa.me/9609763551" target="_blank" rel="noopener" aria-label="WhatsApp">
+            <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M17.47 14.38c-.3-.15-1.76-.87-2.03-.97-.27-.1-.47-.15-.67.15-.2.3-.77.97-.94 1.16-.17.2-.35.22-.64.08-.3-.15-1.26-.46-2.39-1.48-.88-.79-1.48-1.76-1.65-2.06-.17-.3-.02-.46.13-.6.13-.14.3-.35.45-.52.15-.17.2-.3.3-.5.1-.2.05-.37-.03-.52-.07-.15-.67-1.61-.92-2.2-.24-.58-.49-.5-.67-.51h-.57c-.2 0-.52.07-.79.37-.27.3-1.04 1.02-1.04 2.48s1.07 2.88 1.21 3.07c.15.2 2.1 3.2 5.08 4.49.71.31 1.26.49 1.7.63.71.22 1.36.19 1.87.12.57-.09 1.76-.72 2-1.41.25-.7.25-1.29.18-1.41-.08-.13-.27-.2-.57-.35m-5.42 7.4h-.01a9.87 9.87 0 0 1-5.03-1.38l-.36-.21-3.74.98 1-3.65-.24-.37a9.86 9.86 0 0 1-1.51-5.26c0-5.45 4.44-9.88 9.89-9.88 2.64 0 5.12 1.03 6.99 2.9a9.83 9.83 0 0 1 2.89 6.99c0 5.45-4.44 9.88-9.88 9.88m8.41-18.3A11.82 11.82 0 0 0 12.05 0C5.5 0 .16 5.34.16 11.89c0 2.1.55 4.14 1.59 5.95L.06 24l6.3-1.65a11.88 11.88 0 0 0 5.68 1.45h.01c6.55 0 11.89-5.34 11.89-11.89a11.82 11.82 0 0 0-3.48-8.41Z"/></svg>
+          </a>
+          <a class="sf-fb" href="https://www.facebook.com/share/1Bj5PovzUJ/" target="_blank" rel="noopener" aria-label="Facebook">
+            <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M9.1 23.69v-7.98H6.63v-3.67H9.1v-1.58c0-4.09 1.85-5.98 5.86-5.98.4 0 .96.04 1.47.1.39.04.78.11 1.14.2v3.32a8.6 8.6 0 0 0-1.39-.05c-.7 0-1.26.1-1.67.31-.29.15-.52.36-.68.62-.26.42-.37 1-.37 1.75v1.3h3.92l-.39 2.1-.29 1.57h-3.24v8.24C19.4 23.24 24 18.18 24 12.04c0-6.63-5.37-12-12-12S0 5.41 0 12.04c0 5.63 3.87 10.35 9.1 11.65Z"/></svg>
+          </a>
+        </div>
+      </div>
+      <div class="sf-bottom">
+        <span class="sf-org"><img src="images/yp-logo.jpg" alt="" width="22" height="22" loading="lazy" decoding="async"><span data-i18n="tag">Organised by Young Players SC</span></span>
+        <span dir="ltr">&copy; <span id="yr"></span> Young Players SC</span>
+        <a href="privacy.html" data-i18n="ftPrivacy">Privacy Policy</a>
+      </div>
+    </div>
   </footer>
 
   <!-- Full-screen photo viewer: swipe, arrows or keyboard to move between photos -->
@@ -2635,6 +2770,11 @@
       barNext: "ދެން އޮތް މެޗު",
       barIn: s => s + " ފަހުން",
       navMatches: "މެޗުތައް",
+      arcEyebrow: "ކުރީގެ މުބާރާތްތައް",
+      arcTitle: "ނަތީޖާ އަދި ޗެމްޕިއަނުން",
+      pwSub: "2022 އިން ފެށިގެން ހުރިހާ ޗެމްޕިއަނުން",
+      ftPrivacy: "ޕްރައިވެސީ ޕޮލިސީ",
+      ryGo: "ނަތީޖާ ބައްލަވާ",
       navMore: "އިތުރު",
       mcTitle: "މެޗު ސެންޓަރ",
       mcAll: "ހުރިހާ މެޗެއް",
@@ -2724,6 +2864,7 @@
       barNext: "Next match",
       barIn: s => "in " + s,
       mcLatest: "Latest result",
+      ryGo: "See results",
       mcFt: "Full time",
       mc1h: "1st half",
       mc2h: "2nd half",
@@ -3666,7 +3807,7 @@
       const list = document.getElementById("res-list");
       const played = RESULTS.filter(r => r.matches.length);
       list.innerHTML = played.map(r =>
-        `<button type="button" class="res-year" aria-label="${t("resPopTitle", r.year)}"><span class="res-big">${r.year}</span></button>`).join("");
+        `<button type="button" class="res-year" aria-label="${t("resPopTitle", r.year)}"><span class="res-big">${r.year}</span><span class="ry-champ">${escH((lang === "dv" && r.champion.dv) || r.champion.en || t("resTbd"))}</span><span class="ry-go">${t("ryGo")}<svg class="ic" aria-hidden="true"><use href="#i-arrow"/></svg></span></button>`).join("");
       list.querySelectorAll(".res-year").forEach((b, i) => b.addEventListener("click", () => openResults(played[i].year, b)));
       // The open results popup is rebuilt with the new data, except while a match video or its highlights
       // are playing: rebuilding would stop the video (the page reloads results every minute)
@@ -4407,8 +4548,9 @@
 
     // Logos chosen in the organiser portal (Site Settings)
     function applyLogos(l) {
-      if (l.site_logo) document.querySelector("nav .logo img").src = l.site_logo;
-      if (l.club_logo) document.querySelector("footer img").src = l.club_logo;
+      // The tournament emblem in the menu bar and the footer; the organising club's crest beside its name
+      if (l.site_logo) document.querySelectorAll("nav .logo img, .sf-brand img").forEach(i => i.src = l.site_logo);
+      if (l.club_logo) document.querySelectorAll(".sf-org img").forEach(i => i.src = l.club_logo);
     }
     try { applyLogos(JSON.parse(localStorage.getItem("yp-logos") || "{}")); } catch (e) {}
     if (USE_SERVER) api("settings?select=site_logo,club_logo&id=eq.1").then(([l]) => {
@@ -4440,7 +4582,7 @@
     if ("IntersectionObserver" in window) {
       const seen = new IntersectionObserver(entries => entries.forEach(e => { if (e.isIntersecting && !moreSheet.open) setTab(e.target.dataset.tab); }), { rootMargin: "-45% 0px -50% 0px" });
       [["top", "#top"], ["top", "#matches"], ["matches", "#fixtures"], ["table", "#table"], ["matches", ".duo"], ["teams", "#teams"],
-       ["more", "#sp-strip"], ["more", "#champions"], ["more", "#about"], ["more", "#news"], ["more", "#gallery"], ["more", "#register"], ["more", "#sponsors"], ["more", "#contact"]].forEach(([k, sel]) => {
+       ["more", "#sp-strip"], ["more", "#champions"], ["more", "#about"], ["more", "#news"], ["more", "#gallery"], ["more", "#register"], ["more", "#sponsors"], ["more", "#contact"], ["more", "footer.site-foot"]].forEach(([k, sel]) => {
         const el = document.querySelector(sel);
         if (el) { el.dataset.tab = k; seen.observe(el); }
       });
@@ -4456,8 +4598,15 @@
       document.querySelector(".duo").scrollIntoView({ behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth" });
     }));
     // Table and Teams tabs only when those parts are on the page
-    const syncTabs = () => ["table", "teams"].forEach(k => { const tab = tabs.find(a => a.dataset.sec === k); if (tab) tab.hidden = document.getElementById(k).hidden; });
+    // Only touches an element whose state changes: setting the same value again would wake the observers below forever
+    const setHidden = (el, h) => { if (el && el.hidden !== h) el.hidden = h; };
+    const syncTabs = () => {
+      ["table", "teams"].forEach(k => setHidden(tabs.find(a => a.dataset.sec === k), !!document.getElementById(k).hidden));
+      document.querySelectorAll(".sf-links [data-sf]").forEach(a => setHidden(a, a.dataset.sf === "register"
+        ? document.documentElement.classList.contains("reg-off") : !!document.getElementById(a.dataset.sf)?.hidden));
+    };
     new MutationObserver(syncTabs).observe(document.querySelector("main") || document.body, { subtree: true, attributes: true, attributeFilter: ["hidden"] });
+    new MutationObserver(syncTabs).observe(document.documentElement, { attributes: true, attributeFilter: ["class"] });
     syncTabs();
 
     // ---------- More: a sheet with the rest of the page ----------
