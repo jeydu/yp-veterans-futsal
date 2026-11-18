@@ -1849,6 +1849,92 @@
       .sf-bottom { flex-direction: column; align-items: flex-start; gap: 0; }
       .sf-org { margin: 0; min-height: 36px; }
     }
+
+    /* ---------- Follow, share, knockouts, top scorers ---------- */
+    /* Share: a small round button on a result */
+    .sh-btn { display: inline-grid; place-items: center; flex: none; width: 36px; height: 36px; margin-inline-start: 4px; padding: 0; border: 1px solid var(--line); border-radius: 50%; background: #fff; color: var(--ink); cursor: pointer; transition: background .15s ease, transform .15s var(--ease); }
+    .sh-btn:hover { background: var(--soft); }
+    .sh-btn:active { transform: scale(.92); }
+    .sh-btn .ic { font-size: 1rem; }
+    .sh-btn.busy { opacity: .5; pointer-events: none; }
+    .mc-live .sh-btn { background: rgba(255, 255, 255, .1); border-color: rgba(255, 255, 255, .2); color: #fff; }
+    .mc-top .sh-btn { margin-inline-start: 2px; }
+    .fx-tag { display: inline-flex; align-items: center; justify-content: flex-end; gap: 6px; }
+    .share-pop .res-card { max-width: 440px; }
+    .share-body { display: grid; gap: 14px; padding: 16px; }
+    .share-body img { width: 100%; height: auto; border-radius: 14px; background: var(--soft); }
+    .share-acts { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .share-btn { display: flex; align-items: center; justify-content: center; min-height: 48px; border-radius: 99px; font: 700 .9rem "Inter", "Faruma", sans-serif; text-decoration: none; text-align: center; }
+    .share-btn.dark { background: var(--ink); color: #fff; }
+    .share-btn.wa { background: #f4f4f5; color: var(--ink); }
+
+    /* Followed team: a star tag in the Match Centre, marked rows everywhere else */
+    .mc-mine { border-color: var(--red); box-shadow: 0 0 0 1px var(--red), var(--shadow); }
+    .mc-mine-tag { display: inline-flex; align-items: center; gap: 5px; padding: 3px 9px 3px 7px; border-radius: 99px; background: var(--red); color: #fff; font-weight: 700; font-size: .74rem; }
+    .mc-mine-tag .ic { fill: currentColor; font-size: .85rem; }
+    .mc-live.mc-mine { box-shadow: 0 0 0 2px var(--red), 0 12px 32px rgba(24, 24, 27, .22); }
+    .mc-scorers { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 10px; color: var(--muted); font: 500 .76rem/1.4 "Inter", sans-serif; text-align: center; }
+    .mc-live .mc-scorers { color: rgba(255, 255, 255, .72); }
+    .fx-m.mine { box-shadow: inset 4px 0 0 var(--ink); }
+    .fx-m.live.mine { box-shadow: inset 4px 0 0 var(--red); }
+    .lg tr.mine td { background: #fafafa; }
+    .lg tr.mine .tl b::after { content: " ★"; color: var(--red); font-size: .8em; }
+    .tm-card.mine { border-color: var(--ink); }
+    .tm-star { position: absolute; top: 10px; inset-inline-start: 10px; display: grid; place-items: center; width: 26px; height: 26px; border-radius: 50%; background: var(--red); color: #fff; }
+    .tm-star .ic { font-size: .8rem; fill: currentColor; }
+    .tm-follow { display: inline-flex; align-items: center; gap: 6px; min-height: 40px; margin-inline-start: auto; padding: 0 14px; border: 1px solid rgba(255, 255, 255, .3); border-radius: 99px; background: transparent; color: #fff; cursor: pointer; font: 700 .82rem "Inter", "Faruma", sans-serif; transition: background .15s ease, transform .15s var(--ease); }
+    .tm-follow:hover { background: rgba(255, 255, 255, .12); }
+    .tm-follow:active { transform: scale(.96); }
+    .tm-follow.on { background: var(--red); border-color: var(--red); }
+    .tm-follow.on .ic { fill: currentColor; }
+    .tm-gl { margin-inline-start: auto; padding-inline-start: 8px; color: var(--muted); font-style: normal; font-size: .78rem; white-space: nowrap; }
+
+    /* Knockout rounds: semi-finals, then the final with its champion */
+    .ko { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 28px; align-items: center; max-width: 900px; }
+    .ko-col { display: grid; gap: 12px; align-content: center; }
+    .ko-col h3 { margin: 0; color: var(--muted); font: 700 .74rem/1.3 "Inter", "Faruma", sans-serif; letter-spacing: .1em; text-transform: uppercase; }
+    :root[lang="dv"] .ko-col h3 { letter-spacing: 0; text-transform: none; font-size: .85rem; }
+    .ko-m { position: relative; padding: 10px 12px; background: #fff; border: 1px solid var(--line); border-radius: var(--r); box-shadow: var(--shadow); }
+    .ko-col:first-child:not(.ko-end) .ko-m::after { content: ""; position: absolute; top: 50%; inset-inline-end: -29px; width: 28px; border-top: 2px solid var(--line); }
+    .ko-final { border-color: var(--ink); box-shadow: 0 0 0 1px var(--ink), var(--shadow); }
+    .ko-meta { display: flex; align-items: center; justify-content: space-between; gap: 8px; min-height: 36px; color: var(--muted); font: 600 .74rem "Inter", "Faruma", sans-serif; }
+    .ko-ft { color: var(--ink); font-weight: 700; }
+    .ko-t { display: flex; align-items: center; gap: 10px; width: 100%; min-height: 44px; padding: 2px 0; text-align: start; }
+    .ko-t + .ko-t { border-top: 1px solid var(--line); }
+    .ko-t .fxl { width: 30px; height: 30px; }
+    .ko-n { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font: 700 .92rem "Plus Jakarta Sans", sans-serif; }
+    .ko-s { min-width: 22px; text-align: end; font: 800 1.15rem "Plus Jakarta Sans", sans-serif; font-variant-numeric: tabular-nums; }
+    .ko-t.lose .ko-n, .ko-t.lose .ko-s { color: var(--muted); font-weight: 600; }
+    .ko-t.mine .ko-n::after { content: " ★"; color: var(--red); }
+    .ko-tbd .ko-t { color: var(--muted); }
+    .ko-champ { display: flex; align-items: center; gap: 8px; min-height: 48px; padding: 8px 14px; border-radius: var(--r); background: var(--ink); color: #fff; font: 600 .8rem "Inter", "Faruma", sans-serif; }
+    .ko-champ .ic { color: #fbbf24; font-size: 1.1rem; }
+    .ko-champ b { margin-inline-start: auto; font: 800 .95rem "Plus Jakarta Sans", sans-serif; }
+
+    /* Top scorers: rank, player and team, goals */
+    .sc-card { background: #fff; border: 1px solid var(--line); border-radius: var(--r); box-shadow: var(--shadow); overflow: hidden; }
+    .sc-list { list-style: none; margin: 0; padding: 0; }
+    .sc-list li { display: grid; grid-template-columns: 34px minmax(0, 1fr) auto; align-items: center; gap: 10px; padding: 10px 16px; border-top: 1px solid var(--line); }
+    .sc-list li:first-child { border-top: 0; }
+    .sc-list li.mine { background: #fafafa; }
+    .sc-rank { color: var(--muted); font: 800 1rem "Plus Jakarta Sans", sans-serif; text-align: center; }
+    .sc-rank.top { color: var(--red); }
+    .sc-who { display: grid; gap: 2px; min-width: 0; }
+    .sc-who b { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font: 700 .98rem "Plus Jakarta Sans", sans-serif; }
+    .sc-who small { color: var(--muted); font: 600 .78rem "Inter", sans-serif; }
+    .sc-team { display: inline-flex; align-items: center; gap: 6px; min-height: 28px; color: var(--muted); font: 600 .8rem "Inter", sans-serif; }
+    .sc-team .fxl { width: 22px; height: 22px; }
+    .sc-goals { display: grid; justify-items: center; min-width: 52px; }
+    .sc-goals b { font: 800 1.5rem/1 "Plus Jakarta Sans", sans-serif; font-variant-numeric: tabular-nums; }
+    .sc-goals small { color: var(--muted); font-size: .7rem; }
+    #knockout, #scorers { padding-top: 0; }
+
+    @media (max-width: 720px) {
+      .ko { grid-template-columns: 1fr; gap: 18px; }
+      .ko-col:first-child:not(.ko-end) .ko-m::after { display: none; }
+      .tm-follow { min-height: 36px; padding: 0 12px; }
+      .share-acts { grid-template-columns: 1fr; }
+    }
 </style>
 </head>
 <body>
@@ -1980,6 +2066,24 @@
     </div>
   </section>
 
+  <!-- KNOCKOUTS: the semi-finals, playoff and final of the season as a bracket; hidden until a knockout match exists -->
+  <section id="knockout" hidden>
+    <div class="wrap">
+      <span class="eyebrow"><svg class="ic" aria-hidden="true"><use href="#i-trophy"/></svg><span id="ko-season"></span></span>
+      <h2 data-i18n="koTitle">Knockout rounds</h2>
+      <div class="ko" id="ko-body"></div>
+    </div>
+  </section>
+
+  <!-- TOP SCORERS: goals per player, from the scorers organisers pick on the live scoreboard; hidden until there are any -->
+  <section id="scorers" hidden>
+    <div class="wrap">
+      <span class="eyebrow"><svg class="ic" aria-hidden="true"><use href="#i-ball"/></svg><span id="sc-season"></span></span>
+      <h2 data-i18n="scTitle">Top scorers</h2>
+      <div class="sc-card" id="sc-body"></div>
+    </div>
+  </section>
+
   <!-- PAST WINNERS and MATCH RESULTS side by side: each is a small card that opens a popup -->
   <section class="duo" style="padding-top:0">
     <div class="wrap">
@@ -2105,6 +2209,19 @@
       <button type="button" class="gal-more" id="gal-more" data-i18n="galMore" hidden>Show all</button>
     </div>
   </section>
+  <dialog id="share-pop" class="res-pop share-pop" aria-labelledby="share-title">
+    <div class="res-card">
+      <div class="res-top"><h2 class="res-pop-title" id="share-title" data-i18n="shTitle">Share this result</h2>
+        <button type="button" class="res-close" data-i18n-label="close" aria-label="Close"><svg class="ic" aria-hidden="true"><use href="#i-x"/></svg></button></div>
+      <div class="share-body">
+        <img id="share-img" alt="">
+        <div class="share-acts">
+          <a class="share-btn dark" id="share-dl" download="yp-veterans-result.png" href="#" data-i18n="shSave">Save image</a>
+          <a class="share-btn wa" id="share-wa" target="_blank" rel="noopener" href="#" data-i18n="shWa">Send on WhatsApp</a>
+        </div>
+      </div>
+    </div>
+  </dialog>
   <dialog id="story-pop" class="res-pop" aria-label="Story"><div class="res-card story"></div></dialog>
   <dialog id="gal-pop" class="res-pop gal-pop" aria-label="Gallery">
     <div class="res-card">
@@ -2775,6 +2892,19 @@
       pwSub: "2022 އިން ފެށިގެން ހުރިހާ ޗެމްޕިއަނުން",
       ftPrivacy: "ޕްރައިވެސީ ޕޮލިސީ",
       ryGo: "ނަތީޖާ ބައްލަވާ",
+      koTitle: "ނޮކްއައުޓް ބައި",
+      scTitle: "އެންމެ ގިނަ ގޯލު ޖެހި ކުޅުންތެރިން",
+      scGoals: n => n + " ގޯލު",
+      scPlayer: "ކުޅުންތެރިޔާ",
+      scOg: "އޯން ގޯލް",
+      flFollow: "ފޮލޯ ކުރައްވާ",
+      flFollowing: "ފޮލޯ ކުރައްވަނީ",
+      flYour: "ތިޔަ ޓީމު",
+      shShare: "ޝެއާ ކުރައްވާ",
+      shTitle: "މި ނަތީޖާ ޝެއާ ކުރައްވާ",
+      shSave: "ފޮޓޯ ސޭވް ކުރައްވާ",
+      shWa: "ވަޓްސްއެޕް އިން ފޮނުއްވާ",
+      koTbd: "އަދި ނޭނގެ",
       navMore: "އިތުރު",
       mcTitle: "މެޗު ސެންޓަރ",
       mcAll: "ހުރިހާ މެޗެއް",
@@ -2865,6 +2995,19 @@
       barIn: s => "in " + s,
       mcLatest: "Latest result",
       ryGo: "See results",
+      koTitle: "Knockout rounds",
+      scTitle: "Top scorers",
+      scGoals: n => n === 1 ? "1 goal" : n + " goals",
+      scPlayer: "Player",
+      scOg: "Own goal",
+      flFollow: "Follow",
+      flFollowing: "Following",
+      flYour: "Your team",
+      shShare: "Share",
+      shTitle: "Share this result",
+      shSave: "Save image",
+      shWa: "Send on WhatsApp",
+      koTbd: "To be decided",
       mcFt: "Full time",
       mc1h: "1st half",
       mc2h: "2nd half",
@@ -3753,6 +3896,27 @@
     // TEST fixtures shown until the database is set up; after that the same matches come from
     // supabase/seed-results.sql and are edited in the organiser portal (Fixtures & Results → 2027)
     let fromDatabase = false;
+    // Teams this visitor follows (kept in this browser only): their match comes first in the Match Centre,
+    // and their rows are marked in the fixtures, the table and the team cards
+    let follows = [];
+    try { follows = JSON.parse(localStorage.getItem("yp-follow") || "[]").filter(x => typeof x === "string").slice(0, 6); } catch (e) {}
+    const followed = n => follows.includes(n);
+    function setFollow(n, on) {
+      follows = on ? [...new Set([...follows, n])] : follows.filter(x => x !== n);
+      try { localStorage.setItem("yp-follow", JSON.stringify(follows)); } catch (e) {}
+      renderResults();
+    }
+    // A match's own key, for its Share button
+    const mkey = (m, year) => [year, m.day, m.no || 0, m.home, m.away].join("|");
+    const shareMap = new Map();
+    const shareBtn = (m, year) => { const k = mkey(m, year); shareMap.set(k, { m, year }); return `<button type="button" class="sh-btn" data-share="${escH(k)}" aria-label="${t("shShare")}" title="${t("shShare")}"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="m8.6 13.5 6.8 4M15.4 6.5l-6.8 4"/></svg></button>`; };
+    // Who scored for one side, e.g. "Ahmed ×2, Hassan"
+    function scorerText(m, side) {
+      const list = (m.scorers || []).filter(x => x && x.side === side);
+      const counts = new Map();
+      list.forEach(x => { const n = x.og ? t("scOg") : (x.name || "").trim(); if (n) counts.set(n, (counts.get(n) || 0) + 1); });
+      return [...counts].map(([n, c]) => c > 1 ? `${n} ×${c}` : n).join(", ");
+    }
     const TEST_FIXTURES = [
       { year: 2027, day: 1, no: 1, home: "RK SC",       away: "BHC",         kickoff: "2026-11-05T15:45:00Z" },
       { year: 2027, day: 1, no: 2, home: "RBG SC",      away: "Stelco SC",   kickoff: "2026-11-05T16:45:00Z" },
@@ -3789,14 +3953,14 @@
             const [a, b] = m.score ? (m.score[0] === m.score[1] && m.pens ? m.pens : m.score) : [0, 0];
             const res = side => !m.score ? "" : (side ? b > a : a > b) ? " win" : (side ? b < a : a < b) ? " lose" : "";
             return `
-            <div class="fx-m${m.score ? " played" : ""}${isLive(m) ? " live" : ""}">
+            <div class="fx-m${m.score ? " played" : ""}${isLive(m) ? " live" : ""}${followed(m.home) || followed(m.away) ? " mine" : ""}">
               <span class="fx-time" dir="ltr">${m.score ? t("fxFt") : isLive(m) ? liveTag(m) : m.kickoff ? fmt(m.kickoff, { hour: "2-digit", minute: "2-digit", hour12: false }) : "—"}</span>
               <span class="fx-teams" dir="ltr">
                 <button type="button" class="fx-t home tl${res(0)}" data-team="${escH(m.home)}"><span class="fx-n">${escH(m.home)}</span>${teamLogo(m.home)}</button>
                 ${m.score ? `<span class="fx-score">${m.score[0]} – ${m.score[1]}${m.pens ? `<small>${m.pens[0]}–${m.pens[1]} ${t("fxPens")}</small>` : ""}</span>` : m.liveScore ? `<span class="fx-score">${m.liveScore[0]} – ${m.liveScore[1]}</span>` : `<span class="fx-vs">VS</span>`}
                 <button type="button" class="fx-t tl${res(1)}" data-team="${escH(m.away)}">${teamLogo(m.away)}<span class="fx-n">${escH(m.away)}</span></button>
               </span>
-              <span class="fx-tag">${isLive(m) && m.video ? `<a class="fx-watch" href="https://www.youtube.com/watch?v=${escH(m.video)}" target="_blank" rel="noopener">${t("fxWatchLive")}</a>` : m.stage ? t(STAGE_KEYS[m.stage]) : m.no ? t("resMatch", m.no) : ""}</span>
+              <span class="fx-tag">${isLive(m) && m.video ? `<a class="fx-watch" href="https://www.youtube.com/watch?v=${escH(m.video)}" target="_blank" rel="noopener">${t("fxWatchLive")}</a>` : m.stage ? t(STAGE_KEYS[m.stage]) : m.no ? t("resMatch", m.no) : ""}${m.score || m.liveScore ? shareBtn(m, m.year) : ""}</span>
             </div>`; }).join("")}
         </div>`).join("");
     }
@@ -3814,6 +3978,8 @@
       if (resOpen && !watching) fillResults();
       renderTeams();
       renderTable();
+      renderKnockout();
+      renderScorers();
       renderBar();
       renderStats();
     }
@@ -3967,7 +4133,7 @@
       document.getElementById("teams").hidden = !names.length;
       document.getElementById("tm-strip").innerHTML = names.map(n => {
         const d = teamData(n);
-        return `<button type="button" class="tm-card tl" data-team="${escH(n)}">
+        return `<button type="button" class="tm-card tl${followed(n) ? " mine" : ""}" data-team="${escH(n)}">${followed(n) ? `<span class="tm-star" aria-label="${t("flFollowing")}"><svg class="ic" aria-hidden="true"><use href="#i-star"/></svg></span>` : ""}
             ${teamLogo(n)}<b>${escH(n)}</b>
             <small>${d.titles.length ? `<span class="tm-cups"><svg class="ic" aria-hidden="true"><use href="#i-trophy"/></svg>${d.titles.length}</span>` : ""}${t("tmCard", d.rec)}</small>
           </button>`;
@@ -4015,6 +4181,7 @@
       document.getElementById("team-card").innerHTML = `
         <div class="res-top">
           <h2 class="res-pop-title">${t("wzTeam")}</h2>
+          <button type="button" class="tm-follow ${followed(name) ? "on" : ""}" aria-pressed="${followed(name)}"><svg class="ic" aria-hidden="true"><use href="#i-star"/></svg><span>${t(followed(name) ? "flFollowing" : "flFollow")}</span></button>
           <button type="button" class="res-btn tm-share" aria-label="${t("tmShare")}" title="${t("tmShare")}">
             <svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="m8.6 13.5 6.8 4M15.4 6.5l-6.8 4"/></svg>
           </button>
@@ -4033,7 +4200,7 @@
         <div class="tm-body">
           ${comingUp}
           ${squad.length ? `<div class="tm-sec"><h3>${t("wzPlayers")}</h3>
-            <div class="tm-squad">${squad.map(p => `<span class="tm-pl"><b>${p.no ?? ""}</b>${escH(p.name)}</span>`).join("")}</div>
+            <div class="tm-squad">${(() => { const gl = playerGoals(name); return squad.map(p => `<span class="tm-pl"><b>${p.no ?? ""}</b>${escH(p.name)}${gl.get(p.name.trim()) ? `<em class="tm-gl" title="${escH(t("scGoals", gl.get(p.name.trim())))}">⚽ ${gl.get(p.name.trim())}</em>` : ""}</span>`).join(""); })()}</div>
           </div>` : ""}
           <div class="tm-years">
             ${d.years.filter(y => y.ms.some(m => m.score || m.won)).map(y => `<div class="tm-sec">
@@ -4059,6 +4226,8 @@
     });
     // Share the team's link: the phone's share sheet, or copy it
     teamPop.addEventListener("click", async e => {
+      const fol = e.target.closest(".tm-follow");
+      if (fol) { setFollow(teamOpen, !followed(teamOpen)); fillTeam(); return; }
       const btn = e.target.closest(".tm-share");
       if (!btn) return;
       const url = SITE + "#team=" + encodeURIComponent(teamOpen);
@@ -4111,7 +4280,7 @@
           <thead><tr><th class="lg-pos" scope="col">#</th><th class="lg-tm" scope="col">${t("tblTeam")}</th><th scope="col"><abbr title="Played">P</abbr></th><th class="lg-wdl" scope="col"><abbr title="Won">W</abbr></th><th class="lg-wdl" scope="col"><abbr title="Drawn">D</abbr></th><th class="lg-wdl" scope="col"><abbr title="Lost">L</abbr></th>
             <th class="lg-x" scope="col">GF</th><th class="lg-x" scope="col">GA</th><th class="lg-gd" scope="col"><abbr title="Goal difference">GD</abbr></th><th class="lg-pts" scope="col"><abbr title="Points">Pts</abbr></th><th class="lg-x" scope="col">${t("tblForm")}</th></tr></thead>
           <tbody>${list.map((r, i) => { const form = `<span class="lg-form">${r.form.slice(-5).map(o => `<i class="${o}">${t("tm" + o.toUpperCase()).slice(0, 1)}</i>`).join("")}</span>`; return `
-            <tr class="${through.has(r.n) ? "q" : ""}">
+            <tr class="${[through.has(r.n) ? "q" : "", followed(r.n) ? "mine" : ""].join(" ").trim()}">
               <td class="lg-pos">${i + 1}</td>
               <td class="lg-tm"><button type="button" class="tl" data-team="${escH(r.n)}">${teamLogo(r.n)}<span class="lg-nm"><b>${escH(r.n)}${YP_LEAGUE.changed(r.adj) ? "<sup>*</sup>" : ""}</b>${r.form.length ? `<span class="lg-fm">${form}</span>` : ""}</span>${r.live ? liveTag() : ""}</button></td>
               <td>${r.p}</td><td class="lg-wdl">${r.w}</td><td class="lg-wdl">${r.d}</td><td class="lg-wdl">${r.l}</td>
@@ -4178,34 +4347,55 @@
       if (!sec) return;
       const season = currentSeason();
       const cur = season ? season.matches.map(m => ({ ...m, year: season.year })) : [];
-      const live = cur.filter(isLive);
-      const next = cur.filter(m => !m.score && !m.won && !isLive(m) && m.kickoff && Date.parse(m.kickoff) > Date.now())
-        .sort((a, b) => Date.parse(a.kickoff) - Date.parse(b.kickoff))[0];
       const kick = m => m.kickoff ? Date.parse(m.kickoff) : 0;
-      const latest = RESULTS.flatMap(r => r.matches.map(m => ({ ...m, year: r.year }))).filter(m => m.score)
-        .sort((a, b) => b.year - a.year || kick(b) - kick(a) || b.day - a.day || (b.no || 0) - (a.no || 0))[0];
-      const cards = [];
-      live.forEach(m => cards.push(`
+      const newestFirst = (a, b) => b.year - a.year || kick(b) - kick(a) || b.day - a.day || (b.no || 0) - (a.no || 0);
+      const isNext = m => !m.score && !m.won && !isLive(m) && m.kickoff && Date.parse(m.kickoff) > Date.now();
+      const live = cur.filter(isLive);
+      const next = cur.filter(isNext).sort((a, b) => Date.parse(a.kickoff) - Date.parse(b.kickoff))[0];
+      const all = RESULTS.flatMap(r => r.matches.map(m => ({ ...m, year: r.year })));
+      const latest = all.filter(m => m.score).sort(newestFirst)[0];
+      // A followed team: its live match, else its next one, else its latest result
+      const mine = follows.map(team => {
+        const has = m => m.home === team || m.away === team;
+        const m = cur.find(x => has(x) && isLive(x)) || cur.filter(x => has(x) && isNext(x)).sort((a, b) => Date.parse(a.kickoff) - Date.parse(b.kickoff))[0]
+          || all.filter(x => has(x) && x.score).sort(newestFirst)[0];
+        return m ? { team, m } : null;
+      }).filter(Boolean).slice(0, 2);
+      const seen = new Set();
+      const scorersRow = m => { const h = scorerText(m, "h"), a = scorerText(m, "a"); return h || a ? `<div class="mc-scorers" dir="ltr"><span>${escH(h)}</span><span>${escH(a)}</span></div>` : ""; };
+      const liveCard = (m, label) => `
         <article class="mc-card mc-live">
-          <div class="mc-top"><span class="live-tag"><i></i>${t("fxLive")}</span>${m.live ? `<span class="mc-state">${t(m.live === "ht" ? "fxHt" : m.live === "1h" ? "mc1h" : "mc2h")}</span>` : ""}<span class="mc-meta">${escH(mcMeta(m))}</span></div>
+          <div class="mc-top">${label || ""}<span class="live-tag"><i></i>${t("fxLive")}</span>${m.live ? `<span class="mc-state">${t(m.live === "ht" ? "fxHt" : m.live === "1h" ? "mc1h" : "mc2h")}</span>` : ""}<span class="mc-meta">${escH(mcMeta(m))}</span>${m.liveScore ? shareBtn(m, m.year) : ""}</div>
           <div class="mc-row" dir="ltr">${mcTeam(m.home)}${m.liveScore ? mcScore(m.liveScore[0], m.liveScore[1]) : `<span class="mc-vs">VS</span>`}${mcTeam(m.away)}</div>
+          ${scorersRow(m)}
           ${m.video ? `<a class="mc-watch" href="https://www.youtube.com/watch?v=${escH(m.video)}" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5v14l11-7z" fill="currentColor"/></svg>${t("fxWatchLive")}</a>` : ""}
-        </article>`));
-      if (next) cards.push(`
+        </article>`;
+      const nextCard = (m, label) => `
         <article class="mc-card mc-next">
-          <div class="mc-top"><span class="mc-label">${t("barNext")}</span><span class="mc-meta">${escH(mcMeta(next))}</span></div>
-          <div class="mc-row" dir="ltr">${mcTeam(next.home)}<span class="mc-ko"><b>${mcFmt(next.kickoff, { hour: "2-digit", minute: "2-digit", hour12: false })}</b><small>${escH(dayWord(next.kickoff))}</small></span>${mcTeam(next.away)}</div>
-          <div class="mc-foot"><svg class="ic" aria-hidden="true"><use href="#i-calendar"/></svg><span>${escH(mcFmt(next.kickoff, { weekday: "long", day: "numeric", month: "long" }))}</span><b dir="ltr">${escH(t("barIn", timeLeft(next.kickoff)))}</b></div>
-        </article>`);
-      if (latest) {
-        const [a, b] = latest.score[0] === latest.score[1] && latest.pens ? latest.pens : latest.score;
-        cards.push(`
+          <div class="mc-top">${label || `<span class="mc-label">${t("barNext")}</span>`}<span class="mc-meta">${escH(mcMeta(m))}</span></div>
+          <div class="mc-row" dir="ltr">${mcTeam(m.home)}<span class="mc-ko"><b>${mcFmt(m.kickoff, { hour: "2-digit", minute: "2-digit", hour12: false })}</b><small>${escH(dayWord(m.kickoff))}</small></span>${mcTeam(m.away)}</div>
+          <div class="mc-foot"><svg class="ic" aria-hidden="true"><use href="#i-calendar"/></svg><span>${escH(mcFmt(m.kickoff, { weekday: "long", day: "numeric", month: "long" }))}</span><b dir="ltr">${escH(t("barIn", timeLeft(m.kickoff)))}</b></div>
+        </article>`;
+      const ftCard = (m, label) => {
+        const [a, b] = m.score[0] === m.score[1] && m.pens ? m.pens : m.score;
+        return `
         <article class="mc-card mc-ft">
-          <div class="mc-top"><span class="mc-label">${t("mcLatest")}</span><span class="mc-pill">${t("mcFt")}</span><span class="mc-meta">${escH(mcMeta(latest))}</span></div>
-          <div class="mc-row" dir="ltr">${mcTeam(latest.home, a > b ? " win" : a < b ? " lose" : "")}${mcScore(latest.score[0], latest.score[1])}${mcTeam(latest.away, b > a ? " win" : b < a ? " lose" : "")}</div>
-          ${latest.pens ? `<div class="mc-foot mc-pens"><span dir="ltr">${escH(t("resPens", latest.pens[0] + "–" + latest.pens[1]))}</span></div>` : ""}
-        </article>`);
-      }
+          <div class="mc-top">${label || `<span class="mc-label">${t("mcLatest")}</span>`}<span class="mc-pill">${t("mcFt")}</span><span class="mc-meta">${escH(mcMeta(m))}</span>${shareBtn(m, m.year)}</div>
+          <div class="mc-row" dir="ltr">${mcTeam(m.home, a > b ? " win" : a < b ? " lose" : "")}${mcScore(m.score[0], m.score[1])}${mcTeam(m.away, b > a ? " win" : b < a ? " lose" : "")}</div>
+          ${scorersRow(m)}
+          ${m.pens ? `<div class="mc-foot mc-pens"><span dir="ltr">${escH(t("resPens", m.pens[0] + "–" + m.pens[1]))}</span></div>` : ""}
+        </article>`;
+      };
+      const card = (m, label) => isLive(m) ? liveCard(m, label) : m.score ? ftCard(m, label) : nextCard(m, label);
+      const cards = [];
+      mine.forEach(({ team, m }) => {
+        if (seen.has(mkey(m, m.year))) return;
+        seen.add(mkey(m, m.year));
+        cards.push(card(m, `<span class="mc-mine-tag"><svg class="ic" aria-hidden="true"><use href="#i-star"/></svg>${escH(team)}</span>`).replace('class="mc-card ', 'class="mc-card mc-mine '));
+      });
+      live.forEach(m => { if (!seen.has(mkey(m, m.year))) { seen.add(mkey(m, m.year)); cards.push(liveCard(m)); } });
+      if (next && !seen.has(mkey(next, next.year))) { seen.add(mkey(next, next.year)); cards.push(nextCard(next)); }
+      if (latest && !seen.has(mkey(latest, latest.year))) { seen.add(mkey(latest, latest.year)); cards.push(ftCard(latest)); }
       if (!live.length && !next && RESULTS.length) cards.push(`
         <article class="mc-card mc-soon">
           <span class="mc-ic"><svg class="ic" aria-hidden="true"><use href="#i-calendar"/></svg></span>
@@ -4224,6 +4414,172 @@
       // The Matches tab gets a red dot while a match is being played
       document.getElementById("tabbar").classList.toggle("is-live", live.length > 0);
     }
+
+    // ---------- Knockout rounds: semi-finals, playoff and final as a bracket ----------
+    function renderKnockout() {
+      const sec = document.getElementById("knockout");
+      const season = [currentSeason(), ...RESULTS].find(r => r && r.matches.some(m => m.stage));
+      sec.hidden = !season;
+      if (!season) return;
+      document.getElementById("ko-season").textContent = t("fxSeason", season.year);
+      const of = st => season.matches.filter(m => m.stage === st).sort((a, b) => (a.no || 0) - (b.no || 0));
+      const semis = of("semi"), final = of("final"), playoff = of("playoff");
+      const box = m => {
+        const sc = m.score || m.liveScore;
+        const [a, b] = !m.score ? [0, 0] : m.score[0] === m.score[1] && m.pens ? m.pens : m.score;
+        const res = side => !m.score ? "" : (side ? b > a : a > b) ? " win" : " lose";
+        const row = (name, side) => `<button type="button" class="ko-t tl${res(side)}${followed(name) ? " mine" : ""}" data-team="${escH(name)}">${teamLogo(name)}<span class="ko-n">${escH(name)}</span><b class="ko-s">${sc ? sc[side] : ""}</b></button>`;
+        const meta = isLive(m) ? liveTag(m) : m.score ? `<span class="ko-ft">${t("mcFt")}${m.pens ? " · " + escH(t("resPens", m.pens[0] + "–" + m.pens[1])) : ""}</span>`
+          : m.kickoff ? `<span>${escH(kickoffText(m.kickoff))}</span>` : `<span>${m.no ? t("resMatch", m.no) : ""}</span>`;
+        return `<div class="ko-m${m.stage === "final" ? " ko-final" : ""}"><div class="ko-meta">${meta}${m.score || m.liveScore ? shareBtn(m, season.year) : ""}</div><div dir="ltr">${row(m.home, 0)}${row(m.away, 1)}</div></div>`;
+      };
+      const tbd = `<div class="ko-m ko-final ko-tbd"><div class="ko-meta"><span>${t("koTbd")}</span></div><div><span class="ko-t">?</span><span class="ko-t">?</span></div></div>`;
+      const champ = final[0] && final[0].score ? (() => { const m = final[0], [a, b] = m.score[0] === m.score[1] && m.pens ? m.pens : m.score; return a > b ? m.home : b > a ? m.away : ""; })() : "";
+      document.getElementById("ko-body").innerHTML = `
+        ${semis.length ? `<div class="ko-col"><h3>${t("stageSemis")}</h3>${semis.map(box).join("")}</div>` : ""}
+        <div class="ko-col ko-end">
+          <h3>${t("stageFinal")}</h3>${final.length ? final.map(box).join("") : tbd}
+          ${champ ? `<button type="button" class="ko-champ tl" data-team="${escH(champ)}"><svg class="ic" aria-hidden="true"><use href="#i-crown"/></svg><span>${t("resChampion")}</span><b>${escH(champ)}</b></button>` : ""}
+          ${playoff.length ? `<h3>${t("stagePlayoff")}</h3>${playoff.map(box).join("")}` : ""}
+        </div>`;
+    }
+
+    // ---------- Top scorers: from the scorers organisers pick on the live scoreboard ----------
+    let scYear = null;
+    function renderScorers() {
+      const sec = document.getElementById("scorers");
+      const tally = r => {
+        const map = new Map();
+        r.matches.forEach(m => (m.scorers || []).forEach(x => {
+          if (!x || x.og || !(x.name || "").trim() || (x.side !== "h" && x.side !== "a")) return;
+          const team = x.side === "h" ? m.home : m.away, k = team + "|" + x.name.trim();
+          const e = map.get(k) || { name: x.name.trim(), no: x.no, team, goals: 0 };
+          e.goals++; map.set(k, e);
+        }));
+        return [...map.values()].sort((a, b) => b.goals - a.goals || a.name.localeCompare(b.name));
+      };
+      const years = RESULTS.filter(r => tally(r).length);
+      sec.hidden = !years.length;
+      if (!years.length) return;
+      const cur = currentSeason();
+      const season = years.find(r => r.year === scYear) || years.find(r => cur && r.year === cur.year) || years[0];
+      const list = tally(season).slice(0, 10);
+      document.getElementById("sc-season").textContent = t("fxSeason", season.year);
+      let rank = 0, prev = null;
+      document.getElementById("sc-body").innerHTML = `
+        ${years.length > 1 ? `<div class="lg-yrs" role="tablist">${years.map(r => `<button type="button" role="tab" class="lg-yr ${r === season ? "on" : ""}" aria-selected="${r === season}" data-scy="${r.year}">${r.year}</button>`).join("")}</div>` : ""}
+        <ol class="sc-list">${list.map((p, i) => { if (p.goals !== prev) { rank = i + 1; prev = p.goals; } return `
+          <li class="${followed(p.team) ? "mine" : ""}">
+            <span class="sc-rank${rank === 1 ? " top" : ""}">${rank}</span>
+            <span class="sc-who"><b>${escH(p.name)}${p.no != null && p.no !== "" ? ` <small dir="ltr">#${escH(p.no)}</small>` : ""}</b>
+              <button type="button" class="sc-team tl" data-team="${escH(p.team)}">${teamLogo(p.team)}<span>${escH(p.team)}</span></button></span>
+            <span class="sc-goals"><b>${p.goals}</b><small>${escH(t("scGoals", p.goals)).replace(/^\d+\s*/, "")}</small></span>
+          </li>`; }).join("")}</ol>`;
+      document.querySelectorAll("[data-scy]").forEach(b => b.onclick = () => { scYear = +b.dataset.scy; renderScorers(); });
+    }
+    // Goals per player on a team page (every season)
+    const playerGoals = team => {
+      const map = new Map();
+      RESULTS.forEach(r => r.matches.forEach(m => (m.scorers || []).forEach(x => {
+        if (!x || x.og || !(x.name || "").trim()) return;
+        if ((x.side === "h" ? m.home : m.away) !== team) return;
+        map.set(x.name.trim(), (map.get(x.name.trim()) || 0) + 1);
+      })));
+      return map;
+    };
+
+    // ---------- Share a result as a picture (WhatsApp, Facebook, or saved) ----------
+    const sharePop = document.getElementById("share-pop");
+    wirePop(sharePop);
+    const loadImg = src => new Promise(res => {
+      if (!src) return res(null);
+      const im = new Image(); let done = false;
+      const end = v => { if (!done) { done = true; res(v); } };
+      im.crossOrigin = "anonymous";
+      im.onload = () => end(im); im.onerror = () => end(null);
+      setTimeout(() => end(null), 5000);
+      im.src = src;
+    });
+    async function matchImage(m, year) {
+      await Promise.all(["800 200px 'Plus Jakarta Sans'", "700 44px 'Plus Jakarta Sans'", "600 30px Inter"].map(f => document.fonts.load(f).catch(() => {})));
+      const W = 1080, H = 1350, c = document.createElement("canvas");
+      c.width = W; c.height = H;
+      const g = c.getContext("2d");
+      g.direction = "ltr";
+      const logoOf = n => (window.YP_TEAMS || {})[n] ? (window.YP_TEAMS || {})[n].logo : null;
+      const [emblem, hl, al] = await Promise.all([loadImg(document.querySelector("nav .logo img").src), loadImg(logoOf(m.home)), loadImg(logoOf(m.away))]);
+      g.fillStyle = "#18181b"; g.fillRect(0, 0, W, H);
+      g.fillStyle = "#c8102e"; g.fillRect(0, 0, W, 12);
+      const circle = (img, x, y, r, fallback) => {
+        g.save(); g.beginPath(); g.arc(x, y, r, 0, Math.PI * 2); g.closePath(); g.fillStyle = "#fff"; g.fill(); g.clip();
+        if (img) { const k = Math.min((r * 2) / img.width, (r * 2) / img.height), w = img.width * k, h = img.height * k; g.drawImage(img, x - w / 2, y - h / 2, w, h); }
+        else if (fallback) { g.fillStyle = "#3f3f46"; g.fillRect(x - r, y - r, r * 2, r * 2); g.fillStyle = "#fff"; g.font = `800 ${Math.round(r * .7)}px 'Plus Jakarta Sans', sans-serif`; g.textAlign = "center"; g.textBaseline = "middle"; g.fillText(fallback, x, y + 4); }
+        g.restore();
+      };
+      const lines = (text, x, y, maxW, lh, max) => {
+        const words = String(text).split(" "), out = [];
+        let line = "";
+        words.forEach(w => { const tryL = line ? line + " " + w : w; if (g.measureText(tryL).width > maxW && line) { out.push(line); line = w; } else line = tryL; });
+        if (line) out.push(line);
+        out.slice(0, max).forEach((l, i) => g.fillText(l, x, y + i * lh));
+        return Math.min(out.length, max);
+      };
+      // Header: the emblem, the tournament, the season and stage
+      circle(emblem, 112, 112, 56);
+      g.textAlign = "left"; g.textBaseline = "middle";
+      g.fillStyle = "#fff"; g.font = "800 46px 'Plus Jakarta Sans', sans-serif"; g.fillText("YP Veterans Futsal", 190, 96);
+      g.fillStyle = "#a1a1aa"; g.font = "600 30px Inter, 'Faruma', sans-serif"; g.fillText(`${year} · ${m.stage ? t(STAGE_KEYS[m.stage]) : m.no ? t("resMatch", m.no) : t("resDay", m.day)}`, 190, 142);
+      // Status
+      const live = !m.score;
+      const label = live ? `● ${t("fxLive")}${m.live && m.live !== "2h" ? " · " + t(m.live === "ht" ? "fxHt" : "mc1h") : m.live ? " · " + t("mc2h") : ""}` : t("mcFt").toUpperCase();
+      g.font = "800 30px Inter, 'Faruma', sans-serif"; g.textAlign = "center";
+      const pw = g.measureText(label).width + 56;
+      g.fillStyle = live ? "#c8102e" : "#ffffff"; g.beginPath(); if (g.roundRect) g.roundRect(540 - pw / 2, 300, pw, 60, 30); else g.rect(540 - pw / 2, 300, pw, 60); g.fill();
+      g.fillStyle = live ? "#fff" : "#18181b"; g.fillText(label, 540, 331);
+      // Crests, names and the score
+      const sc = m.score || m.liveScore || [0, 0];
+      const ini = n => n.split(" ").map(w => w[0]).join("").slice(0, 2).toUpperCase();
+      circle(hl, 215, 610, 112, ini(m.home)); circle(al, 865, 610, 112, ini(m.away));
+      const [pa, pb] = m.score && m.score[0] === m.score[1] && m.pens ? m.pens : sc;
+      g.textBaseline = "alphabetic";
+      g.font = "800 46px 'Plus Jakarta Sans', sans-serif";
+      g.fillStyle = !m.score || pa >= pb ? "#fff" : "#a1a1aa"; const hn = lines(m.home, 215, 820, 360, 54, 2);
+      g.fillStyle = !m.score || pb >= pa ? "#fff" : "#a1a1aa"; const an = lines(m.away, 865, 820, 360, 54, 2);
+      g.fillStyle = "#fff"; g.font = "800 168px 'Plus Jakarta Sans', sans-serif"; g.fillText(`${sc[0]}–${sc[1]}`, 540, 668);
+      if (m.pens) { g.fillStyle = "#e4e4e7"; g.font = "700 32px Inter, 'Faruma', sans-serif"; g.fillText(t("resPens", m.pens[0] + "–" + m.pens[1]), 540, 740); }
+      // Scorers under each team
+      g.font = "600 32px Inter, 'Faruma', sans-serif"; g.fillStyle = "#d4d4d8";
+      [["h", 215, hn], ["a", 865, an]].forEach(([side, x, n]) => {
+        const txt = scorerText(m, side); if (!txt) return;
+        txt.split(", ").slice(0, 6).forEach((p, i) => g.fillText("⚽ " + p, x, 820 + n * 54 + 34 + i * 46));
+      });
+      // Footer
+      g.fillStyle = "#c8102e"; g.fillRect(0, H - 120, W, 120);
+      g.fillStyle = "#fff"; g.font = "800 44px 'Plus Jakarta Sans', sans-serif"; g.textBaseline = "middle"; g.fillText("ypveterans.com", 540, H - 60);
+      return new Promise(r => c.toBlob(r, "image/png"));
+    }
+    async function shareMatch(btn) {
+      const it = shareMap.get(btn.dataset.share);
+      if (!it || btn.classList.contains("busy")) return;
+      const { m, year } = it, sc = m.score || m.liveScore || [0, 0];
+      btn.classList.add("busy");
+      let blob = null;
+      try { blob = await matchImage(m, year); } catch (e) {}
+      btn.classList.remove("busy");
+      const text = `${m.home} ${sc[0]}–${sc[1]} ${m.away} · ${m.stage ? t(STAGE_KEYS[m.stage]) + " · " : ""}${year} · YP Veterans Futsal`;
+      if (!blob) { if (navigator.share) navigator.share({ text, url: SITE }).catch(() => {}); return; }
+      const file = new File([blob], "yp-veterans-result.png", { type: "image/png" });
+      if (navigator.canShare && navigator.canShare({ files: [file] })) {
+        try { await navigator.share({ files: [file], text: text + " " + SITE }); return; } catch (e) { if (e && e.name === "AbortError") return; }
+      }
+      const url = URL.createObjectURL(blob);
+      document.getElementById("share-img").src = url;
+      document.getElementById("share-img").alt = text;
+      document.getElementById("share-dl").href = url;
+      document.getElementById("share-wa").href = "https://wa.me/?text=" + encodeURIComponent(text + " " + SITE);
+      openPop(sharePop, btn);
+    }
+    document.addEventListener("click", e => { const b = e.target.closest("[data-share]"); if (b) { e.stopPropagation(); shareMatch(b); } }, true);
 
     // ---------- About: tournament facts ----------
     // Worked out from the past winners (the popup above, plus champions saved in the organiser portal) and the results
@@ -4386,7 +4742,8 @@
             liveScore: m.live && m.home_score !== null && m.away_score !== null ? [m.home_score, m.away_score] : null,
             live: m.live || null,
             pens: m.live || m.pen_home === null || m.pen_away === null ? null : [m.pen_home, m.pen_away],
-            stage: m.stage || undefined, video: m.video || undefined, goals: m.goals || []
+            stage: m.stage || undefined, video: m.video || undefined, goals: m.goals || [],
+            scorers: Array.isArray(m.scorers) ? m.scorers : []
           }))
         })).filter(se => se.matches.length || (se.league.add || []).length);
         if (!years.length) return;
@@ -4581,7 +4938,7 @@
     const setTab = k => tabs.forEach(a => { a.classList.toggle("on", a.dataset.sec === k); a.toggleAttribute("aria-current", a.dataset.sec === k && a.tagName === "A"); });
     if ("IntersectionObserver" in window) {
       const seen = new IntersectionObserver(entries => entries.forEach(e => { if (e.isIntersecting && !moreSheet.open) setTab(e.target.dataset.tab); }), { rootMargin: "-45% 0px -50% 0px" });
-      [["top", "#top"], ["top", "#matches"], ["matches", "#fixtures"], ["table", "#table"], ["matches", ".duo"], ["teams", "#teams"],
+      [["top", "#top"], ["top", "#matches"], ["matches", "#fixtures"], ["table", "#table"], ["table", "#knockout"], ["table", "#scorers"], ["matches", ".duo"], ["teams", "#teams"],
        ["more", "#sp-strip"], ["more", "#champions"], ["more", "#about"], ["more", "#news"], ["more", "#gallery"], ["more", "#register"], ["more", "#sponsors"], ["more", "#contact"], ["more", "footer.site-foot"]].forEach(([k, sel]) => {
         const el = document.querySelector(sel);
         if (el) { el.dataset.tab = k; seen.observe(el); }
